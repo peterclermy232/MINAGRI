@@ -1,0 +1,330 @@
+<main id="main" class="main">
+    <div class="pagetitle">
+       <h1>Form Elements</h1>
+       <nav>
+          <ol class="breadcrumb">
+             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+             <li class="breadcrumb-item">Forms</li>
+             <li class="breadcrumb-item active">Elements</li>
+          </ol>
+       </nav>
+    </div>
+    <section class="section">
+       <!-- <div class="row">
+          <div class="col-lg-6">
+             <div class="card">
+                <div class="card-body">
+                   <h5 class="card-title">General Form Elements</h5>
+                   <form>
+                      <div class="row mb-3">
+                         <label for="inputText" class="col-sm-2 col-form-label">Text</label>
+                         <div class="col-sm-10"> <input type="text" class="form-control"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+                         <div class="col-sm-10"> <input type="email" class="form-control"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+                         <div class="col-sm-10"> <input type="password" class="form-control"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputNumber" class="col-sm-2 col-form-label">Number</label>
+                         <div class="col-sm-10"> <input type="number" class="form-control"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputNumber" class="col-sm-2 col-form-label">File Upload</label>
+                         <div class="col-sm-10"> <input class="form-control" type="file" id="formFile"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputDate" class="col-sm-2 col-form-label">Date</label>
+                         <div class="col-sm-10"> <input type="date" class="form-control"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputTime" class="col-sm-2 col-form-label">Time</label>
+                         <div class="col-sm-10"> <input type="time" class="form-control"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputColor" class="col-sm-2 col-form-label">Color Picker</label>
+                         <div class="col-sm-10"> <input type="color" class="form-control form-control-color" id="exampleColorInput" value="#4154f1" title="Choose your color"></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label for="inputPassword" class="col-sm-2 col-form-label">Textarea</label>
+                         <div class="col-sm-10"><textarea class="form-control" style="height: 100px"></textarea></div>
+                      </div>
+                      <fieldset class="row mb-3">
+                         <legend class="col-form-label col-sm-2 pt-0">Radios</legend>
+                         <div class="col-sm-10">
+                            <div class="form-check"> <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked> <label class="form-check-label" for="gridRadios1"> First radio </label></div>
+                            <div class="form-check"> <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2"> <label class="form-check-label" for="gridRadios2"> Second radio </label></div>
+                            <div class="form-check disabled"> <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios" value="option" disabled> <label class="form-check-label" for="gridRadios3"> Third disabled radio </label></div>
+                         </div>
+                      </fieldset>
+                      <div class="row mb-3">
+                         <legend class="col-form-label col-sm-2 pt-0">Checkboxes</legend>
+                         <div class="col-sm-10">
+                            <div class="form-check"> <input class="form-check-input" type="checkbox" id="gridCheck1"> <label class="form-check-label" for="gridCheck1"> Example checkbox </label></div>
+                            <div class="form-check"> <input class="form-check-input" type="checkbox" id="gridCheck2" checked> <label class="form-check-label" for="gridCheck2"> Example checkbox 2 </label></div>
+                         </div>
+                      </div>
+                      <div class="row mb-3">
+                         <label class="col-sm-2 col-form-label">Disabled</label>
+                         <div class="col-sm-10"> <input type="text" class="form-control" value="Read only / Disabled" disabled></div>
+                      </div>
+                      <div class="row mb-3">
+                         <label class="col-sm-2 col-form-label">Select</label>
+                         <div class="col-sm-10">
+                            <select class="form-select" aria-label="Default select example">
+                               <option selected>Open this select menu</option>
+                               <option value="1">One</option>
+                               <option value="2">Two</option>
+                               <option value="3">Three</option>
+                            </select>
+                         </div>
+                      </div>
+                      <div class="row mb-3">
+                         <label class="col-sm-2 col-form-label">Multi Select</label>
+                         <div class="col-sm-10">
+                            <select class="form-select" multiple aria-label="multiple select example">
+                               <option selected>Open this select menu</option>
+                               <option value="1">One</option>
+                               <option value="2">Two</option>
+                               <option value="3">Three</option>
+                            </select>
+                         </div>
+                      </div>
+                      <div class="row mb-3">
+                         <label class="col-sm-2 col-form-label">Submit Button</label>
+                         <div class="col-sm-10"> <button type="submit" class="btn btn-primary">Submit Form</button></div>
+                      </div>
+                   </form>
+                </div>
+             </div>
+          </div>
+          <div class="col-lg-6">
+             <div class="card">
+                <div class="card-body">
+                   <h5 class="card-title">Advanced Form Elements</h5>
+                   <form>
+                      <div class="row mb-5">
+                         <label class="col-sm-2 col-form-label">Switches</label>
+                         <div class="col-sm-10">
+                            <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault"> <label class="form-check-label" for="flexSwitchCheckDefault">Default switch checkbox input</label></div>
+                            <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked> <label class="form-check-label" for="flexSwitchCheckChecked">Checked switch checkbox input</label></div>
+                            <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="flexSwitchCheckDisabled" disabled> <label class="form-check-label" for="flexSwitchCheckDisabled">Disabled switch checkbox input</label></div>
+                            <div class="form-check form-switch"> <input class="form-check-input" type="checkbox" id="flexSwitchCheckCheckedDisabled" checked disabled> <label class="form-check-label" for="flexSwitchCheckCheckedDisabled">Disabled checked switch checkbox input</label></div>
+                         </div>
+                      </div>
+                      <div class="row mb-5">
+                         <label class="col-sm-2 col-form-label">Ranges</label>
+                         <div class="col-sm-10">
+                            <div> <label for="customRange1" class="form-label">Example range</label> <input type="range" class="form-range" id="customRange1"></div>
+                            <div> <label for="disabledRange" class="form-label">Disabled range</label> <input type="range" class="form-range" id="disabledRange" disabled></div>
+                            <div> <label for="customRange2" class="form-label">Min and max with steps</label> <input type="range" class="form-range" min="0" max="5" step="0.5" id="customRange2"></div>
+                         </div>
+                      </div>
+                      <div class="row mb-3">
+                         <label class="col-sm-2 col-form-label">Floating labels</label>
+                         <div class="col-sm-10">
+                            <div class="form-floating mb-3"> <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"> <label for="floatingInput">Email address</label></div>
+                            <div class="form-floating mb-3"> <input type="password" class="form-control" id="floatingPassword" placeholder="Password"> <label for="floatingPassword">Password</label></div>
+                            <div class="form-floating mb-3"><textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" style="height: 100px;"></textarea><label for="floatingTextarea">Comments</label></div>
+                            <div class="form-floating mb-3">
+                               <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                  <option selected>Open this select menu</option>
+                                  <option value="1">One</option>
+                                  <option value="2">Two</option>
+                                  <option value="3">Three</option>
+                               </select>
+                               <label for="floatingSelect">Works with selects</label>
+                            </div>
+                         </div>
+                      </div>
+                      <div class="row mb-5">
+                         <label class="col-sm-2 col-form-label">Input groups</label>
+                         <div class="col-sm-10">
+                            <div class="input-group mb-3"> <span class="input-group-text" id="basic-addon1">@</span> <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"></div>
+                            <div class="input-group mb-3"> <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2"> <span class="input-group-text" id="basic-addon2">@example.com</span></div>
+                            <label for="basic-url" class="form-label">Your vanity URL</label>
+                            <div class="input-group mb-3"> <span class="input-group-text" id="basic-addon3">https://example.com/users/</span> <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"></div>
+                            <div class="input-group mb-3"> <span class="input-group-text">$</span> <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)"> <span class="input-group-text">.00</span></div>
+                            <div class="input-group mb-3"> <input type="text" class="form-control" placeholder="Username" aria-label="Username"> <span class="input-group-text">@</span> <input type="text" class="form-control" placeholder="Server" aria-label="Server"></div>
+                            <div class="input-group"> <span class="input-group-text">With textarea</span><textarea class="form-control" aria-label="With textarea"></textarea></div>
+                         </div>
+                      </div>
+                   </form>
+                </div>
+             </div>
+          </div>
+       </div> -->
+       <nav class="navbar navbar-ligth bg-primary">
+         <div class="container-fluid">
+           <h1 style="color: aliceblue;">Add New Organization </h1>
+           <div class="d-flex">
+             <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+               data-bs-target="#exampleModal">Add New Organization </button>
+           </div>
+         </div>
+       </nav>
+       
+       <table class="table mt-3">
+         <thead>
+           <tr>
+            <th scope="col">Organization ID</th>
+             <th scope="col">Organization Type</th>
+             <th scope="col">Organization Name</th>
+             <th scope="col">Main office</th>
+             <th scope="col">Official Email</th>
+             <th scope="col">Email Address</th>
+             <th scope="col">Phone Number</th>
+             <th scope="col">Upload logo(file)</th>
+             <th scope="col">Upload Registration Certificate(file)</th>
+             <th scope="col">Upload Practice License(file)</th>
+             <th scope="col">First Name</th>
+             <th scope="col">Second Name</th>
+             <th scope="col">Last Name</th>
+             <th scope="col">Phone Number</th>
+             <th scope="col">Email Address</th>
+             <th scope="col">Title in the Organization</th>
+             
+             
+           </tr>
+         </thead>
+         <tbody>
+           <tr >
+            <td>1</td>
+             <td>Farm</td>
+             <td>Coding</td>
+             <td>MainOffice</td>
+             <td>Email@gmail.</td>
+             <td>official@email.com</td>
+             <td>12233345</td>
+             <td>PDF.Logo</td>
+             <td>PDF.register</td>
+             <td>PracticeLicense</td>
+             <td>John </td>
+             <td>Doe</td>
+             <td>Smith</td>
+             <td>John.Doe@Smith</td>
+             <td>Title</td>
+
+             
+             <td>
+               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+               <button  class="btn btn-danger">Delete</button>
+             </td>
+           </tr>
+         </tbody>
+       
+       </table>
+       
+       <!-- Modal -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">Organization Type</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+               <form [formGroup]="formValue">
+                 <div class="mb-3">
+                   <label for="exampleInputEmail1" class="form-label">Enter Organization Type</label>
+                   <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                     aria-describedby="emailHelp">
+                 </div>
+                 <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Enter Organization Name</label>
+                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Enter main office address</label>
+                  <input type="email" formControlName="name" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Enter Email Address</label>
+                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Phone Number</label>
+                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp">
+                </div>
+                <h2>Organization Registration</h2>
+
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Upload Logo</span>
+                  </div>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                  </div>
+                </div>
+
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Upload Registration Certificate</span>
+                  </div>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                  </div>
+                </div>
+
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Upload Practice License</span>
+                  </div>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                  </div>
+                </div>
+                <h3>Contact Practice Information</h3>
+
+                 <div class="mb-3">
+                   <label for="exampleInputPassword1" class="form-label">First Name</label>
+                   <input type="text" formControlName="firstName" class="form-control" id="exampleInputPassword1">
+                 </div>
+                  <div class="mb-3">
+                   <label for="exampleInputPassword1" class="form-label">Second Name</label>
+                   <input type="text" formControlName="secondName" class="form-control" id="exampleInputPassword1">
+                 </div>
+                 <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Last Name</label>
+                  <input type="text" formControlName="lastName" class="form-control" id="exampleInputPassword1">
+                </div>
+
+                <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Phone Number</label>
+                  <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputPassword1">
+                </div>
+
+                <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Email Address</label>
+                  <input type="email" formControlName="email" class="form-control" id="exampleInputPassword1">
+                </div>
+
+                <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Title in the Organization</label>
+                  <input type="text" formControlName="title" class="form-control" id="exampleInputPassword1">
+                </div>
+               </form>
+             </div>
+             <div class="modal-footer">
+               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="button"  class="btn btn-primary">Add</button>
+               <button type="button" 
+                 class="btn btn-primary">Update</button>
+             </div>
+           </div>
+         </div>
+       </div>
+       
+      </section>
+ </main>
