@@ -4,13 +4,14 @@
        <nav>
           <ol class="breadcrumb">
              <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Tables</li>
-             <li class="breadcrumb-item active">General</li>
+             <li class="breadcrumb-item">Roles</li>
+             <ol class="breadcrumb-item active">Role</ol>
           </ol>
        </nav>
     </div>
     <section class="section">
-       <div class="row">
+       <!-- <div class="row">
+
           <div class="col-lg-6">
              <div class="card">
                 <div class="card-body">
@@ -554,6 +555,79 @@
                 </div>
              </div>
           </div>
+       </div> -->
+       <nav class="navbar navbar-ligth bg-primary">
+         <div class="container-fluid">
+           <h1 style="color: aliceblue;">Add New Role</h1>
+           <div class="d-flex">
+             <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+               data-bs-target="#exampleModal">Add New Role</button>
+           </div>
+         </div>
+       </nav>
+       
+       <table class="table mt-3">
+         <thead>
+           <tr>
+            <th scope="col">Organization ID</th>
+             <th scope="col">Role Name</th>
+             <th scope="col">Description</th>
+             <th scope="col">Status</th>
+             
+           </tr>
+         </thead>
+         <tbody>
+           <tr >
+            <td>1</td>
+             <td>Peter AtITO</td>
+             <td>Coding</td>
+             <td>Active</td>
+             
+             <td>
+               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+               <button  class="btn btn-danger">Delete</button>
+             </td>
+           </tr>
+         </tbody>
+       
+       </table>
+       
+       <!-- Modal -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">Role Type</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+               <form [formGroup]="formValue">
+                 <div class="mb-3">
+                   <label for="exampleInputEmail1" class="form-label">Enter  Role</label>
+                   <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                     aria-describedby="emailHelp">
+       
+                 </div>
+                 <div class="mb-3">
+                   <label for="exampleInputPassword1" class="form-label">Enter Description</label>
+                   <input type="text" formControlName="description" class="form-control" id="exampleInputPassword1">
+                 </div>
+                 <!-- <div class="mb-3">
+                   <label for="exampleInputPassword1" class="form-label">Status</label>
+                   <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
+                 </div> -->
+               </form>
+             </div>
+             <div class="modal-footer">
+               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="button"  class="btn btn-primary">Add</button>
+               <button type="button" 
+                 class="btn btn-primary">Update</button>
+             </div>
+           </div>
+         </div>
        </div>
-    </section>
- </main>
+       
+      </section>
+ </main> 
