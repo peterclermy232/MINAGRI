@@ -4,8 +4,8 @@
        <nav>
           <ol class="breadcrumb">
              <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Roles</li>
-             <ol class="breadcrumb-item active">Role</ol>
+             <li class="breadcrumb-item">Products</li>
+             <ol class="breadcrumb-item active">Products</ol>
           </ol>
        </nav>
     </div>
@@ -24,9 +24,10 @@
        <table class="table mt-3">
          <thead>
            <tr>
-            <th scope="col">Organization ID</th>
-             <th scope="col">Role Name</th>
+            <th scope="col">Product ID</th>
+             <th scope="col">Enter  Product Category</th>
              <th scope="col">Description</th>
+             <th scope="col">Product CategoryType</th>
              <th scope="col">Status</th>
              
            </tr>
@@ -34,8 +35,9 @@
          <tbody>
            <tr >
             <td>1</td>
-             <td>Peter AtITO</td>
-             <td>Coding</td>
+             <td>maize</td>
+             <td>grow well</td>
+             <td>Weather</td>
              <td>Active</td>
              
              <td>
@@ -53,13 +55,13 @@
          <div class="modal-dialog">
            <div class="modal-content">
              <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">Role Type</h5>
+               <h5 class="modal-title" id="exampleModalLabel">Manage Product</h5>
                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
              </div>
              <div class="modal-body">
                <form [formGroup]="formValue">
                  <div class="mb-3">
-                   <label for="exampleInputEmail1" class="form-label">Enter  Role</label>
+                   <label for="exampleInputEmail1" class="form-label">Enter  Product Category</label>
                    <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                      aria-describedby="emailHelp">
        
@@ -68,10 +70,21 @@
                    <label for="exampleInputPassword1" class="form-label">Enter Description</label>
                    <input type="text" formControlName="description" class="form-control" id="exampleInputPassword1">
                  </div>
-                 <!-- <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Status</label>
-                   <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div> -->
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Product CategoryType</label>
+                   <select>
+                    <option>Area Yield</option>
+                    <option>Weather Index</option>
+                   </select>
+                 </div> 
+
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Status</label>
+                   <select>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                   </select>
+                 </div> 
                </form>
              </div>
              <div class="modal-footer">
