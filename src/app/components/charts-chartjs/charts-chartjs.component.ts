@@ -1,4 +1,5 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms'
 
 @Component({
   selector: 'app-charts-chartjs',
@@ -7,13 +8,22 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 })
 export class ChartsChartjsComponent implements OnInit {
 
-  constructor(private elementRef: ElementRef) { }
+  formValue !:FormGroup;
+  //employeeModelObj : EmployeeModel = new EmployeeModel();
+  employeeData !:any;
+  showAdd!: boolean;
+  showUpdate!:boolean;
+  constructor(private formbuilder: FormBuilder) { }
 
   ngOnInit(): void {
 
-    var s = document.createElement("script");
-    s.type = "text/javascript";
-    s.src = "../assets/js/main.js";
-    this.elementRef.nativeElement.appendChild(s);
+    this.formValue = this.formbuilder.group({
+      name : [''],
+      description : ['']
+      //email : [''],
+     // mobile : [''],
+     // salary : ['']
+    })
+   
   }
 }

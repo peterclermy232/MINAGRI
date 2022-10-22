@@ -1,89 +1,132 @@
 <main id="main" class="main">
-    <div class="pagetitle">
-       <h1>Chart.js</h1>
-       <nav>
-          <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Charts</li>
-             <li class="breadcrumb-item active">Chart.js</li>
-          </ol>
-       </nav>
-    </div>
-    <p>Chart.JS Examples. You can check the <a href="https://www.chartjs.org/docs/latest/samples/" target="_blank">official website</a> for more examples.</p>
-    <section class="section">
-       <div class="row">
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Line Chart</h5>
-                   <canvas id="lineChart" style="max-height: 400px;"></canvas>
-                   
-                </div>
-             </div>
+   <div class="pagetitle">
+      <h1>Manage Loss Assesor</h1>
+      <nav>
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+            <li class="breadcrumb-item">Dashboard</li>
+            <li class="breadcrumb-item active">Manage Loss Assesor</li>
+         </ol>
+      </nav>
+   </div>
+   <section class="section">
+     
+      <nav class="navbar navbar-ligth bg-primary">
+        <div class="container">
+          <div class="d-flex">
+            <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">Add New Loss </button>
           </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Bar CHart</h5>
-                   <canvas id="barChart" style="max-height: 400px;"></canvas>
-                   
+        </div>
+      </nav>
+      
+      <table class="table mt-3">
+        <thead>
+          <tr>
+           <th scope="col">Organization ID</th>
+   
+            <th scope="col">First Name</th>
+            <th scope="col">Second Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Email Address</th>
+            <th scope="col">Practice Number</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+            
+            
+          </tr>
+        </thead>
+        <tbody>
+          <tr >
+           <td>1</td>
+            
+            <td>John </td>
+            <td>Doe</td>
+            <td>Smith</td>
+            <td>John.Doe@Smith</td>
+            <td>1234567</td>
+            <td>34</td>
+            <td>
+               <select>
+                  <option>Acredited</option>
+                  <option>Blacklisted</option>
+                  <option>Disable</option>
+               </select>
+            </td>
+
+            
+            <td>
+              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+              
+            </td>
+          </tr>
+        </tbody>
+      
+      </table>
+      
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Organization Type</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form [formGroup]="formValue">
+               
+
+
+               <h3>Manage Loss Assessors</h3>
+
+                <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">First Name</label>
+                  <input type="text" formControlName="firstName" class="form-control" id="exampleInputPassword1">
                 </div>
-             </div>
-          </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Pie Chart</h5>
-                   <canvas id="pieChart" style="max-height: 400px;"></canvas>
-                  
+                 <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Second Name</label>
+                  <input type="text" formControlName="secondName" class="form-control" id="exampleInputPassword1">
                 </div>
-             </div>
-          </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Doughnut Chart</h5>
-                   <canvas id="doughnutChart" style="max-height: 400px;"></canvas>
-                  
+                <div class="mb-3">
+                 <label for="exampleInputPassword1" class="form-label">Last Name</label>
+                 <input type="text" formControlName="lastName" class="form-control" id="exampleInputPassword1">
+               </div>
+
+               <div class="mb-3">
+                 <label for="exampleInputPassword1" class="form-label">Phone Number</label>
+                 <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputPassword1">
+               </div>
+
+               <div class="mb-3">
+                 <label for="exampleInputPassword1" class="form-label">Email Address</label>
+                 <input type="email" formControlName="email" class="form-control" id="exampleInputPassword1">
+               </div>
+
+               <div class="mb-3">
+                 <label for="exampleInputPassword1" class="form-label">Title in the Organization</label>
+                 <input type="text" formControlName="title" class="form-control" id="exampleInputPassword1">
+               </div>
+               <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Status</label>
+                  <select>
+                     <option>Acredited</option>
+                    <option>Blacklisted</option>
+                    <option>Disable</option>
+                  </select>
                 </div>
-             </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button"  class="btn btn-primary">Add</button>
+              <button type="button" 
+                class="btn btn-primary">Update</button>
+            </div>
           </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Radar Chart</h5>
-                   <canvas id="radarChart" style="max-height: 400px;"></canvas>
-                  
-                </div>
-             </div>
-          </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Polar Area Chart</h5>
-                   <canvas id="polarAreaChart" style="max-height: 400px;"></canvas>
-                  
-                </div>
-             </div>
-          </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Stacked Bar Chart</h5>
-                   <canvas id="stakedBarChart" style="max-height: 400px;"></canvas>
-                   
-                </div>
-             </div>
-          </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Bubble Chart</h5>
-                   <canvas id="bubbleChart" style="max-height: 400px;"></canvas>
-                   
-                </div>
-             </div>
-          </div>
-       </div>
-    </section>
- </main>
+        </div>
+      </div>
+      
+     </section>
+</main>

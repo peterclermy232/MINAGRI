@@ -2,7 +2,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
        <li class="nav-item"> <a class="nav-link " routerLink="/dashboard"> <i class="bi bi-grid"></i> <span>Dashboard</span> </a></li>
        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+          <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-menu-button-wide"></i><span>Manage Organization</span><i class="bi bi-chevron-down ms-auto"></i> </a>
           <!-- <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
              <li> <a routerLink="/alerts"> <i class="bi bi-circle"></i><span>Alerts</span> </a></li>
              <li> <a routerLink="/accordion"> <i class="bi bi-circle"></i><span>Accordion</span> </a></li>
@@ -21,38 +21,50 @@
           </ul> -->
           <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             
-            <li> <a routerLink="/accordion"> <i class="bi bi-circle"></i><span>Manage Organization Type</span> </a></li>
+            <li> <a routerLink="/accordion"> <i class="bi bi-circle"></i><span> Organization Type</span> </a></li>
+            <li> <a routerLink="/alerts"> <i class="bi bi-circle"></i><span>Manage Organization</span> </a></li>
           </ul>
        </li>
        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+          <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-journal-text"></i><span>Manage User</span><i class="bi bi-chevron-down ms-auto"></i> </a>
           <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-             <li> <a routerLink="/form-elements"> <i class="bi bi-circle"></i><span>Form Elements</span> </a></li>
+             <li> <a routerLink="/form-elements"> <i class="bi bi-circle"></i><span>Add New User</span> </a></li>
+             <li> <a routerLink="/badges"> <i class="bi bi-circle"></i><span>Add New Role</span> </a></li>
              
           </ul>
        </li>
        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+          <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-layout-text-window-reverse"></i><span>Manage Farmer</span><i class="bi bi-chevron-down ms-auto"></i> </a>
           <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
              <li> <a routerLink="/tables-general"> <i class="bi bi-circle"></i><span>General Tables</span> </a></li>
-             <li> <a routerLink="/tables-data"> <i class="bi bi-circle"></i><span>Data Tables</span> </a></li>
+             <!-- <li> <a routerLink="/tables-data"> <i class="bi bi-circle"></i><span>Data Tables</span> </a></li> -->
           </ul>
        </li>
        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-bar-chart"></i><span>Charts</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+          <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-bar-chart"></i><span>Loss Accessors</span><i class="bi bi-chevron-down ms-auto"></i> </a>
           <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-             <li> <a routerLink="/charts-chartjs"> <i class="bi bi-circle"></i><span>Chart.js</span> </a></li>
-             <li> <a routerLink="/charts-apexcharts"> <i class="bi bi-circle"></i><span>ApexCharts</span> </a></li>
+             <li> <a routerLink="/charts-chartjs"> <i class="bi bi-circle"></i><span>Manage Loss Assessors</span> </a></li>
+             <li> <a routerLink="/charts-apexcharts"> <i class="bi bi-circle"></i><span>Assign Loss Assessors</span> </a></li> 
           </ul>
        </li>
        <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-gem"></i><span>Icons</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+          <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-gem"></i><span>Manage Crops</span><i class="bi bi-chevron-down ms-auto"></i> </a>
           <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-             <li> <a routerLink="/icons-bootstrap"> <i class="bi bi-circle"></i><span>Bootstrap Icons</span> </a></li>
-             <li> <a routerLink="/icons-remix"> <i class="bi bi-circle"></i><span>Remix Icons</span> </a></li>
-             <li> <a routerLink="/icons-boxicons"> <i class="bi bi-circle"></i><span>Boxicons</span> </a></li>
+             <li> <a routerLink="/icons-bootstrap"> <i class="bi bi-circle"></i><span>Add crops</span> </a></li>
+             <!-- <li> <a routerLink="/icons-remix"> <i class="bi bi-circle"></i><span>Remix I</span> </a></li> -->
+             <li> <a routerLink="/icons-boxicons"> <i class="bi bi-circle"></i><span>Manage Crop Varieties</span> </a></li>
           </ul>
        </li>
+
+       <li class="nav-heading">Manage Products</li>
+       <li class="nav-item">
+         <a class="nav-link collapsed" data-bs-target="#manage-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-gem"></i><span>Manage Product Category</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+         <ul id="manage-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+         <li> <a routerLink="/manage-product"> <i class="bi bi-circle"></i><span>Manage Product Category</span> </a></li>
+         </ul>
+       </li>
+       
+       
        <li class="nav-heading">Pages</li>
        <li class="nav-item"> <a class="nav-link collapsed" routerLink="/user-profile"> <i class="bi bi-person"></i> <span>Profile</span> </a></li>
        <li class="nav-item"> <a class="nav-link collapsed" routerLink="/pages-faq"> <i class="bi bi-question-circle"></i> <span>F.A.Q</span> </a></li>

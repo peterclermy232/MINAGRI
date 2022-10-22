@@ -31,6 +31,7 @@ import { PagesFaqComponent } from './pages/pages-faq/pages-faq.component';
 import { PagesLoginComponent } from './pages/pages-login/pages-login.component';
 import { PagesRegisterComponent } from './pages/pages-register/pages-register.component';
 import { UsersProfileComponent } from './pages/users-profile/users-profile.component';
+import { ManageProductComponent } from './manage-product/manage-product.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -44,7 +45,7 @@ const routes: Routes = [
   { path: 'carousel', component: CarouselComponent },
   { path: 'charts-apexcharts', component: ChartsApexchartsComponent },
   { path: 'charts-chartjs', component: ChartsChartjsComponent },
-  
+  {path: 'manage-product', component: ManageProductComponent},
   { path: 'form-elements', component: FormsElementsComponent },
   { path: 'form-layouts', component: FormsLayoutsComponent },
   { path: 'icons-bootstrap', component: IconsBootstrapComponent },

@@ -1,34 +1,84 @@
 <main id="main" class="main">
-    <div class="pagetitle">
-       <h1>ApexCharts</h1>
-       <nav>
-          <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Charts</li>
-             <li class="breadcrumb-item active">ApexCharts</li>
-          </ol>
-       </nav>
-    </div>
-    <p>ApexCharts Examples. You can check the <a href="https://apexcharts.com/javascript-chart-demos/" target="_blank">official website</a> for more examples.</p>
-    <section class="section">
-       <div class="row">
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Line Chart</h5>
-                   <div id="AlineChart"></div>
-                   
-                </div>
-             </div>
+   <div class="pagetitle">
+      <h1>Assign Loss Assessors</h1>
+      <nav>
+         <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+            <li class="breadcrumb-item">Dashboard</li>
+            <ol class="breadcrumb-item active">Assign Loss Assessors</ol>
+         </ol>
+      </nav>
+   </div>
+   <section class="section">
+     
+      <nav class="navbar navbar-ligth bg-primary">
+        <div class="container-fluid">
+          <h1 style="color: aliceblue;">Add New Loss</h1>
+          <div class="d-flex">
+            <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">Add New Loss</button>
           </div>
-          <div class="col-lg-6">
-             <div class="card">
-                <div class="card-body">
-                   <h5 class="card-title">Area Chart</h5>
-                   <div id="AareaChart"></div> 
+        </div>
+      </nav>
+      
+      <table class="table mt-3">
+        <thead>
+          <tr>
+           <th scope="col">Organization ID</th>
+            <th scope="col">Assign Loss Assessors</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          <tr >
+           <td>1</td>
+            <td>Active</td>
+            
+            <td>
+              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+             
+            </td>
+          </tr>
+        </tbody>
+      
+      </table>
+      
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Role Type</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form [formGroup]="formValue">
+                
+                <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Select Loss Assessors</label>
+                  <select>
+                     <option>Accredit</option>
+                     <option>Blacklisted</option>
+                     <option>Disable</option>
+                  </select>
                 </div>
-             </div>
+                <!-- <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Status</label>
+                  <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
+                </div> -->
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button"  class="btn btn-primary">Add</button>
+              <button type="button" 
+                class="btn btn-primary">Update</button>
+            </div>
           </div>
-       </div>
-    </section>
- </main>
+        </div>
+      </div>
+      
+     </section>
+ </main> 
+ 

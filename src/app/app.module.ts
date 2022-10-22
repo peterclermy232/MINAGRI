@@ -38,6 +38,7 @@ import { PagesError404Component } from './pages/pages-error404/pages-error404.co
 import { PagesBlankComponent } from './pages/pages-blank/pages-blank.component';
 
 import { ReactiveFormsModule } from '@angular/forms';
+import { ManageProductComponent } from './manage-product/manage-product.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     PagesLoginComponent,
     PagesError404Component,
     PagesBlankComponent,
+    ManageProductComponent,
    
   ],
   imports: [
