@@ -7,27 +7,17 @@ import { HeaderComponent } from './layouts/header/header.component';
 import { FooterComponent } from './layouts/footer/footer.component';
 import { SidebarComponent } from './layouts/sidebar/sidebar.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { AlertsComponent } from './components/alerts/alerts.component';
+import { OrganizationComponent } from './components/organization/organization.component';
 import { AccordionComponent } from './components/Organization/accordion.component';
 import { BadgesComponent } from './components/badges/badges.component';
-import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
-import { ButtonsComponent } from './components/buttons/buttons.component';
-import { CardsComponent } from './components/cards/cards.component';
-import { CarouselComponent } from './components/carousel/carousel.component';
-import { ListGroupComponent } from './components/list-group/list-group.component';
-import { ModalComponent } from './components/modal/modal.component';
-import { TabsComponent } from './components/tabs/tabs.component';
-import { PaginationComponent } from './components/pagination/pagination.component';
-import { ProgressComponent } from './components/progress/progress.component';
-import { SpinnersComponent } from './components/spinners/spinners.component';
-import { TooltipsComponent } from './components/tooltips/tooltips.component';
+
 import { FormsElementsComponent } from './components/AddOrganization/forms-elements.component';
-import { TablesGeneralComponent } from './components/tables-general/tables-general.component';
-import { TablesDataComponent } from './components/tables-data/tables-data.component';
+import { ManageFarmerComponent } from './components/manage-farmer/manage-farmer.component';
+
 import { ChartsChartjsComponent } from './components/charts-chartjs/charts-chartjs.component';
-import { ChartsApexchartsComponent } from './components/charts-apexcharts/charts-apexcharts.component';
+import { AssignlossComponent } from './components/assignLoss/assignloss.component';
 import { IconsBootstrapComponent } from './components/icons-bootstrap/icons-bootstrap.component';
-import { IconsRemixComponent } from './components/icons-remix/icons-remix.component';
+
 import { IconsBoxiconsComponent } from './components/icons-boxicons/icons-boxicons.component';
 import { UsersProfileComponent } from './pages/users-profile/users-profile.component';
 import { PagesFaqComponent } from './pages/pages-faq/pages-faq.component';
@@ -39,6 +29,8 @@ import { PagesBlankComponent } from './pages/pages-blank/pages-blank.component';
 
 import { ReactiveFormsModule } from '@angular/forms';
 import { ManageProductComponent } from './manage-product/manage-product.component';
+import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
+import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
 
 @NgModule({
   declarations: [
@@ -47,27 +39,17 @@ import { ManageProductComponent } from './manage-product/manage-product.componen
     FooterComponent,
     SidebarComponent,
     DashboardComponent,
-    AlertsComponent,
+    OrganizationComponent,
     AccordionComponent,
     BadgesComponent,
-    BreadcrumbsComponent,
-    ButtonsComponent,
-    CardsComponent,
-    CarouselComponent,
-    ListGroupComponent,
-    ModalComponent,
-    TabsComponent,
-    PaginationComponent,
-    ProgressComponent,
-    SpinnersComponent,
-    TooltipsComponent,
+   
     FormsElementsComponent,
-    TablesGeneralComponent,
-    TablesDataComponent,
+    ManageFarmerComponent,
+    
     ChartsChartjsComponent,
-    ChartsApexchartsComponent,
+    AssignlossComponent,
     IconsBootstrapComponent,
-    IconsRemixComponent,
+    
     IconsBoxiconsComponent,
     UsersProfileComponent,
     PagesFaqComponent,
@@ -77,6 +59,8 @@ import { ManageProductComponent } from './manage-product/manage-product.componen
     PagesError404Component,
     PagesBlankComponent,
     ManageProductComponent,
+    ManageInsuranceComponent,
+    ManageSubsidyComponent,
    
   ],
   imports: [

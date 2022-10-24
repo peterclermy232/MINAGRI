@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
   styleUrls: ['./forms-elements.component.css']
 })
 export class FormsElementsComponent implements OnInit {
+  
 
   formValue !:FormGroup;
   //employeeModelObj : EmployeeModel = new EmployeeModel();
@@ -19,11 +20,18 @@ export class FormsElementsComponent implements OnInit {
 
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
-      name : [''],
-      description : ['']
-      //email : [''],
-     // mobile : [''],
-     // salary : ['']
+     organizationType : [''],
+      organizationName : [''],
+      mainOffice : [''],
+      email : [''],
+     phoneNumber : [''],
+      uploadLogo : [''],
+      uploadRegistration : [''],
+      uploadPractice : [''],
+      firstName : [''],
+      secondName : [''],
+      lastName : [''],
+      title : ['']
     })
   
   }

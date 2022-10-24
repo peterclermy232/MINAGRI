@@ -1,0 +1,128 @@
+<main id="main" class="main">
+    <div class="pagetitle">
+       <h1>Manage Subsidy</h1>
+       <nav>
+          <ol class="breadcrumb">
+             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+             <li class="breadcrumb-item">Manage-subsidy</li>
+             <ol class="breadcrumb-item active">Manage-subsidy</ol>
+          </ol>
+       </nav>
+    </div>
+    <section class="section">
+      
+       <nav class="navbar navbar-ligth ">
+         <div class="container-fluid">
+           <h1 style="color: aliceblue;">Add New Subsidy</h1>
+           <div class="d-flex">
+             <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+               data-bs-target="#exampleModal">Add New Subsidy</button>
+           </div>
+         </div>
+       </nav>
+       
+       <table class="table mt-3">
+         <thead>
+           <tr>
+            <th scope="col">Organization ID</th>
+             <th scope="col">Subsidy Name</th>
+             <th scope="col">Organization</th>
+             <th scope="col">Insurance Product</th>
+             <th scope="col">Farmer Category</th>
+             <th scope="col">Rate</th>
+             <th scope="col">Status</th>
+             
+           </tr>
+         </thead>
+         <tbody>
+           <tr >
+            <td>1</td>
+             <td>Peter AtITO</td>
+             <td>Coding</td>
+             <td>Product</td>
+             <td>Category</td>
+             <td>50%</td>
+             <td>Active</td>
+             
+             <td>
+               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+               <button  class="btn btn-danger">view</button>
+             </td>
+           </tr>
+         </tbody>
+       
+       </table>
+       
+       <!-- Modal -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">Manage Subsidy</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+               <form [formGroup]="formValue">
+                 <div class="mb-3">
+                   <label for="exampleInputEmail1" class="form-label">Enter  Subsidy Name</label>
+                   <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                     aria-describedby="emailHelp">
+       
+                 </div>
+
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Organization</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Insurance Product</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                
+               
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Farmer Category</label>
+                    <select class="form-control">
+                        <option>On</option>
+                        <option>Off</option>
+                      </select>
+                 </div> 
+
+                 <div class="mb-3">
+                   <label for="exampleInputPassword1" class="form-label">Enter Rate</label>
+                   <input type="text" formControlName="description" class="form-control" id="exampleInputPassword1">
+                 </div>
+
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Status</label>
+                    <select>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                </select>
+                 </div>
+                 <!-- <div class="mb-3">
+                   <label for="exampleInputPassword1" class="form-label">Status</label>
+                   <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
+                 </div> -->
+               </form>
+             </div>
+             <div class="modal-footer">
+               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="button"  class="btn btn-primary">Add</button>
+               <button type="button" 
+                 class="btn btn-primary">Update</button>
+             </div>
+           </div>
+         </div>
+       </div>
+       
+      </section>
+  </main> 
+  

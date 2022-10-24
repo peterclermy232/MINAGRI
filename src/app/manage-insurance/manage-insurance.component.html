@@ -1,0 +1,211 @@
+<main id="main" class="main">
+    <div class="pagetitle">
+       <h1>Manage Insurance</h1>
+       <nav>
+          <ol class="breadcrumb">
+             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+             <li class="breadcrumb-item">Products Insurance</li>
+             <ol class="breadcrumb-item active">Products Insurance</ol>
+          </ol>
+       </nav>
+    </div>
+    <section class="section">
+      
+       <nav class="navbar navbar-ligth ">
+         <div class="container-fluid">
+           <h1 style="color: aliceblue;">Add New Product Insurance</h1>
+           <div class="d-flex">
+             <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+               data-bs-target="#exampleModal">Add New Product  Insurance</button>
+           </div>
+         </div>
+       </nav>
+       
+       <table class="table mt-3">
+         <thead>
+           <tr>
+            <th scope="col">Product ID</th>
+             <th scope="col">Enter  Season Name</th>
+             <th scope="col">Organization</th>
+             <th scope="col">Product Category</th>
+             <th scope="col">Farm Category</th>
+             <th scope="col">Average Premium Rate</th>
+             <th scope="col">Crop</th>
+             <th scope="col">Crop Varieties</th>
+             <th scope="col">Season date Start</th>
+             <th scope="col">Season date End</th>
+             <th scope="col">Window date Start</th>
+             <th scope="col">Window date Start</th>
+             <th scope="col">Loading Name</th>
+             <th scope="col">Organization Loading</th>
+             <th scope="col">Select Type(%/Fixed)</th>
+             <th scope="col">Paremeter Name</th>
+             <th scope="col">Upload File</th>
+             <th scope="col">Action</th>
+             
+             
+           </tr>
+         </thead>
+         <tbody>
+           <tr >
+            <td>1</td>
+             <td>July</td>
+             <td>TECH</td>
+             <td>MaiZE</td>
+             <td>1 acres</td>
+             <td>34c</td>
+             <td>Maize</td>
+             <td>Maizebread</td>
+             <td>1/2/34</td>
+             <td>4/9/34</td>
+             <td>Fer</td>
+             <td>Sept</td>
+             <td>Loading</td>
+             <td>Organization</td>
+             <td>Fixed</td>
+             <td>Paremeter</td>
+             <td>File</td>
+             
+             <td>
+               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+               <button  class="btn btn-danger">View</button>
+             </td>
+           </tr>
+         </tbody>
+       
+       </table>
+       
+       <!-- Modal -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">Manage Product</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+               <form [formGroup]="formValue">
+                
+                 <div class="mb-3">
+                   <label for="exampleInputEmail1" class="form-label">Enter  Season Name</label>
+                   <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                     aria-describedby="emailHelp">
+       
+                 </div>
+                 
+                  
+
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Organization</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Product Catagory</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                
+               
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Farmer Category</label>
+                    <select class="form-control">
+                        <option>On</option>
+                        <option>Off</option>
+                      </select>
+                 </div> 
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Average Premium Rate</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Crop</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Crop Varieties</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+               
+            
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Season Start Date</label>
+                    <input class="date form-control"  type="text">  
+                 </div>
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Season End Date</label>
+                    <input class="date form-control"  type="text">  
+                 </div>
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Window Start Date</label>
+                    <input class="date form-control"  type="text">  
+                 </div>
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Window End Date</label>
+                    <input class="date form-control"  type="text">  
+                 </div>
+                 <h3>Loading</h3>
+                 <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Enter Loading Name</label>
+                    <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                      aria-describedby="emailHelp">
+        
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Organization the Loading applies for</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                 <div class="mb-3">
+                    <label for="exampleInputPassword1" class="form-label">Select Type(%/Fixed)</label>
+                    <select class="form-control">
+                        <option>Insurance Company</option>
+                        <option>Default select</option>
+                      </select>
+                 </div> 
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Paremeter Name</label>
+                    <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                      aria-describedby="emailHelp">
+        
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Upload</label>
+                    <input type="file" formControlName="name" class="form-control" id="exampleInputEmail1"
+                      aria-describedby="emailHelp">
+        
+                  </div>
+                 
+               </form>
+             </div>
+             <div class="modal-footer">
+               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="button"  class="btn btn-primary">Add</button>
+               <button type="button" 
+                 class="btn btn-primary">Update</button>
+             </div>
+           </div>
+         </div>
+       </div>
+       
+      </section>
+  </main> 
+  
+

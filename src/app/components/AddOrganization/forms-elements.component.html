@@ -1,11 +1,11 @@
 <main id="main" class="main">
     <div class="pagetitle">
-       <h1>Form Elements</h1>
+       <h1>Manage User</h1>
        <nav>
           <ol class="breadcrumb">
              <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
              <li class="breadcrumb-item">Forms</li>
-             <li class="breadcrumb-item active">Elements</li>
+             <li class="breadcrumb-item active">Manage User</li>
           </ol>
        </nav>
     </div>
@@ -157,7 +157,7 @@
              </div>
           </div>
        </div> -->
-       <nav class="navbar navbar-ligth bg-primary">
+       <nav class="navbar navbar-ligth ">
          <div class="container">
            <div class="d-flex">
              <button  class="btn btn-success" type="button" data-bs-toggle="modal"
@@ -206,12 +206,10 @@
              <td>Smith</td>
              <td>John.Doe@Smith</td>
              <td>Title</td>
-
-             
              <td>
                <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
-               <button  class="btn btn-danger">Delete</button>
+                 data-bs-target="#exampleModal" class="btn btn-info ">Edit</button>
+               <button  class="btn btn-danger mx-3">View</button>
              </td>
            </tr>
          </tbody>
@@ -230,27 +228,27 @@
                <form [formGroup]="formValue">
                  <div class="mb-3">
                    <label for="exampleInputEmail1" class="form-label">Enter Organization Type</label>
-                   <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                   <input type="text" formControlName="organizationType" class="form-control" id="exampleInputEmail1"
                      aria-describedby="emailHelp">
                  </div>
                  <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Enter Organization Name</label>
-                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                  <input type="text" formControlName="organizationName" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Enter main office address</label>
-                  <input type="email" formControlName="name" class="form-control" id="exampleInputEmail1"
+                  <input type="text" formControlName="mainOffice" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Enter Email Address</label>
-                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                  <input type="email" formControlName="email" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Phone Number</label>
-                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                  <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
                 <h2>Organization Registration</h2>
@@ -260,7 +258,7 @@
                     <span class="input-group-text">Upload Logo</span>
                   </div>
                   <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    <input type="file" formControlName="uploadLogo" class="custom-file-input" id="inputGroupFile01">
                     <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                   </div>
                 </div>
@@ -270,7 +268,7 @@
                     <span class="input-group-text">Upload Registration Certificate</span>
                   </div>
                   <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    <input type="file" formControlName="uploadRegistration" class="custom-file-input" id="inputGroupFile01">
                     <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                   </div>
                 </div>
@@ -280,7 +278,7 @@
                     <span class="input-group-text">Upload Practice License</span>
                   </div>
                   <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputGroupFile01">
+                    <input type="file" formControlName="uploadPractice" class="custom-file-input" id="inputGroupFile01">
                     <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                   </div>
                 </div>
