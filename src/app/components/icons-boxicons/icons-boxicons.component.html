@@ -1,19 +1,19 @@
 <main id="main" class="main">
    <div class="pagetitle">
-      <h1>Manage Crops</h1>
+      <h1>Manage Crops Varieties</h1>
       <nav>
          <ol class="breadcrumb">
             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
             <li class="breadcrumb-item">Dashboard</li>
-            <ol class="breadcrumb-item active">Manage Crops</ol>
+            <ol class="breadcrumb-item active">Manage Crops Varieties</ol>
          </ol>
       </nav>
    </div>
    <section class="section">
      
-      <nav class="navbar navbar-ligth bg-primary">
+      <nav class="navbar navbar-ligth ">
         <div class="container-fluid">
-          <h1 style="color: aliceblue;">Add New Crop</h1>
+          <h1 style="color: aliceblue;">Add New Crop Varieties</h1>
           <div class="d-flex">
             <button  class="btn btn-success" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Add New Crop</button>
@@ -25,9 +25,11 @@
         <thead>
           <tr>
            <th scope="col">Organization ID</th>
-            <th scope="col">Role Name</th>
-            <th scope="col">Description</th>
+           <th scope="col">Selected Crop</th>
+            <th scope="col">Crop Variety Name</th>
+            
             <th scope="col">Status</th>
+            <th scope="col">Action</th>
             
           </tr>
         </thead>
@@ -35,18 +37,16 @@
           <tr >
            <td>1</td>
             <td>Peter AtITO</td>
+            
             <td>Coding</td>
             <td>
-               <select>
-                  <option>Active</option>
-                  <option>Inactive</option>
-               </select>
+               Active
             </td>
             
             <td>
               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
-              
+              <button type="button" class="btn btn-success mx-3">View</button>
             </td>
           </tr>
         </tbody>
@@ -64,6 +64,14 @@
             <div class="modal-body">
               <form [formGroup]="formValue">
                 <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Select Crop</label>
+                  <select class="form-control">
+                     <option>Maize</option>
+                     
+                  </select>
+                </div>
+                
+                <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Enter  Crop Name</label>
                   <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
@@ -71,7 +79,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Status</label>
-                  <select>
+                  <select class="form-control">
                      <option>Active</option>
                      <option>Inactive</option>
                   </select>

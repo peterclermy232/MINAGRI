@@ -25,11 +25,8 @@
           <tr>
            <th scope="col">Organization ID</th>
    
-            <th scope="col">First Name</th>
-            <th scope="col">Second Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Phone Number</th>
-            <th scope="col">Email Address</th>
+            <th scope="col">Organization</th>
+            <th scope="col">User</th>
             <th scope="col">Practice Number</th>
             <th scope="col">Status</th>
             <th scope="col">Action</th>
@@ -41,18 +38,11 @@
           <tr >
            <td>1</td>
             
-            <td>John </td>
+            <td>Mixed </td>
             <td>Doe</td>
-            <td>Smith</td>
-            <td>John.Doe@Smith</td>
-            <td>1234567</td>
             <td>34</td>
             <td>
-               <select>
-                  <option>Acredited</option>
-                  <option>Blacklisted</option>
-                  <option>Disable</option>
-               </select>
+               Accredit
             </td>
 
             
@@ -82,30 +72,16 @@
                <h3>Manage Loss Assessors</h3>
 
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">First Name</label>
-                  <input type="text" formControlName="firstName" class="form-control" id="exampleInputPassword1">
+                  <label for="exampleInputPassword1" class="form-label">Select Organization</label>
+                  <input type="text" formControlName="organization" class="form-control" id="exampleInputPassword1">
                 </div>
                  <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Second Name</label>
-                  <input type="text" formControlName="secondName" class="form-control" id="exampleInputPassword1">
+                  <label for="exampleInputPassword1" class="form-label">Select User</label>
+                  <input type="text" formControlName="user" class="form-control" id="exampleInputPassword1">
                 </div>
-                <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Last Name</label>
-                 <input type="text" formControlName="lastName" class="form-control" id="exampleInputPassword1">
-               </div>
 
                <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Phone Number</label>
-                 <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputPassword1">
-               </div>
-
-               <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Email Address</label>
-                 <input type="email" formControlName="email" class="form-control" id="exampleInputPassword1">
-               </div>
-
-               <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Title in the Organization</label>
+                 <label for="exampleInputPassword1" class="form-label">Practice Number</label>
                  <input type="text" formControlName="title" class="form-control" id="exampleInputPassword1">
                </div>
                <div class="mb-3">

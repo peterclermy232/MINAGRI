@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { OrganizationComponent } from './components/organization/organization.component';
+import { OrganizationComponent } from './components/organizations/organization.component';
 import { AccordionComponent } from './components/Organization/accordion.component';
 import { BadgesComponent } from './components/badges/badges.component';
 
@@ -29,7 +29,8 @@ import { AssignlossComponent } from './components/assignLoss/assignloss.componen
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'Organization', component: OrganizationComponent },
+  
+  { path: 'organization', component: OrganizationComponent },
   { path: 'accordion', component: AccordionComponent },
   { path: 'badges', component: BadgesComponent },
   {path: 'assignloss', component: AssignlossComponent},

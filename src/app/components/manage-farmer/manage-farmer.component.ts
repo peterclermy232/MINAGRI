@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 })
 export class ManageFarmerComponent implements OnInit {
 
+ 
   formValue !:FormGroup;
   //employeeModelObj : EmployeeModel = new EmployeeModel();
   employeeData !:any;
@@ -19,10 +20,20 @@ export class ManageFarmerComponent implements OnInit {
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
       name : [''],
-      description : ['']
-      //email : [''],
-     // mobile : [''],
-     // salary : ['']
+      firstName : [''],
+      lastName : [''],
+      physicalAddress : [''],
+      id : [''],
+      category : [''],
+       date : [''],
+       upi : [''],
+       farmName : [''],
+       farmSize : [''],
+      bankName : [''],
+      accountNumber : [''],
+      emailAddres : [''],
+      phoneNumber : [''],
+      relationship : ['']
     })
   
   }

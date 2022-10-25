@@ -19,10 +19,8 @@ export class BadgesComponent implements OnInit {
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
       name : [''],
-      description : ['']
-      //email : [''],
-     // mobile : [''],
-     // salary : ['']
+      description : [''],
+      select : [''],
     })
   }
 

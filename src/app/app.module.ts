@@ -7,7 +7,7 @@ import { HeaderComponent } from './layouts/header/header.component';
 import { FooterComponent } from './layouts/footer/footer.component';
 import { SidebarComponent } from './layouts/sidebar/sidebar.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { OrganizationComponent } from './components/organization/organization.component';
+import { OrganizationComponent } from './components/organizations/organization.component';
 import { AccordionComponent } from './components/Organization/accordion.component';
 import { BadgesComponent } from './components/badges/badges.component';
 

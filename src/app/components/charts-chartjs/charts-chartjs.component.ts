@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup } from '@angular/forms'
 })
 export class ChartsChartjsComponent implements OnInit {
 
+  
   formValue !:FormGroup;
   //employeeModelObj : EmployeeModel = new EmployeeModel();
   employeeData !:any;
@@ -18,11 +19,10 @@ export class ChartsChartjsComponent implements OnInit {
   ngOnInit(): void {
 
     this.formValue = this.formbuilder.group({
-      name : [''],
-      description : ['']
-      //email : [''],
-     // mobile : [''],
-     // salary : ['']
+      organization : [''],
+      user : [''],
+      practiceNumber : [''],
+     status : ['']
     })
    
   }

@@ -19,7 +19,7 @@ export class IconsBoxiconsComponent implements OnInit {
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
       name : [''],
-      description : ['']
+      //description : ['']
       //email : [''],
      // mobile : [''],
      // salary : ['']

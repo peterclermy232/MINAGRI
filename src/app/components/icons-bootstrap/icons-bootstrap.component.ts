@@ -19,7 +19,7 @@ export class IconsBootstrapComponent implements OnInit {
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
       name : [''],
-      description : ['']
+      status : ['']
       //email : [''],
      // mobile : [''],
      // salary : ['']

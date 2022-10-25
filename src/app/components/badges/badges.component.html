@@ -1,6 +1,6 @@
 <main id="main" class="main">
   <div class="pagetitle">
-     <h1>General Tables</h1>
+     <h1>Manage Role</h1>
      <nav>
         <ol class="breadcrumb">
            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
@@ -41,7 +41,7 @@
            <td>
              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
                data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
-             <button  class="btn btn-danger">Delete</button>
+             <button  class="btn btn-danger mx-3">View</button>
            </td>
          </tr>
        </tbody>
@@ -59,19 +59,24 @@
            <div class="modal-body">
              <form [formGroup]="formValue">
                <div class="mb-3">
-                 <label for="exampleInputEmail1" class="form-label">Enter  Role</label>
+                 <label for="exampleInputEmail1" class="form-label">Enter Role Name</label>
                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                    aria-describedby="emailHelp">
      
                </div>
                <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Enter Description</label>
+                 <label for="exampleInputPassword1" class="form-label">Enter Role Description</label>
                  <input type="text" formControlName="description" class="form-control" id="exampleInputPassword1">
                </div>
-               <!-- <div class="mb-3">
+               
+                <div class="mb-3">
                  <label for="exampleInputPassword1" class="form-label">Status</label>
-                 <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
-               </div> -->
+                 <select class="form-control">
+                  <option>Active</option>
+                     <option>Inactive</option>
+                     
+                 </select>
+               </div> 
              </form>
            </div>
            <div class="modal-footer">
