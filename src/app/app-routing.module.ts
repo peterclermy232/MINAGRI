@@ -35,6 +35,7 @@ const routes: Routes = [
   { path: 'badges', component: BadgesComponent },
   {path: 'assignloss', component: AssignlossComponent},
   { path: 'charts-chartjs', component: ChartsChartjsComponent },
+
   {path: 'manage-product', component: ManageProductComponent},
   {path: 'manage-insurance', component: ManageInsuranceComponent},
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
@@ -43,7 +44,7 @@ const routes: Routes = [
   { path: 'icons-bootstrap', component: IconsBootstrapComponent },
   { path: 'icons-boxicons', component: IconsBoxiconsComponent },
   
-  { path: 'tables-general', component: ManageFarmerComponent },
+  { path: 'manage-farmer', component: ManageFarmerComponent },
   
   { path: 'pages-blank', component: PagesBlankComponent },
   { path: 'pages-contact', component: PagesContactComponent },

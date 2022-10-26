@@ -89,22 +89,22 @@
                 </div>
                 <div class="mb-3">
                  <label for="exampleInputEmail1" class="form-label">Enter Organization Name</label>
-                 <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                 <input type="text" formControlName="organizationName" class="form-control" id="exampleInputEmail1"
                    aria-describedby="emailHelp">
                </div>
                <div class="mb-3">
                  <label for="exampleInputEmail1" class="form-label">Enter main office address</label>
-                 <input type="email" formControlName="name" class="form-control" id="exampleInputEmail1"
+                 <input type="email" formControlName="mainOffice" class="form-control" id="exampleInputEmail1"
                    aria-describedby="emailHelp">
                </div>
                <div class="mb-3">
                  <label for="exampleInputEmail1" class="form-label">Enter Email Address</label>
-                 <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                 <input type="email" formControlName="emailAddress" class="form-control" id="exampleInputEmail1"
                    aria-describedby="emailHelp">
                </div>
                <div class="mb-3">
                  <label for="exampleInputEmail1" class="form-label">Phone Number</label>
-                 <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
+                 <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
                    aria-describedby="emailHelp">
                </div>
                <h2>Organization Registration</h2>
@@ -114,7 +114,7 @@
                    <span class="input-group-text">Upload Logo</span>
                  </div>
                  <div class="custom-file">
-                   <input type="file" class="custom-file-input" id="inputGroupFile01">
+                   <input type="file" class="custom-file-input" formControlName="uploadLogo"  id="inputGroupFile01">
                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                  </div>
                </div>
@@ -124,7 +124,7 @@
                    <span class="input-group-text">Upload Registration Certificate</span>
                  </div>
                  <div class="custom-file">
-                   <input type="file" class="custom-file-input" id="inputGroupFile01">
+                   <input type="file" class="custom-file-input" formControlName="uploadRegistration" id="inputGroupFile01">
                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                  </div>
                </div>
@@ -134,7 +134,7 @@
                    <span class="input-group-text">Upload Practice License</span>
                  </div>
                  <div class="custom-file">
-                   <input type="file" class="custom-file-input" id="inputGroupFile01">
+                   <input type="file" class="custom-file-input" formControlName="uploadPractice" id="inputGroupFile01">
                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                  </div>
                </div>

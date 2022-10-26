@@ -15,7 +15,7 @@
         <div class="container-fluid">
           <h1 style="color: aliceblue;">Add New Crop</h1>
           <div class="d-flex">
-            <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+            <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Add New Crop</button>
           </div>
         </div>
@@ -32,16 +32,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr >
-           <td>1</td>
-            <td>Maize</td>
+          <tr *ngFor="let row of addData" >
+           <td>{{row.id}}</td>
+            <td>{{row.name}}</td>
     
             <td>
-               Active
+               {{row.status}}
             </td>
             
             <td>
-              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+              <button  style="color: aliceblue;" type="button" (click)="onEdit(row)" data-bs-toggle="modal"
                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
                 <button type="button" class="btn btn-success" mx-3>view</button>
               
@@ -79,8 +79,8 @@
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button"  class="btn btn-primary">Add</button>
-              <button type="button" 
+              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                 class="btn btn-primary">Update</button>
             </div>
           </div>
