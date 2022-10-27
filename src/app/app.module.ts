@@ -33,6 +33,16 @@ import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.co
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FarmerComponent } from './farmer/farmer.component';
+import { QuotationComponent } from './quotation/quotation.component';
+import { InsuranceComponent } from './insurance/insurance.component';
+import { PaidComponent } from './paid/paid.component';
+import { InvoiceComponent } from './invoice/invoice.component';
+import { ApprovedComponent } from './approved/approved.component';
+import { PendingComponent } from './pending/pending.component';
+import { SettledComponent } from './settled/settled.component';
+import { ClaimComponent } from './claim/claim.component';
+import { PaymentComponent } from './payment/payment.component';
+import { PaidClaimComponent } from './paid-claim/paid-claim.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +74,16 @@ import { FarmerComponent } from './farmer/farmer.component';
     ManageInsuranceComponent,
     ManageSubsidyComponent,
     FarmerComponent,
+    QuotationComponent,
+    InsuranceComponent,
+    PaidComponent,
+    InvoiceComponent,
+    ApprovedComponent,
+    PendingComponent,
+    SettledComponent,
+    ClaimComponent,
+    PaymentComponent,
+    PaidClaimComponent,
    
   ],
   imports: [
