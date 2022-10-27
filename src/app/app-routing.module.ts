@@ -28,9 +28,11 @@ import { AssignlossComponent } from './components/assignLoss/assignloss.componen
 import { FarmerComponent } from './farmer/farmer.component';
 
 const routes: Routes = [
-  { path: '', component: DashboardComponent },
+  { path: '', component: PagesLoginComponent },
+  { path: 'register', component: PagesRegisterComponent },
+  { path: 'home', component: DashboardComponent },
   { path: 'dashboard', component: DashboardComponent },
-  
+
   { path: 'organization', component: OrganizationComponent },
   { path: 'accordion', component: AccordionComponent },
   { path: 'badges', component: BadgesComponent },
@@ -42,18 +44,17 @@ const routes: Routes = [
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
   { path: 'form-elements', component: FormsElementsComponent },
   {path: 'farmer', component: FarmerComponent},
-  
+
   { path: 'icons-bootstrap', component: IconsBootstrapComponent },
   { path: 'icons-boxicons', component: IconsBoxiconsComponent },
-  
+
   { path: 'manage-farmer', component: ManageFarmerComponent },
-  
+
   { path: 'pages-blank', component: PagesBlankComponent },
   { path: 'pages-contact', component: PagesContactComponent },
   { path: 'pages-error404', component: PagesError404Component },
   { path: 'pages-faq', component: PagesFaqComponent },
-  { path: 'pages-login', component: PagesLoginComponent },
-  { path: 'pages-register', component: PagesRegisterComponent },
+
   { path: 'user-profile', component: UsersProfileComponent },
 ];
 
