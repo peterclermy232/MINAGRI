@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms'
+import { UserService } from 'src/app/shared/user.service';
+import { UserModel } from './users';
 
 
 @Component({
@@ -11,28 +13,103 @@ export class FormsElementsComponent implements OnInit {
   
 
   formValue !:FormGroup;
-  //employeeModelObj : EmployeeModel = new EmployeeModel();
-  employeeData !:any;
+  userModelObj : UserModel = new UserModel();
+  userData !:any;
   showAdd!: boolean;
   showUpdate!:boolean;
   constructor(private formbuilder:FormBuilder,
+    private api : UserService
     ) { }
 
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
-     organizationType : [''],
-      organizationName : [''],
-      mainOffice : [''],
-      email : [''],
-     phoneNumber : [''],
-      uploadLogo : [''],
-      uploadRegistration : [''],
-      uploadPractice : [''],
+     organization : [''],
       firstName : [''],
       secondName : [''],
       lastName : [''],
-      title : ['']
+      password : [''],
+      confirmPassword : ['']
     })
+    this.getAllEmployee();
+  }
+    clickAddEmployee(){
+      this.formValue.reset();
+      this.showAdd = true;
+      this.showUpdate = false;
+    }
+  
+    postEmployeeDetails(){
+      this.userModelObj.organization= this.formValue.value.organization;
+      this.userModelObj.firstName = this.formValue.value.firstName;
+      this.userModelObj.secondName = this.formValue.value.secondName;
+      this.userModelObj.lastName = this.formValue.value.lastName;
+      this.userModelObj.password = this.formValue.value.password;
+      this.userModelObj.confirmPassword = this.formValue.value.confirmPassword;
+      
+      
+      
+      
+      this.api.postUser(this.  userModelObj)
+      .subscribe(res=>{
+        console.log(res);
+        alert("Organization Added Successfully");
+        let ref = document.getElementById('cancel')
+        ref?.click();
+        this.formValue.reset();
+        this.getAllEmployee();
+      },
+      error=>{
+        alert("something went wrong");
+      })
+    }
+    getAllEmployee(){
+      this.api.getUser()
+      .subscribe(res=>{
+        this.userData = res;
+      })
+    }
+    // deleteEmployee( row:any){
+    //   this.api.deleteEmployee( row.id)
+    //   .subscribe(res=>{
+    //     alert("Employee Deleted")
+    //     this.getAllEmployee();
+    //   })
+    // }
+    onEdit( row:any){
+      this.showAdd = false;
+      this.showUpdate = true;
+      this.  userModelObj.id =  row.id;
+      this.formValue.controls['organization'].setValue( row.organization);
+      this.formValue.controls['firstName'].setValue( row.firstName);
+      this.formValue.controls['secondName'].setValue( row.secondName);
+      this.formValue.controls['lastName'].setValue( row.lastName);
+      this.formValue.controls['password'].setValue( row.password);
+      this.formValue.controls['confirmPassword'].setValue( row.confirmPassword);
+      
+      
+      
+     
+     
+     
+    }
+    updateEmployeeDetails(){
+      this.userModelObj.organization= this.formValue.value.organization;
+      this.userModelObj.firstName = this.formValue.value.firstName;
+      this.userModelObj.secondName = this.formValue.value.secondName;
+      this.userModelObj.lastName = this.formValue.value.lastName;
+      this.userModelObj.password = this.formValue.value.password;
+      this.userModelObj.confirmPassword = this.formValue.value.confirmPassword;
+      
+      
+      
+      this.api.updateUser(this.  userModelObj,this.  userModelObj.id)
+      .subscribe(res=>{
+        alert("Updated Successfully")
+        let ref = document.getElementById('cancel')
+        ref?.click();
+        this.formValue.reset();
+        this.getAllEmployee();
+      })
   
   }
 

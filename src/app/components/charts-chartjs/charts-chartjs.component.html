@@ -14,7 +14,7 @@
       <nav class="navbar navbar-ligth bg-primary">
         <div class="container">
           <div class="d-flex">
-            <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+            <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Create New Loss </button>
           </div>
         </div>
@@ -35,19 +35,19 @@
           </tr>
         </thead>
         <tbody>
-          <tr >
-           <td>1</td>
+          <tr *ngFor="let  users of lossData" >
+           <td>{{ users.id}}</td>
             
-            <td>Mixed </td>
-            <td>Doe</td>
-            <td>34</td>
+            <td>{{ users.organization}}</td>
+            <td>{{ users.user}}</td>
+            <td>{{ users.practiceNumber}}</td>
             <td>
-               Accredit
+               {{ users.status}}
             </td>
 
             
             <td>
-              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+              <button  style="color: aliceblue;" (click)="onEdit( users)" type="button" data-bs-toggle="modal"
                 data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
               
             </td>
@@ -82,11 +82,11 @@
 
                <div class="mb-3">
                  <label for="exampleInputPassword1" class="form-label">Practice Number</label>
-                 <input type="text" formControlName="title" class="form-control" id="exampleInputPassword1">
+                 <input type="text" formControlName="practiceNumber" class="form-control" id="exampleInputPassword1">
                </div>
                <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Status</label>
-                  <select>
+                  <select formControlName="status">
                      <option>Acredited</option>
                     <option>Blacklisted</option>
                     <option>Disable</option>
@@ -96,8 +96,8 @@
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button"  class="btn btn-primary">Add</button>
-              <button type="button" 
+              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Add</button>
+              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                 class="btn btn-primary">Update</button>
             </div>
           </div>

@@ -32,6 +32,7 @@ import { ManageProductComponent } from './manage-product/manage-product.componen
 import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
 import { HttpClientModule } from '@angular/common/http';
+import { FarmerComponent } from './farmer/farmer.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { HttpClientModule } from '@angular/common/http';
     ManageProductComponent,
     ManageInsuranceComponent,
     ManageSubsidyComponent,
+    FarmerComponent,
    
   ],
   imports: [

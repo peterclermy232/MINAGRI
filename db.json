@@ -2,11 +2,8 @@
   "posts": [
     {
       "id": 1,
-      "select": "Maize",
-      "status": {
-        "select": "Maize",
-        "status": "Active"
-      }
+      "name": "maize",
+      "description": "good growth"
     },
     {
       "id": 2,
@@ -68,6 +65,24 @@
       "id": 7,
       "name": "carrot",
       "status": "Active"
+    },
+    {
+      "id": 8,
+      "organization": "group",
+      "user": "maize",
+      "practiceNumber": "23344",
+      "status": "Blacklisted"
+    },
+    {
+      "id": 9,
+      "name": "maize",
+      "description": "hello"
+    },
+    {
+      "id": 10,
+      "name": "Unemployment",
+      "description": "no job",
+      "select": "Active"
     }
   ],
   "comments": [

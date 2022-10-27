@@ -15,7 +15,7 @@
        <div class="container-fluid">
          <h1 style="color: aliceblue;">Add New Role</h1>
          <div class="d-flex">
-           <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+           <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
              data-bs-target="#exampleModal">Add New Role</button>
          </div>
        </div>
@@ -23,24 +23,25 @@
      
      <table class="table mt-3">
        <thead>
-         <tr>
+         <tr >
           <th scope="col">Organization ID</th>
            <th scope="col">Role Name</th>
            <th scope="col">Description</th>
-           <th scope="col">Status</th>
+           <th scope="col">Select</th>
+           <th scope="col">Action</th>
            
          </tr>
        </thead>
        <tbody>
-         <tr >
-          <td>1</td>
-           <td>Peter AtITO</td>
-           <td>Coding</td>
-           <td>Active</td>
+         <tr *ngFor ="let users of roleData">
+          <td>{{users.id}}</td>
+           <td>{{users.name}}</td>
+           <td>{{users.description}}</td>
+           <td>{{users.select}}</td>
            
            <td>
              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+               data-bs-target="#exampleModal" (click)="onEdit( users)" class="btn btn-info">Edit</button>
              <button  class="btn btn-danger mx-3">View</button>
            </td>
          </tr>
@@ -71,7 +72,7 @@
                
                 <div class="mb-3">
                  <label for="exampleInputPassword1" class="form-label">Status</label>
-                 <select class="form-control">
+                 <select class="form-control" formControlName="select">
                   <option>Active</option>
                      <option>Inactive</option>
                      
@@ -81,8 +82,8 @@
            </div>
            <div class="modal-footer">
              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-             <button type="button"  class="btn btn-primary">Add</button>
-             <button type="button" 
+             <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+             <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                class="btn btn-primary">Update</button>
            </div>
          </div>

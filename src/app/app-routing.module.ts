@@ -25,6 +25,7 @@ import { ManageProductComponent } from './manage-product/manage-product.componen
 import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
+import { FarmerComponent } from './farmer/farmer.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -40,6 +41,7 @@ const routes: Routes = [
   {path: 'manage-insurance', component: ManageInsuranceComponent},
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
   { path: 'form-elements', component: FormsElementsComponent },
+  {path: 'farmer', component: FarmerComponent},
   
   { path: 'icons-bootstrap', component: IconsBootstrapComponent },
   { path: 'icons-boxicons', component: IconsBoxiconsComponent },
