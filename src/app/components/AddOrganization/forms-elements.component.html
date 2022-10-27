@@ -15,7 +15,7 @@
        <nav class="navbar navbar-ligth ">
          <div class="container">
            <div class="d-flex">
-             <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+             <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
                data-bs-target="#exampleModal">Add New Organization </button>
            </div>
          </div>
@@ -25,46 +25,32 @@
          <thead>
            <tr>
             <th scope="col">Organization ID</th>
-             <th scope="col">Organization Type</th>
+             
              <th scope="col">Organization Name</th>
-             <th scope="col">Main office</th>
-             <th scope="col">Official Email</th>
-             <th scope="col">Email Address</th>
-             <th scope="col">Phone Number</th>
-             <th scope="col">Upload logo(file)</th>
-             <th scope="col">Upload Registration Certificate(file)</th>
-             <th scope="col">Upload Practice License(file)</th>
+             
              <th scope="col">First Name</th>
              <th scope="col">Second Name</th>
              <th scope="col">Last Name</th>
-             <th scope="col">Phone Number</th>
-             <th scope="col">Email Address</th>
-             <th scope="col">Title in the Organization</th>
+             
+             <th scope="col">Action</th>
              
              
            </tr>
          </thead>
          <tbody>
-           <tr >
-            <td>1</td>
-             <td>Farm</td>
-             <td>Coding</td>
-             <td>MainOffice</td>
-             <td>Email@gmail.</td>
-             <td>official@email.com</td>
-             <td>12233345</td>
-             <td>PDF.Logo</td>
-             <td>PDF.register</td>
-             <td>PracticeLicense</td>
-             <td>John </td>
-             <td>Doe</td>
-             <td>Smith</td>
-             <td>John.Doe@Smith</td>
-             <td>Title</td>
+           <tr *ngFor ="let row of userData">
+            <td>{{row.id}}</td>
+             <td>{{row.organization}}</td>
+            
+             <td>{{row.firstName}}</td>
+             <td>{{row.secondName}}</td>
+             <td>{{row.lastName}}</td>
+             
+             
              <td>
                <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                 data-bs-target="#exampleModal" class="btn btn-info ">Edit</button>
-               <button  class="btn btn-danger mx-3">View</button>
+                 data-bs-target="#exampleModal" (click)="onEdit( row)" class="btn btn-info ">Edit</button>
+               <!-- <button  class="btn btn-danger mx-3">View</button> -->
              </td>
            </tr>
          </tbody>
@@ -81,63 +67,14 @@
              </div>
              <div class="modal-body">
                <form [formGroup]="formValue">
-                 <div class="mb-3">
-                   <label for="exampleInputEmail1" class="form-label">Enter Organization Type</label>
-                   <input type="text" formControlName="organizationType" class="form-control" id="exampleInputEmail1"
-                     aria-describedby="emailHelp">
-                 </div>
+                
                  <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Enter Organization Name</label>
-                  <input type="text" formControlName="organizationName" class="form-control" id="exampleInputEmail1"
+                  <input type="text" formControlName="organization" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
-                <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Enter main office address</label>
-                  <input type="text" formControlName="mainOffice" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp">
-                </div>
-                <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Enter Email Address</label>
-                  <input type="email" formControlName="email" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp">
-                </div>
-                <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Phone Number</label>
-                  <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp">
-                </div>
-                <h2>Organization Registration</h2>
-
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Upload Logo</span>
-                  </div>
-                  <div class="custom-file">
-                    <input type="file" formControlName="uploadLogo" class="custom-file-input" id="inputGroupFile01">
-                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                  </div>
-                </div>
-
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Upload Registration Certificate</span>
-                  </div>
-                  <div class="custom-file">
-                    <input type="file" formControlName="uploadRegistration" class="custom-file-input" id="inputGroupFile01">
-                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                  </div>
-                </div>
-
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Upload Practice License</span>
-                  </div>
-                  <div class="custom-file">
-                    <input type="file" formControlName="uploadPractice" class="custom-file-input" id="inputGroupFile01">
-                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-                  </div>
-                </div>
-                <h3>Contact Practice Information</h3>
+               
+                
 
                  <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">First Name</label>
@@ -153,25 +90,22 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Phone Number</label>
+                  <label for="exampleInputPassword1" class="form-label">Password</label>
                   <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputPassword1">
                 </div>
 
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Email Address</label>
-                  <input type="email" formControlName="email" class="form-control" id="exampleInputPassword1">
+                  <label for="exampleInputPassword1" class="form-label">Confirm Password</label>
+                  <input type="number" formControlName="confirmPassword" class="form-control" id="exampleInputPassword1">
                 </div>
 
-                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Title in the Organization</label>
-                  <input type="text" formControlName="title" class="form-control" id="exampleInputPassword1">
-                </div>
+               
                </form>
              </div>
              <div class="modal-footer">
                <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button"  class="btn btn-primary">Add</button>
-               <button type="button" 
+               <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Add</button>
+               <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                  class="btn btn-primary">Update</button>
              </div>
            </div>

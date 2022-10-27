@@ -31,6 +31,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ManageProductComponent } from './manage-product/manage-product.component';
 import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
+import { HttpClientModule } from '@angular/common/http';
+import { FarmerComponent } from './farmer/farmer.component';
 
 @NgModule({
   declarations: [
@@ -61,12 +63,14 @@ import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.componen
     ManageProductComponent,
     ManageInsuranceComponent,
     ManageSubsidyComponent,
+    FarmerComponent,
    
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

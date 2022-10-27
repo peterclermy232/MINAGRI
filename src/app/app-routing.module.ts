@@ -25,6 +25,7 @@ import { ManageProductComponent } from './manage-product/manage-product.componen
 import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
+import { FarmerComponent } from './farmer/farmer.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -35,15 +36,17 @@ const routes: Routes = [
   { path: 'badges', component: BadgesComponent },
   {path: 'assignloss', component: AssignlossComponent},
   { path: 'charts-chartjs', component: ChartsChartjsComponent },
+
   {path: 'manage-product', component: ManageProductComponent},
   {path: 'manage-insurance', component: ManageInsuranceComponent},
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
   { path: 'form-elements', component: FormsElementsComponent },
+  {path: 'farmer', component: FarmerComponent},
   
   { path: 'icons-bootstrap', component: IconsBootstrapComponent },
   { path: 'icons-boxicons', component: IconsBoxiconsComponent },
   
-  { path: 'tables-general', component: ManageFarmerComponent },
+  { path: 'manage-farmer', component: ManageFarmerComponent },
   
   { path: 'pages-blank', component: PagesBlankComponent },
   { path: 'pages-contact', component: PagesContactComponent },

@@ -1,0 +1,120 @@
+<main id="main" class="main">
+    <div class="pagetitle">
+       <h1>Manage Farmer</h1>
+       <nav>
+          <ol class="breadcrumb">
+             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+             <li class="breadcrumb-item">Dashboard</li>
+             <li class="breadcrumb-item active">Manage Farmer</li>
+          </ol>
+       </nav>
+    </div>
+    <section class="section">
+      
+       <nav class="navbar navbar-ligth ">
+         <div class="container">
+           <div class="d-flex">
+             <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
+               data-bs-target="#exampleModal">Add New Farmer </button>
+           </div>
+         </div>
+       </nav>
+       
+       <table class="table mt-3">
+         <thead>
+           <tr>
+            <th scope="col">Organization ID</th>
+             <th scope="col">First Name</th>
+             <th scope="col">Second Name</th>
+             <th scope="col">Last Name</th>
+             <th scope="col">Phone Number</th>
+             <th scope="col">ID NUMBER</th>
+             <th scope="col">Action</th>
+             
+             
+           </tr>
+         </thead>
+         <tbody>
+           <tr *ngFor="let row of registrationData">
+            <td>{{row.id}}</td>
+             
+             <td>{{row.firstName}} </td>
+             <td>{{row.secondName}}</td>
+             <td>{{row.lastName}}</td>
+             <td>{{row.phoneNumber}}</td>
+             <td>{{row.idNumber}}</td>
+ 
+             
+             <td>
+               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                 data-bs-target="#exampleModal" (click)="onEdit(row)" class="btn btn-info">Edit</button>
+               <!-- <button  class="btn btn-danger">Delete</button> -->
+             </td>
+           </tr>
+         </tbody>
+       
+       </table>
+       
+       <!-- Modal -->
+       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">Farmer Self Registration</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+               <form [formGroup]="formValue">
+                 <div class="mb-3">
+                   <label for="exampleInputEmail1" class="form-label">Enter First Name</label>
+                   <input type="text" formControlName="firstName" class="form-control" id="exampleInputEmail1"
+                     aria-describedby="emailHelp">
+                 </div>
+                 <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Enter second Name</label>
+                  <input type="text" formControlName="secondName" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Enter Last Name</label>
+                  <input type="text" formControlName="lastName" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp">
+                </div>
+               
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Phone Number</label>
+                  <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp">
+                </div>
+
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Enter ID NUMBER</label>
+                    <input type="number" formControlName="idNumber" class="form-control" id="exampleInputEmail1"
+                      aria-describedby="emailHelp">
+                  </div>
+                
+ 
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Upload Practice License</span>
+                  </div>
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" formControlName="uploadPractice" id="inputGroupFile01">
+                    <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                  </div>
+                </div>
+               
+               </form>
+             </div>
+             <div class="modal-footer">
+               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+               <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
+                 class="btn btn-primary">Update</button>
+             </div>
+           </div>
+         </div>
+       </div>
+       
+      </section>
+ </main>

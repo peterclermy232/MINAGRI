@@ -16,7 +16,7 @@
      <nav class="navbar navbar-ligth ">
        <div class="container">
          <div class="d-flex">
-           <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+           <button  class="btn btn-success" type="button" (click)="clickAddEmployee()" data-bs-toggle="modal"
              data-bs-target="#exampleModal">Add New Farmer</button>
          </div>
        </div>
@@ -35,7 +35,7 @@
            <th scope="col">Farmer Category</th>
            <th scope="col">Date of Registration</th>
 
-           <th scope="col">Location Province</th>
+           <!-- <th scope="col">Location Province</th> -->
            <th scope="col">Farm Name</th>
            <th scope="col">Farm Size</th>
            <th scope="col">UPI NO.</th>
@@ -43,7 +43,7 @@
 
            <th scope="col">Bank Name</th>
            <th scope="col">Account Number</th>
-           <th scope="col">Account Name</th>
+           <!-- <th scope="col">Account Name</th> -->
 
            <th scope="col">First Name</th>
            <th scope="col">Last Name</th>
@@ -54,49 +54,43 @@
 
            <th scope="col">Action</th>
 
-
-           
-           
-           
-           
-           
          </tr>
        </thead>
        <tbody>
-         <tr >
-          <td>1</td>
-           <td>Peter</td>
-           <td>OOjoh</td>
-           <td>234567799</td>
-           <td>Email@gmail.</td>
-           <td>E456</td>
-           <td>physical@gmail.com</td>
-           <td>Mix Farming</td>
-           <td>12/3/2022</td>
+         <tr *ngFor="let column of farmerData" >
+          <td>{{column.id}}</td>
+           <td>{{column.firstName}}</td>
+           <td>{{column.lastName}}</td>
+           <td>{{column.phoneNumber}}</td>
+           <td>{{column.emailAddress}}</td>
+           <td>{{column.idNumber}}</td>
+           <td>{{column.physicalAddress}}</td>
+           <td>{{column.category}}</td>
+           <td>{{column.date}}</td>
 
 
-           <td>Co-op</td>
-           <td>S122336677</td>
-           <td>Peter OOjoh</td>
+           <td>{{column.farmName}}</td>
+           <td>{{column.farmSize}}</td>
+           <td>{{column.upi}}</td>
 
-           <td>Nairobi</td>
-           <td>Bean</td>
-           <td>2acres</td>
-           <td>es234DFG</td>
+           <!-- <td>Nairobi</td> -->
+           <td>{{column.bankName}}</td>
+           <td>{{column.accountNumber}}</td>
+           <td>{{column.firstName}}</td>
 
-           <td>Ojera</td>
-           <td>MakeGG</td>
-           <td>234567</td>
-           <td>+2547777</td>
-           <td>Email@gmail.com</td>
+           <td>{{column.lastName}}</td>
+           <td>{{column.idNumber}}</td>
+           <td>{{column.phoneNumber}}</td>
+           <td>{{column.emailAddress}}</td>
+           <td>{{column.relationship}}</td>
+           <!-- <td>Email@gmail.com</td>
            <td>Mother</td>
-           
-           <td>
-             <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal" class="btn btn-info">Edit</button> <br>
-               <button class="btn btn-danger">View</button>
-            
-           </td>
+            -->
+            <td>
+              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+                data-bs-target="#exampleModal" (click)="onEdit(column)" class="btn btn-info">Edit</button>
+              <button  class="btn btn-danger mx-3">Delete</button>
+            </td>
          </tr>
        </tbody>
      
@@ -134,7 +128,7 @@
               </div>
               <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">ID NUMBER</label>
-                <input type="number" formControlName="id" class="form-control" id="exampleInputEmail1"
+                <input type="number" formControlName="idNumber" class="form-control" id="exampleInputEmail1"
                   aria-describedby="emailHelp">
               </div>
         
@@ -240,8 +234,8 @@
            </div>
            <div class="modal-footer">
              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-             <button type="button"  class="btn btn-primary">Add</button>
-             <button type="button" 
+             <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+             <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                class="btn btn-primary">Update</button>
            </div>
          </div>

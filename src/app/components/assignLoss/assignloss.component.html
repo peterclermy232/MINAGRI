@@ -15,7 +15,7 @@
         <div class="container-fluid">
           <h1 style="color: aliceblue;">Add New Loss</h1>
           <div class="d-flex">
-            <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+            <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Add New Loss</button>
           </div>
         </div>
@@ -30,13 +30,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr >
-           <td>1</td>
-            <td>accredit</td>
+          <tr *ngFor ="let row of assignData">
+           <td>{{row.id}}</td>
+            <td>{{row.assessor}}</td>
             
             <td>
               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+                data-bs-target="#exampleModal" (click)="onEdit( row)" class="btn btn-info">Edit</button>
              
             </td>
           </tr>
@@ -50,7 +50,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel">Role Type</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form [formGroup]="formValue">
@@ -58,7 +58,7 @@
 
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Select Loss Assessors</label>
-                  <select class="form-control">
+                  <select class="form-control" formControlName="assessor">
                     <option>Accredit</option>
                     <option>Blacklisted</option>
                     <option>Disable</option>
@@ -72,8 +72,8 @@
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button"  class="btn btn-primary">Add</button>
-              <button type="button" 
+              <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                 class="btn btn-primary">Update</button>
             </div>
           </div>

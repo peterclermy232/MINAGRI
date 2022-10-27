@@ -15,7 +15,7 @@
         <div class="container-fluid">
           <h1 style="color: aliceblue;">Add New Crop Varieties</h1>
           <div class="d-flex">
-            <button  class="btn btn-success" type="button" data-bs-toggle="modal"
+            <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Add New Crop</button>
           </div>
         </div>
@@ -25,8 +25,9 @@
         <thead>
           <tr>
            <th scope="col">Organization ID</th>
+           <th scope="col">Crop Variety Name</th>
            <th scope="col">Selected Crop</th>
-            <th scope="col">Crop Variety Name</th>
+            
             
             <th scope="col">Status</th>
             <th scope="col">Action</th>
@@ -34,18 +35,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr >
-           <td>1</td>
-            <td>Peter AtITO</td>
+          <tr *ngFor="let row of cropData" >
+           <td>{{row.id}}</td>
+            <td>{{row.name}}</td>
             
-            <td>Coding</td>
-            <td>
-               Active
-            </td>
+            <td>{{row.select}}</td>
+            <td>{{row.status}}</td>
+            
             
             <td>
               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+                data-bs-target="#exampleModal" (click)="onEdit(row)" class="btn btn-info">Edit</button>
               <button type="button" class="btn btn-success mx-3">View</button>
             </td>
           </tr>
@@ -65,7 +65,7 @@
               <form [formGroup]="formValue">
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Select Crop</label>
-                  <select class="form-control">
+                  <select class="form-control" formControlName="select">
                      <option>Maize</option>
                      
                   </select>
@@ -79,7 +79,7 @@
                 </div>
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Status</label>
-                  <select class="form-control">
+                  <select class="form-control" formControlName="status">
                      <option>Active</option>
                      <option>Inactive</option>
                   </select>
@@ -89,8 +89,8 @@
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button"  class="btn btn-primary">Add</button>
-              <button type="button" 
+              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Add</button>
+              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                 class="btn btn-primary">Update</button>
             </div>
           </div>

@@ -1,0 +1,98 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "name": "maize",
+      "description": "good growth"
+    },
+    {
+      "id": 2,
+      "name": "MIXED f",
+      "firstName": "Lami",
+      "lastName": "jenga",
+      "physicalAddress": "Physcal@addrea.com",
+      "idNumber": 232437784994,
+      "category": "crop",
+      "date": "10/2/22",
+      "upi": null,
+      "farmName": "acra",
+      "farmSize": 5,
+      "bankName": "Equity",
+      "accountNumber": 1000000003445,
+      "emailAddres": null,
+      "phoneNumber": 756633663,
+      "relationship": "Father"
+    },
+    {
+      "id": 3,
+      "name": "Sorghum",
+      "status": "Inactive"
+    },
+    {
+      "id": 4,
+      "name": null,
+      "firstName": "denis",
+      "lastName": "lee",
+      "physicalAddress": "addr@phsycal.com",
+      "idNumber": 345558869,
+      "category": "crop",
+      "date": "10/2/34",
+      "upi": null,
+      "farmName": "ollee",
+      "farmSize": 8,
+      "bankName": "family",
+      "accountNumber": 2004849494000,
+      "emailAddres": null,
+      "phoneNumber": 762435355,
+      "relationship": "Mother"
+    },
+    {
+      "id": 5,
+      "name": "Beans",
+      "select": "Maize",
+      "status": {
+        "name": "Beans",
+        "select": "Maize",
+        "status": "Inactive"
+      }
+    },
+    {
+      "id": 6,
+      "name": "Maize",
+      "status": "Active"
+    },
+    {
+      "id": 7,
+      "name": "carrot",
+      "status": "Active"
+    },
+    {
+      "id": 8,
+      "organization": "group",
+      "user": "maize",
+      "practiceNumber": "23344",
+      "status": "Blacklisted"
+    },
+    {
+      "id": 9,
+      "name": "maize",
+      "description": "hello"
+    },
+    {
+      "id": 10,
+      "name": "Unemployment",
+      "description": "no job",
+      "select": "Active"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
