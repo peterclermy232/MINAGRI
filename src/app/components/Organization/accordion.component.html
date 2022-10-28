@@ -1,11 +1,11 @@
 <main id="main" class="main">
     <div class="pagetitle">
-       <h1>Manage Organization</h1>
+       <h1>Manage Organisation</h1>
        <nav>
           <ol class="breadcrumb">
              <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Organization</li>
-             <li class="breadcrumb-item active">Organization</li>
+             <li class="breadcrumb-item">Organisation</li>
+             <li class="breadcrumb-item active">Organisation</li>
           </ol>
        </nav>
     </div>
@@ -14,10 +14,10 @@
 
        <nav class="navbar navbar-ligth ">
          <div class="container-fluid">
-           <h1 style="color: aliceblue;">Add New Organization Type</h1>
+           <h1 style="color: aliceblue;">Add New Organisation Type</h1>
            <div class="d-flex">
              <button  (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal">Add New Organization Type</button>
+               data-bs-target="#exampleModal">Add New Organisation Type</button>
            </div>
          </div>
        </nav>
@@ -25,8 +25,8 @@
        <table class="table mt-3">
          <thead>
            <tr>
-            <th scope="col">Organization ID</th>
-             <th scope="col">Organization Type Name</th>
+            <th scope="col">Organisation ID</th>
+             <th scope="col">Organisation Type Name</th>
              <th scope="col">Description</th>
               <th scope="col">Status</th> 
              <th scope="col">Action</th>
@@ -55,13 +55,13 @@
          <div class="modal-dialog">
            <div class="modal-content">
              <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">Organization Type</h5>
+               <h5 class="modal-title" id="exampleModalLabel">Organisation Type</h5>
                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
              </div>
              <div class="modal-body">
                <form [formGroup]="formValue">
                  <div class="mb-3">
-                   <label for="exampleInputEmail1" class="form-label">Enter Organization Type Name</label>
+                   <label for="exampleInputEmail1" class="form-label">Enter Organisation Type Name</label>
                    <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                      aria-describedby="emailHelp">
        
