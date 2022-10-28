@@ -28,7 +28,7 @@
             <th scope="col">Organization ID</th>
              <th scope="col">Organization Type Name</th>
              <th scope="col">Description</th>
-             <!-- <th scope="col">Status</th> -->
+              <th scope="col">Status</th> 
              <th scope="col">Action</th>
              
            </tr>
@@ -38,7 +38,7 @@
             <td>{{row.id}}</td>
              <td>{{row.name}}</td>
              <td>{{row.description}}</td>
-             <!-- <td>Active</td> -->
+             <td>{{row.status}}</td>
              
              <td>
                <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
@@ -61,7 +61,7 @@
              <div class="modal-body">
                <form [formGroup]="formValue">
                  <div class="mb-3">
-                   <label for="exampleInputEmail1" class="form-label">Enter Organization Name</label>
+                   <label for="exampleInputEmail1" class="form-label">Enter Organization Type Name</label>
                    <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                      aria-describedby="emailHelp">
        
@@ -74,6 +74,14 @@
                    <label for="exampleInputPassword1" class="form-label">Status</label>
                    <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
                  </div> -->
+                 <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">Status </label>
+                  <select class="form-control" formControlName="status">
+                    <option>Active</option>
+                     <option>Inactive</option>
+                   
+                    </select>
+                  </div> 
                </form>
              </div>
              <div class="modal-footer">
