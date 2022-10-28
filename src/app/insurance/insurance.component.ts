@@ -37,7 +37,7 @@ export class InsuranceComponent implements OnInit {
     }
   
     postEmployeeDetails(){
-      this.insuranceModelObj.idNumber= this.formValue.value.idNumber;
+      this.insuranceModelObj.id= this.formValue.value.id;
     this.insuranceModelObj.idNumber= this.formValue.value.idNumber;
     this.insuranceModelObj.farm = this.formValue.value.farm;
     this.insuranceModelObj.insurance= this.formValue.value.insurance;
