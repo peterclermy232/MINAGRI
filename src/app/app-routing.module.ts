@@ -26,6 +26,16 @@ import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.co
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
 import { FarmerComponent } from './farmer/farmer.component';
+import { QuotationComponent } from './quotation/quotation.component';
+import { InsuranceComponent } from './insurance/insurance.component';
+import { PaidComponent } from './paid/paid.component';
+import { InvoiceComponent } from './invoice/invoice.component';
+import { ApprovedComponent } from './approved/approved.component';
+import { PendingComponent } from './pending/pending.component';
+import { SettledComponent } from './settled/settled.component';
+import { PaymentComponent } from './payment/payment.component';
+import { PaidClaimComponent } from './paid-claim/paid-claim.component';
+import { ClaimComponent } from './claim/claim.component';
 
 const routes: Routes = [
   { path: '', component: PagesLoginComponent },
@@ -38,13 +48,27 @@ const routes: Routes = [
   { path: 'badges', component: BadgesComponent },
   {path: 'assignloss', component: AssignlossComponent},
   { path: 'charts-chartjs', component: ChartsChartjsComponent },
+  {path: 'invoice', component: InvoiceComponent},
+  {path: 'approved', component: ApprovedComponent},
+  {path:'pending', component: PendingComponent},
+  {path: 'settled', component: SettledComponent},
 
   {path: 'manage-product', component: ManageProductComponent},
   {path: 'manage-insurance', component: ManageInsuranceComponent},
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
   { path: 'form-elements', component: FormsElementsComponent },
   {path: 'farmer', component: FarmerComponent},
+<<<<<<< HEAD
 
+=======
+  {path: 'quotation', component: QuotationComponent},
+  {path: 'insurance', component: InsuranceComponent},
+  {path: 'paid', component: PaidComponent},
+  {path: 'payment', component: PaymentComponent},
+  {path: 'peid', component: PaidClaimComponent },
+  {path: 'claim', component: ClaimComponent},
+  
+>>>>>>> 844c7c726a1aa2ade83511e777451a4fd50047f6
   { path: 'icons-bootstrap', component: IconsBootstrapComponent },
   { path: 'icons-boxicons', component: IconsBoxiconsComponent },
 
