@@ -58,17 +58,12 @@ const routes: Routes = [
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
   { path: 'form-elements', component: FormsElementsComponent },
   {path: 'farmer', component: FarmerComponent},
-<<<<<<< HEAD
-
-=======
   {path: 'quotation', component: QuotationComponent},
   {path: 'insurance', component: InsuranceComponent},
   {path: 'paid', component: PaidComponent},
   {path: 'payment', component: PaymentComponent},
   {path: 'peid', component: PaidClaimComponent },
   {path: 'claim', component: ClaimComponent},
-  
->>>>>>> 844c7c726a1aa2ade83511e777451a4fd50047f6
   { path: 'icons-bootstrap', component: IconsBootstrapComponent },
   { path: 'icons-boxicons', component: IconsBoxiconsComponent },
 
