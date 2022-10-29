@@ -35,18 +35,18 @@ export class PaidComponent implements OnInit {
       this.showAdd = true;
       this.showUpdate = false;
     }
-  
+
     postEmployeeDetails(){
-      this.paidModelObj.idNumber= this.formValue.value.idNumber;
-    this.paidModelObj.idNumber= this.formValue.value.idNumber;
+    this.paidModelObj.idNumber = this.formValue.value.idNumber;
+    this.paidModelObj.idNumber = this.formValue.value.idNumber;
     this.paidModelObj.farm = this.formValue.value.farm;
     this.paidModelObj.insurance= this.formValue.value.insurance;
     this.paidModelObj.planting = this.formValue.value.planting;
     this.paidModelObj.landSize = this.formValue.value.landSize;
     this.paidModelObj.measure = this.formValue.value.measure;
-      
-      
-      
+
+
+
       this.api.postPaid(this.  paidModelObj)
       .subscribe(res=>{
         console.log(res);
@@ -84,22 +84,17 @@ export class PaidComponent implements OnInit {
       this.formValue.controls['landSize'].setValue( row.landSize);
       this.formValue.controls['assessor'].setValue( row.assessor);
       this.formValue.controls['measure'].setValue( row.measure);
-
-      
-     
-     
-     
     }
     updateEmployeeDetails(){
-    this.paidModelObj.idNumber= this.formValue.value.idNumber;
+    this.paidModelObj.idNumber = this.formValue.value.idNumber;
     this.paidModelObj.farm = this.formValue.value.farm;
     this.paidModelObj.insurance= this.formValue.value.insurance;
     this.paidModelObj.planting = this.formValue.value.planting;
     this.paidModelObj.landSize = this.formValue.value.landSize;
     this.paidModelObj.measure = this.formValue.value.measure;
-      
-      
-      
+
+
+
        this.api.updatePaid(this.  paidModelObj,this.  paidModelObj.id)
       .subscribe(res=>{
         alert("Updated Successfully")

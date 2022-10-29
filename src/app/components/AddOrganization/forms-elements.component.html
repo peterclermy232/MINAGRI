@@ -16,7 +16,7 @@
          <div class="container">
            <div class="d-flex">
              <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal">Add New Organization </button>
+               data-bs-target="#exampleModal">Add New User </button>
            </div>
          </div>
        </nav>
@@ -24,13 +24,16 @@
        <table class="table mt-3">
          <thead>
            <tr>
-            <th scope="col">Organization ID</th>
+            <th scope="col">Organisation ID</th>
              
-             <th scope="col">Organization Name</th>
+             <th scope="col">Organisation Name</th>
              
              <th scope="col">First Name</th>
              <th scope="col">Second Name</th>
              <th scope="col">Last Name</th>
+             <th scope="col">Password</th>
+             <th scope="col">   Confirm  Password</th>
+            
              
              <th scope="col">Action</th>
              
@@ -45,6 +48,9 @@
              <td>{{row.firstName}}</td>
              <td>{{row.secondName}}</td>
              <td>{{row.lastName}}</td>
+             <td>{{row.password}</td>
+             <td>{{row.confirm}}</td>
+            
              
              
              <td>
@@ -62,14 +68,14 @@
          <div class="modal-dialog">
            <div class="modal-content">
              <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">Organization Type</h5>
+               <h5 class="modal-title" id="exampleModalLabel">Organisation Type</h5>
                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
              </div>
              <div class="modal-body">
                <form [formGroup]="formValue">
                 
                  <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Enter Organization Name</label>
+                  <label for="exampleInputEmail1" class="form-label">Enter Organisation Name</label>
                   <input type="text" formControlName="organization" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
@@ -91,14 +97,15 @@
 
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Password</label>
-                  <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputPassword1">
+                  <input type="number" formControlName="password" class="form-control" id="exampleInputPassword1">
                 </div>
 
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Confirm Password</label>
-                  <input type="number" formControlName="confirmPassword" class="form-control" id="exampleInputPassword1">
+                  <label for="exampleInputPassword1" class="form-label">   Confirm  Password</label>
+                  <input type="number" formControlName="confirm" class="form-control" id="exampleInputPassword1">
                 </div>
-
+                
+                
                
                </form>
              </div>

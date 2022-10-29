@@ -4,7 +4,11 @@ export class UserModel{
     firstName : string = '';
     secondName : string = '';
     lastName : string = '';
-    password : string = '';
-    confirmPassword : number = 0;
+    password : number = 0;
+    confirm: number = 0;
+   
 
 }
+
+
+

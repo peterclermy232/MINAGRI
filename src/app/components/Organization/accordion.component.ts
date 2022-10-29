@@ -20,17 +20,11 @@ export class AccordionComponent implements OnInit {
     ) { }
 
   ngOnInit(): void {
-    // this.formValue = this.formbuilder.group({
-    //   name : [''],
-    //   description : ['']
-    //   //email : [''],
-    //  // mobile : [''],
-    //  // salary : ['']
-    // })
+   
     this.formValue = this.formbuilder.group({
       name : [''],
-      description : ['']
-      // lastName : [''],
+      description : [''],
+       status : [''],
       // email : [''],
       // mobile : [''],
       // salary : ['']
@@ -46,6 +40,7 @@ export class AccordionComponent implements OnInit {
   postEmployeeDetails(){
     this.organizationModelObj.name = this.formValue.value.name;
     this.organizationModelObj.description = this.formValue.value.description;
+    this.organizationModelObj.status = this.formValue.value.status
     
     this.api.postOrganization(this.organizationModelObj)
     .subscribe(res=>{
@@ -79,11 +74,13 @@ export class AccordionComponent implements OnInit {
     this.organizationModelObj.id = row.id;
     this.formValue.controls['name'].setValue(row.name);
     this.formValue.controls['description'].setValue(row.description);
+    this.formValue.controls['status'].setValue(row.status);
    
   }
   updateEmployeeDetails(){
     this.organizationModelObj.name = this.formValue.value.name;
     this.organizationModelObj.description = this.formValue.value.description;
+    this.organizationModelObj.status = this.formValue.value.status
     
     this.api.updateOrganization(this.organizationModelObj,this.organizationModelObj.id)
     .subscribe(res=>{

@@ -27,8 +27,10 @@ export class FormsElementsComponent implements OnInit {
       firstName : [''],
       secondName : [''],
       lastName : [''],
-      password : [''],
-      confirmPassword : ['']
+       password: [''],
+      confirm: [''],
+     role : [''],
+     status : ['']
     })
     this.getAllEmployee();
   }
@@ -43,8 +45,8 @@ export class FormsElementsComponent implements OnInit {
       this.userModelObj.firstName = this.formValue.value.firstName;
       this.userModelObj.secondName = this.formValue.value.secondName;
       this.userModelObj.lastName = this.formValue.value.lastName;
-      this.userModelObj.password = this.formValue.value.password;
-      this.userModelObj.confirmPassword = this.formValue.value.confirmPassword;
+      this.userModelObj. password = this.formValue.value. password;
+      this.userModelObj. confirm = this.formValue.value. confirm;
       
       
       
@@ -52,7 +54,7 @@ export class FormsElementsComponent implements OnInit {
       this.api.postUser(this.  userModelObj)
       .subscribe(res=>{
         console.log(res);
-        alert("Organization Added Successfully");
+        alert(" Added Successfully");
         let ref = document.getElementById('cancel')
         ref?.click();
         this.formValue.reset();
@@ -83,8 +85,9 @@ export class FormsElementsComponent implements OnInit {
       this.formValue.controls['firstName'].setValue( row.firstName);
       this.formValue.controls['secondName'].setValue( row.secondName);
       this.formValue.controls['lastName'].setValue( row.lastName);
-      this.formValue.controls['password'].setValue( row.password);
-      this.formValue.controls['confirmPassword'].setValue( row.confirmPassword);
+      this.formValue.controls[' password'].setValue( row. password);
+      this.formValue.controls[' confirm'].setValue( row. confirm);
+      
       
       
       
@@ -97,8 +100,9 @@ export class FormsElementsComponent implements OnInit {
       this.userModelObj.firstName = this.formValue.value.firstName;
       this.userModelObj.secondName = this.formValue.value.secondName;
       this.userModelObj.lastName = this.formValue.value.lastName;
-      this.userModelObj.password = this.formValue.value.password;
-      this.userModelObj.confirmPassword = this.formValue.value.confirmPassword;
+      this.userModelObj. password = this.formValue.value. password;
+      this.userModelObj. confirm = this.formValue.value. confirm;
+      
       
       
       
