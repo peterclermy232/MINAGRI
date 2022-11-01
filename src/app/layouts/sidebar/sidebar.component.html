@@ -1,7 +1,34 @@
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
        <li class="nav-item"> <a class="nav-link " routerLink="/dashboard"> <i class="bi bi-grid"></i> <span>Dashboard</span> </a></li>
+      
+      <!--Policy Mgt-->
+      <li class="nav-item">
+         <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-layout-text-window-reverse"></i><span>Policy Administration</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+         <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+            <li> <a routerLink="/manage-farmer"> <i class="bi bi-circle"></i><span>Farmer Register</span> </a></li>
+            <!-- <li> <a routerLink="/farmer"> <i class="bi bi-circle"></i><span>Self Farmer Registration</span> </a></li> -->
+            <li> <a routerLink="/Quotation"> <i class="bi bi-circle"></i><span>Open Quotation</span> </a></li>
+            <li> <a routerLink="/paid"> <i class="bi bi-circle"></i><span>Paid Quotation</span> </a></li>
+            <li> <a routerLink="/insurance"> <i class="bi bi-circle"></i><span>Subsidy Approved Quotation</span> </a></li>
+            <!-- <li> <a routerLink="/tables-data"> <i class="bi bi-circle"></i><span>Data Tables</span> </a></li> -->
+         </ul>
+      </li>      
+      
+      <!--Subsidy Settlement-->
+      <li class="nav-item">
+         <a class="nav-link collapsed" data-bs-target="#subsidy-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-gem"></i><span>Subsidy Settlement</span><i class="bi bi-chevron-down ms-auto"></i> </a>
+         <ul id="subsidy-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+         <li> <a routerLink="/invoice"> <i class="bi bi-circle"></i><span>Open Invoice</span> </a></li>
+         <li> <a routerLink="/approved"> <i class="bi bi-circle"></i><span>Approved Invoice</span> </a></li>
+         <li> <a routerLink="/pending"> <i class="bi bi-circle"></i><span>Pending Settlement</span> </a></li>
+         <li> <a routerLink="/settled"> <i class="bi bi-circle"></i><span>Settled Invoice</span> </a></li>
+         </ul>
+       </li>
+      
+      
        <li class="nav-item">
+
           <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-menu-button-wide"></i><span>Manage Organization</span><i class="bi bi-chevron-down ms-auto"></i> </a>
           <!-- <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
              <li> <a routerLink="/alerts"> <i class="bi bi-circle"></i><span>Alerts</span> </a></li>
@@ -77,26 +104,8 @@
 
 
 
-       <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-layout-text-window-reverse"></i><span>Policy Administration</span><i class="bi bi-chevron-down ms-auto"></i> </a>
-          <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-             <li> <a routerLink="/manage-farmer"> <i class="bi bi-circle"></i><span>Farmer Register</span> </a></li>
-             <!-- <li> <a routerLink="/farmer"> <i class="bi bi-circle"></i><span>Self Farmer Registration</span> </a></li> -->
-             <li> <a routerLink="/Quotation"> <i class="bi bi-circle"></i><span>Open Quotation</span> </a></li>
-             <li> <a routerLink="/paid"> <i class="bi bi-circle"></i><span>Paid Quotation</span> </a></li>
-             <li> <a routerLink="/insurance"> <i class="bi bi-circle"></i><span>Subsidy Approved Quotation</span> </a></li>
-             <!-- <li> <a routerLink="/tables-data"> <i class="bi bi-circle"></i><span>Data Tables</span> </a></li> -->
-          </ul>
-       </li>
-       <li class="nav-item">
-         <a class="nav-link collapsed" data-bs-target="#subsidy-nav" data-bs-toggle="collapse" href="#"> <i class="bi bi-gem"></i><span>Subsidy Settlement</span><i class="bi bi-chevron-down ms-auto"></i> </a>
-         <ul id="subsidy-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-         <li> <a routerLink="/invoice"> <i class="bi bi-circle"></i><span>Open Invoice</span> </a></li>
-         <li> <a routerLink="/approved"> <i class="bi bi-circle"></i><span>Approved Invoice</span> </a></li>
-         <li> <a routerLink="/pending"> <i class="bi bi-circle"></i><span>Pending Settlement</span> </a></li>
-         <li> <a routerLink="/settled"> <i class="bi bi-circle"></i><span>Settled Invoice</span> </a></li>
-         </ul>
-       </li>
+       
+       
        
 
        <li class="nav-item">
