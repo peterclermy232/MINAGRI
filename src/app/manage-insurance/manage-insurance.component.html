@@ -78,7 +78,7 @@
        
        <!-- Modal -->
        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-         <div class="modal-dialog">
+         <div class="modal-dialog modal-lg">
            <div class="modal-content w-100">
              <div class="modal-header">
                <h5 class="modal-title" id="exampleModalLabel">Manage Product</h5>
@@ -94,8 +94,6 @@
        
                  </div>
                  
-                  
-
                  <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Select Organization</label>
                     <select class="form-control">
@@ -103,6 +101,9 @@
                         <option>Default select</option>
                       </select>
                  </div> 
+
+                </div>
+                <div class="row align-items-start">
                  <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Select Product Catagory</label>
                     <select class="form-control">
@@ -110,9 +111,8 @@
                         <option>Default select</option>
                       </select>
                  </div> 
-                </div>
+                
                
-                <div class="row align-items-start">
                  <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Select Farmer Category</label>
                     <select class="form-control">
@@ -120,6 +120,8 @@
                         <option>Off</option>
                       </select>
                  </div> 
+                </div>
+                <div class="row align-items-start">
                  <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Select Average Rate</label>
                     <select class="form-control">
@@ -137,6 +139,7 @@
 
                  </div>
                  
+                 
                  <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Select Crop Varieties</label>
                     <select class="form-control">
@@ -145,51 +148,64 @@
                       </select>
                  </div> 
                
-            
-                 <div class="mb-3">
+                 <div class="row align-items-start">
+                 <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Season Start Date</label>
-                    <input class="date form-control"  type="text">  
+                    <input class="date form-control"  type="date">  
                  </div>
-                 <div class="mb-3">
+                 <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Season End Date</label>
-                    <input class="date form-control"  type="text">  
+                    <input class="date form-control"  type="date">  
                  </div>
-                 <div class="mb-3">
+                 </div>
+
+                 <div class="row align-items-start">
+                 <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Window Start Date</label>
-                    <input class="date form-control"  type="text">  
+                    <input class="date form-control"  type="date">  
                  </div>
-                 <div class="mb-3">
+                 <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Window End Date</label>
-                    <input class="date form-control"  type="text">  
+                    <input class="date form-control"  type="date">  
                  </div>
+                 </div>
+
                  <h3>Loading</h3>
-                 <div class="mb-3">
+                 <div class="row align-items-start">
+                 <div class="col mb-3">
                     <label for="exampleInputEmail1" class="form-label">Enter Loading Name</label>
                     <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                       aria-describedby="emailHelp">
         
                   </div>
-
-                  <div class="mb-3">
+                
+                  <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Select Organization the Loading applies for</label>
                     <select class="form-control">
                         <option>Insurance Company</option>
                         <option>Default select</option>
                       </select>
                  </div> 
-                 <div class="mb-3">
+                 </div>
+
+                 <div class="row align-items-start">
+                 <div class="col mb-3">
                     <label for="exampleInputPassword1" class="form-label">Select Type(%/Fixed)</label>
                     <select class="form-control">
                         <option>Insurance Company</option>
                         <option>Default select</option>
                       </select>
                  </div> 
-                  <div class="mb-3">
+                
+               
+                  <div class="col mb-3">
                     <label for="exampleInputEmail1" class="form-label">Paremeter Name</label>
                     <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                       aria-describedby="emailHelp">
         
                   </div>
+                </div>
+
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Upload</label>
                     <input type="file" formControlName="name" class="form-control" id="exampleInputEmail1"

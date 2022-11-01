@@ -36,6 +36,7 @@ import { SettledComponent } from './settled/settled.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
 import { ClaimComponent } from './claim/claim.component';
+import { SeasonsComponent } from './seasons/seasons.component';
 
 const routes: Routes = [
   { path: '', component: PagesLoginComponent },
@@ -52,6 +53,7 @@ const routes: Routes = [
   {path: 'approved', component: ApprovedComponent},
   {path:'pending', component: PendingComponent},
   {path: 'settled', component: SettledComponent},
+  {path: 'seasons', component: SeasonsComponent},
 
   {path: 'manage-product', component: ManageProductComponent},
   {path: 'manage-insurance', component: ManageInsuranceComponent},
