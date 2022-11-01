@@ -43,6 +43,7 @@ import { SettledComponent } from './settled/settled.component';
 import { ClaimComponent } from './claim/claim.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
+import { SeasonsComponent } from './seasons/seasons.component';
 
 @NgModule({
   declarations: [
@@ -84,6 +85,7 @@ import { PaidClaimComponent } from './paid-claim/paid-claim.component';
     ClaimComponent,
     PaymentComponent,
     PaidClaimComponent,
+    SeasonsComponent,
    
   ],
   imports: [
