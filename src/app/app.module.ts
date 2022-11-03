@@ -31,7 +31,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ManageProductComponent } from './manage-product/manage-product.component';
 import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { FarmerComponent } from './farmer/farmer.component';
 import { QuotationComponent } from './quotation/quotation.component';
 import { InsuranceComponent } from './insurance/insurance.component';
@@ -45,6 +45,7 @@ import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
 import { WrittenComponent } from './written/written.component';
+import {AuthHeaderInterceptor} from "./interceptors/auth-header.interceptor";
 
 @NgModule({
   declarations: [
@@ -56,14 +57,14 @@ import { WrittenComponent } from './written/written.component';
     OrganizationComponent,
     AccordionComponent,
     BadgesComponent,
-   
+
     FormsElementsComponent,
     ManageFarmerComponent,
-    
+
     ChartsChartjsComponent,
     AssignlossComponent,
     IconsBootstrapComponent,
-    
+
     IconsBoxiconsComponent,
     UsersProfileComponent,
     PagesFaqComponent,
@@ -88,7 +89,7 @@ import { WrittenComponent } from './written/written.component';
     PaidClaimComponent,
     SeasonsComponent,
     WrittenComponent,
-   
+
   ],
   imports: [
     BrowserModule,
@@ -96,7 +97,13 @@ import { WrittenComponent } from './written/written.component';
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthHeaderInterceptor,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
