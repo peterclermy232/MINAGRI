@@ -88,7 +88,7 @@ import {AuthHeaderInterceptor} from "./interceptors/auth-header.interceptor";
     PaymentComponent,
     PaidClaimComponent,
     SeasonsComponent,
-    WrittenComponent,
+    WrittenComponent
 
   ],
   imports: [
