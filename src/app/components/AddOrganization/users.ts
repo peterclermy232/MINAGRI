@@ -6,7 +6,7 @@ export class UserModel{
     user_msisdn: string = '';
     new_password : number = 0;
     
-
+///
 }
 
 
