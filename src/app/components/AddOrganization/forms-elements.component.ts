@@ -10,7 +10,7 @@ import { UserModel } from './users';
   styleUrls: ['./forms-elements.component.css']
 })
 export class FormsElementsComponent implements OnInit {
-  
+
 
   formValue !:FormGroup;
   userModelObj : UserModel = new UserModel();
@@ -21,7 +21,7 @@ export class FormsElementsComponent implements OnInit {
     private api : UserService
     ) { }
 // <td>{{row.user_type}}</td>
-            
+
 // <td>{{row.user_name}}</td>
 // <td>{{row.user_email}}</td>
 // <td>{{row.user_msisdn}}</td>
@@ -34,7 +34,7 @@ export class FormsElementsComponent implements OnInit {
       user_email : [''],
       user_msisdn : [''],
        new_password: [''],
-     
+
      status : ['']
     })
     this.getAllEmployee();
@@ -44,19 +44,21 @@ export class FormsElementsComponent implements OnInit {
       this.showAdd = true;
       this.showUpdate = false;
     }
-  
+
     postEmployeeDetails(){
       this.userModelObj.user_type= this.formValue.value.user_type;
       this.userModelObj.user_name = this.formValue.value.user_name;
       this.userModelObj.user_email = this.formValue.value.user_email;
       this.userModelObj.user_msisdn = this.formValue.value.user_msisdn;
-      this.userModelObj. new_password = this.formValue.value. new_password;
-     
-      
-      
-      
-      
-      this.api.postUser(this.  userModelObj)
+      this.userModelObj.new_password = this.formValue.value.new_password;
+
+
+      // "organisation_id": 1,
+      //   "country_id": 1,
+      //   "user_status": "ACTIVE"
+      //
+
+      this.api.postUser({...this.userModelObj,organisation_id:1,country_id:1,user_status:'ACTIVE'})
       .subscribe(res=>{
         console.log(res);
         alert(" Added Successfully");
@@ -91,14 +93,14 @@ export class FormsElementsComponent implements OnInit {
       this.formValue.controls['user_email'].setValue( row.user_email);
       this.formValue.controls['user_msisdn'].setValue( row.user_msisdn);
       this.formValue.controls[' new_password'].setValue( row. new_password);
-     
-      
-      
-      
-      
-     
-     
-     
+
+
+
+
+
+
+
+
     }
     updateEmployeeDetails(){
       this.userModelObj.user_type= this.formValue.value.user_type;
@@ -106,10 +108,10 @@ export class FormsElementsComponent implements OnInit {
       this.userModelObj.user_email = this.formValue.value.user_email;
       this.userModelObj.user_msisdn = this.formValue.value.user_msisdn;
       this.userModelObj. new_password = this.formValue.value. new_password;
-     
-      
-      
-      
+
+
+
+
       this.api.updateUser(this.  userModelObj,this.  userModelObj.id)
       .subscribe(res=>{
         alert("Updated Successfully")
@@ -118,7 +120,7 @@ export class FormsElementsComponent implements OnInit {
         this.formValue.reset();
         this.getAllEmployee();
       })
-  
+
   }
 
 }
