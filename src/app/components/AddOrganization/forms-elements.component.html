@@ -28,11 +28,11 @@
              
              <th scope="col">Organisation Name</th>
              
-             <th scope="col">First Name</th>
-             <th scope="col">Second Name</th>
-             <th scope="col">Last Name</th>
+             <th scope="col">User Name</th>
+             <th scope="col">email</th>
+             <th scope="col">Phone Number</th>
              <th scope="col">Password</th>
-             <th scope="col">   Confirm  Password</th>
+             
             
              
              <th scope="col">Action</th>
@@ -43,13 +43,13 @@
          <tbody>
            <tr *ngFor ="let row of userData">
             <td>{{row.id}}</td>
-             <td>{{row.organization}}</td>
+             <td>{{row.user_type}}</td>
             
-             <td>{{row.firstName}}</td>
-             <td>{{row.secondName}}</td>
-             <td>{{row.lastName}}</td>
-             <td>{{row.password}</td>
-             <td>{{row.confirm}}</td>
+             <td>{{row.user_name}}</td>
+             <td>{{row.user_email}}</td>
+             <td>{{row.user_msisdn}}</td>
+             <td>{{row.new_password}</td>
+             <!-- <td>{{row.confirm}}</td> -->
             
              
              
@@ -76,35 +76,35 @@
                 
                  <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Enter Organisation Name</label>
-                  <input type="text" formControlName="organization" class="form-control" id="exampleInputEmail1"
+                  <input type="text" formControlName="user_type" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
                
                 
 
                  <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">First Name</label>
-                   <input type="text" formControlName="firstName" class="form-control" id="exampleInputPassword1">
+                   <label for="exampleInputPassword1" class="form-label">User Name</label>
+                   <input type="text" formControlName="user_name" class="form-control" id="exampleInputPassword1">
                  </div>
-                  <div class="mb-3">
+                  <!-- <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">Second Name</label>
                    <input type="text" formControlName="secondName" class="form-control" id="exampleInputPassword1">
-                 </div>
+                 </div> -->
                  <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Last Name</label>
-                  <input type="text" formControlName="lastName" class="form-control" id="exampleInputPassword1">
+                  <label for="exampleInputPassword1" class="form-label">email</label>
+                  <input type="text" formControlName="user_email" class="form-control" id="exampleInputPassword1">
                 </div>
 
                 <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Password</label>
-                  <input type="number" formControlName="password" class="form-control" id="exampleInputPassword1">
+                  <input type="password" formControlName="new_password" class="form-control" id="exampleInputPassword1">
                 </div>
 
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">   Confirm  Password</label>
                   <input type="number" formControlName="confirm" class="form-control" id="exampleInputPassword1">
                 </div>
-                
+                 -->
                 
                
                </form>

@@ -10,19 +10,19 @@ export class UserService {
   constructor(private http : HttpClient) { }
 
   postUser(data:any){
-    return this.http.post<any>("http://localhost:3000/posts",data)
+    return this.http.post<any>("https://minagri.swiftcoins.co.ke/api/v1/users",data)
     .pipe(map((res:any)=>{
       return res;
     }))
   }
   getUser(){
-    return this.http.get<any>("http://localhost:3000/posts")
+    return this.http.get<any>("https://minagri.swiftcoins.co.ke/api/v1/users")
     .pipe(map((res:any)=>{
       return res;
     }))
   }
   updateUser(data:any,id:number){
-    return this.http.put<any>("http://localhost:3000/posts/"+id,data)
+    return this.http.put<any>("https://minagri.swiftcoins.co.ke/api/v1/users/"+id,data)
     .pipe(map((res:any)=>{
       return res;
     }))

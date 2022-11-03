@@ -20,16 +20,21 @@ export class FormsElementsComponent implements OnInit {
   constructor(private formbuilder:FormBuilder,
     private api : UserService
     ) { }
+// <td>{{row.user_type}}</td>
+            
+// <td>{{row.user_name}}</td>
+// <td>{{row.user_email}}</td>
+// <td>{{row.user_msisdn}}</td>
+// <td>{{row.new_new_password}</td>
 
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
-     organization : [''],
-      firstName : [''],
-      secondName : [''],
-      lastName : [''],
-       password: [''],
-      confirm: [''],
-     role : [''],
+     user_type : [''],
+      user_name : [''],
+      user_email : [''],
+      user_msisdn : [''],
+       new_password: [''],
+     
      status : ['']
     })
     this.getAllEmployee();
@@ -41,12 +46,12 @@ export class FormsElementsComponent implements OnInit {
     }
   
     postEmployeeDetails(){
-      this.userModelObj.organization= this.formValue.value.organization;
-      this.userModelObj.firstName = this.formValue.value.firstName;
-      this.userModelObj.secondName = this.formValue.value.secondName;
-      this.userModelObj.lastName = this.formValue.value.lastName;
-      this.userModelObj. password = this.formValue.value. password;
-      this.userModelObj. confirm = this.formValue.value. confirm;
+      this.userModelObj.user_type= this.formValue.value.user_type;
+      this.userModelObj.user_name = this.formValue.value.user_name;
+      this.userModelObj.user_email = this.formValue.value.user_email;
+      this.userModelObj.user_msisdn = this.formValue.value.user_msisdn;
+      this.userModelObj. new_password = this.formValue.value. new_password;
+     
       
       
       
@@ -81,12 +86,12 @@ export class FormsElementsComponent implements OnInit {
       this.showAdd = false;
       this.showUpdate = true;
       this.  userModelObj.id =  row.id;
-      this.formValue.controls['organization'].setValue( row.organization);
-      this.formValue.controls['firstName'].setValue( row.firstName);
-      this.formValue.controls['secondName'].setValue( row.secondName);
-      this.formValue.controls['lastName'].setValue( row.lastName);
-      this.formValue.controls[' password'].setValue( row. password);
-      this.formValue.controls[' confirm'].setValue( row. confirm);
+      this.formValue.controls['user_type'].setValue( row.user_type);
+      this.formValue.controls['user_name'].setValue( row.user_name);
+      this.formValue.controls['user_email'].setValue( row.user_email);
+      this.formValue.controls['user_msisdn'].setValue( row.user_msisdn);
+      this.formValue.controls[' new_password'].setValue( row. new_password);
+     
       
       
       
@@ -96,13 +101,12 @@ export class FormsElementsComponent implements OnInit {
      
     }
     updateEmployeeDetails(){
-      this.userModelObj.organization= this.formValue.value.organization;
-      this.userModelObj.firstName = this.formValue.value.firstName;
-      this.userModelObj.secondName = this.formValue.value.secondName;
-      this.userModelObj.lastName = this.formValue.value.lastName;
-      this.userModelObj. password = this.formValue.value. password;
-      this.userModelObj. confirm = this.formValue.value. confirm;
-      
+      this.userModelObj.user_type= this.formValue.value.user_type;
+      this.userModelObj.user_name = this.formValue.value.user_name;
+      this.userModelObj.user_email = this.formValue.value.user_email;
+      this.userModelObj.user_msisdn = this.formValue.value.user_msisdn;
+      this.userModelObj. new_password = this.formValue.value. new_password;
+     
       
       
       
