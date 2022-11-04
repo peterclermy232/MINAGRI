@@ -23,7 +23,8 @@ export class ApiInterceptor implements HttpInterceptor {
         url: `${environment.oauth_baseurl}${req.url}`,
         headers: new HttpHeaders()
           .set('Authorization', `Basic ${this.authBasicToken}`)
-          .set('Content-Type', 'application/x-www-form-urlencoded'),
+          .set('Content-Type', 'application/x-www-form-urlencoded')
+          .set('Origin', '*'),
       });
       return next.handle(oauthReq);
     }
@@ -32,7 +33,9 @@ export class ApiInterceptor implements HttpInterceptor {
         console.log('new token', token);
         const changedReq = req.clone({
           url: `${environment.crop_baseurl}${req.url}`,
-          headers: new HttpHeaders().set('Authorization', `Bearer ${token}`),
+          headers: new HttpHeaders()
+            .set('Authorization', `Bearer ${token}`)
+            .set('Origin', '*'),
         });
         return next.handle(changedReq);
       })
