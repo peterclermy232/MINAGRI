@@ -8,6 +8,16 @@ export interface Crop {
   status: boolean;
 }
 
+export interface CropVariety {
+  cropVarietyId?: number;
+  cropId: number;
+  organisationId: number;
+  recordVersion?: number;
+  deleted: boolean;
+  status: boolean;
+  cropVariety: string;
+}
+
 export interface ENV {
   consumer_key: string;
   consumer_secret: string;
