@@ -1,0 +1,12 @@
+{
+  "/oauth2/*": {
+    "target": "https://apim-minagri.wrightinteractives.com:9443",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/crop-insurance/1.0/*": {
+    "target": "https://apim-minagri.wrightinteractives.com:8243",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

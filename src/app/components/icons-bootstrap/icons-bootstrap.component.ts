@@ -1,90 +1,135 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AddcropService } from 'src/app/shared/addcrop.service';
 import { AddModel } from './manage-crop';
+import { Crop } from '../../types';
+import { AuthService } from '../../shared/auth.service';
+import { UserService } from '../../shared/user.service';
+import { CropService } from '../../shared/crop.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-icons-bootstrap',
   templateUrl: './icons-bootstrap.component.html',
-  styleUrls: ['./icons-bootstrap.component.css']
+  styleUrls: ['./icons-bootstrap.component.css'],
 })
 export class IconsBootstrapComponent implements OnInit {
-
-  formValue !:FormGroup;
-  addModelObj : AddModel = new AddModel();
-  addData !:any;
-  showAdd!: boolean;
-  showUpdate!:boolean;
-  constructor(private formbuilder:FormBuilder,
-    private api : AddcropService
-    ) { }
-
+  cropForm: FormGroup;
+  formSubmitted = false;
+  modalMode = {
+    label: 'Create Crop',
+    typ: 'Create',
+  };
+  modalBtn = {
+    loading: false,
+    text: 'Create Crop',
+    classes: 'btn btn-primary',
+  };
+  crops: {
+    loading: boolean;
+    data: Crop[];
+  } = {
+    loading: false,
+    data: [],
+  };
+  dataTable = {
+    columns: [
+      {
+        label: 'Crop',
+        data: 'crop',
+        classes: '',
+      },
+      {
+        label: 'Organization',
+        data: 'organisationId',
+        classes: '',
+      },
+      {
+        label: 'Status',
+        data: 'status',
+        classes: 'text-center',
+      },
+    ],
+  };
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private cropService: CropService,
+    private fb: FormBuilder
+  ) {
+    this.cropForm = this.fb.group({
+      crop: ['', [Validators.required]],
+      status: [true, Validators.required],
+      cropId: [''],
+    });
+  }
   ngOnInit(): void {
-    this.formValue = this.formbuilder.group({
-      name : [''],
-      status : ['']
-      //email : [''],
-     // mobile : [''],
-     // salary : ['']
-    })
-    this.getAllEmployee();
-  }
-  clickAddEmployee(){
-    this.formValue.reset();
-    this.showAdd = true;
-    this.showUpdate = false;
+    this.getCrops();
   }
 
-  postEmployeeDetails(){
-    this. addModelObj.name = this.formValue.value.name;
-    this. addModelObj.status = this.formValue.value.status;
-    
-    this.api.postAdd(this. addModelObj)
-    .subscribe(res=>{
-      console.log(res);
-      alert("Organization Added Successfully");
-      let ref = document.getElementById('cancel')
-      ref?.click();
-      this.formValue.reset();
-      this.getAllEmployee();
-    },
-    error=>{
-      alert("something went wrong");
-    })
+  showModal(crop?: Crop) {
+    if (crop) {
+      this.modalMode.typ = 'edit';
+      this.modalMode.label = 'Edit Crop';
+      this.modalBtn = {
+        text: 'Edit Crop',
+        classes: 'btn btn-warning',
+        loading: false,
+      };
+      this.setCropInfo(crop);
+    } else {
+      this.modalMode.typ = 'create';
+      this.modalMode.label = 'Create Crop';
+      this.modalBtn = {
+        text: 'Create Crop',
+        classes: 'btn btn-primary',
+        loading: false,
+      };
+      this.resetForm();
+    }
   }
-  getAllEmployee(){
-    this.api.getAdd()
-    .subscribe(res=>{
-      this.addData = res;
-    })
+  setCropInfo(crop: Crop) {
+    this.cropForm.get('crop')!.setValue(crop.crop);
+    this.cropForm.get('status')!.setValue(crop.status);
+    this.cropForm.get('cropId')!.setValue(crop.cropId);
   }
-  // deleteEmployee(row:any){
-  //   this.api.deleteEmployee(row.id)
-  //   .subscribe(res=>{
-  //     alert("Employee Deleted")
-  //     this.getAllEmployee();
-  //   })
-  // }
-  onEdit(row:any){
-    this.showAdd = false;
-    this.showUpdate = true;
-    this. addModelObj.id = row.id;
-    this.formValue.controls['name'].setValue(row.name);
-    this.formValue.controls['description'].setValue(row.description);
-   
-  }
-  updateEmployeeDetails(){
-    this. addModelObj.name = this.formValue.value.name;
-    this. addModelObj.status = this.formValue.value.status;
-    
-    this.api.updateAdd(this. addModelObj,this. addModelObj.id)
-    .subscribe(res=>{
-      alert("Updated Successfully")
-      let ref = document.getElementById('cancel')
-      ref?.click();
-      this.formValue.reset();
-      this.getAllEmployee();
-    })
+  getCrops() {
+    this.crops.loading = true;
+    this.cropService
+      .getCrops()
+      .pipe(
+        finalize(() => {
+          this.crops.loading = false;
+        })
+      )
+      .subscribe(
+        (resp) => {
+          this.crops.data = resp;
+        },
+        (err) => {
+          console.log('crop err', err);
+        }
+      );
   }
 
+  resetForm() {
+    this.cropForm.reset();
+    this.cropForm.markAsPristine();
+    this.modalBtn = {
+      loading: false,
+      text: 'Create Crop',
+      classes: 'btn btn-primary',
+    };
+  }
+
+  handleSubmit() {
+    if (this.cropForm.invalid) {
+      console.log('invalid');
+      this.formSubmitted = true;
+      return;
+    }
+
+    this.formSubmitted = false;
+    console.log('ok');
+  }
 }

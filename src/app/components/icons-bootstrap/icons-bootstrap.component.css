@@ -1,0 +1,20 @@
+/*custom styles*/
+
+.en-badge-success{
+  background: #0070ff;
+  color: white;
+  padding: 2px 13px;
+  border-radius: 10px;
+}
+.en-badge-warning{
+  background: #ff8500;
+  color: white;
+  padding: 2px 13px;
+  border-radius: 10px;
+}
+
+.flex-centered{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
