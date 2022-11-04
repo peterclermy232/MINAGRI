@@ -20,7 +20,7 @@ export class ApiInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     if (this.isOauthApi(req.url)) {
       const oauthReq = req.clone({
-        url: `${req.url}`,
+        url: `${environment.oauth_baseurl}${req.url}`,
         headers: new HttpHeaders()
           .set('Authorization', `Basic ${this.authBasicToken}`)
           .set('Content-Type', 'application/x-www-form-urlencoded'),
@@ -31,6 +31,7 @@ export class ApiInterceptor implements HttpInterceptor {
       switchMap((token: any) => {
         console.log('new token', token);
         const changedReq = req.clone({
+          url: `${environment.crop_baseurl}${req.url}`,
           headers: new HttpHeaders().set('Authorization', `Bearer ${token}`),
         });
         return next.handle(changedReq);
