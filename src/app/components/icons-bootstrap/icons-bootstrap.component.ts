@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AddcropService } from 'src/app/shared/addcrop.service';
-import { AddModel } from './manage-crop';
+import Swal from 'sweetalert2';
 import { Crop } from '../../types';
 import { AuthService } from '../../shared/auth.service';
 import { UserService } from '../../shared/user.service';
@@ -16,6 +15,7 @@ import { finalize } from 'rxjs';
 export class IconsBootstrapComponent implements OnInit {
   cropForm: FormGroup;
   formSubmitted = false;
+  currentCrop: null | Crop = null;
   modalMode = {
     label: 'Create Crop',
     typ: 'Create',
@@ -76,6 +76,7 @@ export class IconsBootstrapComponent implements OnInit {
         classes: 'btn btn-warning',
         loading: false,
       };
+      this.currentCrop = crop;
       this.setCropInfo(crop);
     } else {
       this.modalMode.typ = 'create';
@@ -112,6 +113,99 @@ export class IconsBootstrapComponent implements OnInit {
       );
   }
 
+  createCrop() {
+    this.modalBtn = {
+      loading: true,
+      text: 'Processing...',
+      classes: 'btn btn-primary',
+    };
+    this.cropService
+      .postCrop({
+        crop: this.cropForm.get('crop')?.value,
+        deleted: false,
+        icon: 'no icon',
+        organisationId: 1,
+        status: this.cropForm.get('status')?.value,
+      })
+      .pipe(
+        finalize(() => {
+          this.modalBtn = {
+            loading: false,
+            text: 'Create Crop',
+            classes: 'btn btn-primary',
+          };
+        })
+      )
+      .subscribe(
+        (resp) => {
+          console.log('create resp', resp);
+          this.resetForm();
+          this.getCrops();
+        },
+        (err) => {
+          console.log('crop err', err);
+          this.alertWithError();
+        }
+      );
+  }
+  updateCrop() {
+    this.modalBtn = {
+      loading: true,
+      text: 'Processing...',
+      classes: 'btn btn-primary',
+    };
+    this.cropService
+      .updateCrop(
+        {
+          crop: this.cropForm.get('crop')?.value,
+          cropId: this.cropForm.get('cropId')!.value,
+          deleted: false,
+          icon: 'no icon',
+          organisationId: 1,
+          status: this.cropForm.get('status')?.value,
+          recordVersion: this.currentCrop?.recordVersion,
+        },
+        this.cropForm.get('cropId')!.value
+      )
+      .pipe(
+        finalize(() => {
+          this.modalBtn = {
+            loading: false,
+            text: 'Create Crop',
+            classes: 'btn btn-primary',
+          };
+        })
+      )
+      .subscribe(
+        (resp) => {
+          console.log('create resp', resp);
+          this.resetForm();
+          this.getCrops();
+        },
+        (err) => {
+          console.log('crop err', err);
+          this.alertWithError();
+        }
+      );
+  }
+
+  deleteCrop() {
+    const cId = this.currentCrop!.cropId;
+    if (!cId) {
+      return;
+    }
+    this.cropService.deleteCrop(cId).subscribe(
+      (resp) => {
+        Swal.fire('Deleted!', 'Crop successfully deleted', 'success');
+        this.getCrops();
+      },
+      (err) => {
+        console.log('crop err', err);
+        this.alertWithError();
+      }
+    );
+  }
+
   resetForm() {
     this.cropForm.reset();
     this.cropForm.markAsPristine();
@@ -130,6 +224,34 @@ export class IconsBootstrapComponent implements OnInit {
     }
 
     this.formSubmitted = false;
-    console.log('ok');
+    if (this.cropForm.get('cropId')?.value) {
+      this.updateCrop();
+    } else {
+      this.createCrop();
+    }
+  }
+
+  alertWithSuccess() {
+    Swal.fire('Thank you...', 'You submitted succesfully!', 'success');
+  }
+  alertWithError() {
+    Swal.fire('Error Occurred!', 'Try again later!', 'error');
+  }
+
+  confirmBox(crop: Crop) {
+    this.currentCrop = crop;
+    Swal.fire({
+      title: 'Are you sure want to delete crop?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it',
+    }).then((result) => {
+      if (result.value) {
+        this.deleteCrop();
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+      }
+    });
   }
 }
