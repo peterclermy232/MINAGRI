@@ -24,7 +24,7 @@ export class ApiInterceptor implements HttpInterceptor {
         headers: new HttpHeaders()
           .set('Authorization', `Basic ${this.authBasicToken}`)
           .set('Content-Type', 'application/x-www-form-urlencoded')
-          .set('Access-Control-Allow-Origin', 'https://minagri-web.vercel.app'),
+          .set('Access-Control-Allow-Origin', '*'),
       });
       return next.handle(oauthReq);
     }
@@ -35,10 +35,7 @@ export class ApiInterceptor implements HttpInterceptor {
           url: `${environment.crop_baseurl}${req.url}`,
           headers: new HttpHeaders()
             .set('Authorization', `Bearer ${token}`)
-            .set(
-              'Access-Control-Allow-Origin',
-              'https://minagri-web.vercel.app'
-            ),
+            .set('Access-Control-Allow-Origin', '*'),
         });
         return next.handle(changedReq);
       })
