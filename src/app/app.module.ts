@@ -31,7 +31,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ManageProductComponent } from './manage-product/manage-product.component';
 import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FarmerComponent } from './farmer/farmer.component';
 import { QuotationComponent } from './quotation/quotation.component';
 import { InsuranceComponent } from './insurance/insurance.component';
@@ -45,7 +45,11 @@ import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
 import { WrittenComponent } from './written/written.component';
-import {AuthHeaderInterceptor} from "./interceptors/auth-header.interceptor";
+import { AuthHeaderInterceptor } from './interceptors/auth-header.interceptor';
+import { ApiInterceptor } from './interceptors/api.interceptor';
+import { environment } from '../environments/environment';
+import { DataTableComponent } from './ReUsableComponents/data-table/data-table.component';
+import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-section.component';
 
 @NgModule({
   declarations: [
@@ -88,22 +92,28 @@ import {AuthHeaderInterceptor} from "./interceptors/auth-header.interceptor";
     PaymentComponent,
     PaidClaimComponent,
     SeasonsComponent,
-    WrittenComponent
 
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
   ],
   providers: [
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: AuthHeaderInterceptor,
+    //   multi: true,
+    // },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthHeaderInterceptor,
+      useClass: ApiInterceptor,
       multi: true,
     },
+    { provide: 'OAUTH_BASE_URL', useValue: environment.oauth_baseurl },
+    { provide: 'CROP_BASE_URL', useValue: environment.crop_baseurl },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

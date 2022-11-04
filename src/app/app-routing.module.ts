@@ -56,7 +56,7 @@ const routes: Routes = [
   {path: 'settled', component: SettledComponent},
   {path: 'seasons', component: SeasonsComponent},
   {path: 'written', component: WrittenComponent},
-  
+
   {path: 'manage-product', component: ManageProductComponent},
   {path: 'manage-insurance', component: ManageInsuranceComponent},
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
@@ -68,8 +68,8 @@ const routes: Routes = [
   {path: 'payment', component: PaymentComponent},
   {path: 'peid', component: PaidClaimComponent },
   {path: 'claim', component: ClaimComponent},
-  { path: 'icons-bootstrap', component: IconsBootstrapComponent },
-  { path: 'icons-boxicons', component: IconsBoxiconsComponent },
+  { path: 'crop', component: IconsBootstrapComponent },
+  { path: 'crop-varieties', component: IconsBoxiconsComponent },
 
   { path: 'manage-farmer', component: ManageFarmerComponent },
 

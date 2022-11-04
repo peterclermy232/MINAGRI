@@ -10,49 +10,35 @@
       </nav>
    </div>
    <section class="section">
-     
+
       <nav class="navbar navbar-ligth ">
         <div class="container-fluid">
           <h1 style="color: aliceblue;">Add New Crop Varieties</h1>
           <div class="d-flex">
-            <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
+            <button class="btn btn-success" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Add New Crop Variety</button>
           </div>
         </div>
       </nav>
-      
+
       <table class="table mt-3">
         <thead>
           <tr>
            <th scope="col">Organisation ID</th>
            <th scope="col">Crop Variety Name</th>
            <th scope="col">Selected Crop</th>
-            
-            
             <th scope="col">Status</th>
             <th scope="col">Action</th>
-            
+
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let row of cropData" >
-           <td>{{row.id}}</td>
-            <td>{{row.name}}</td>
-            
-            <td>{{row.select}}</td>
-            <td>{{row.status}}</td>
-            
-            
-            <td>
-              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" (click)="onEdit(row)" class="btn btn-info">Edit</button>
-              <button type="button" class="btn btn-success mx-3">View</button>
-            </td>
+          <tr>
           </tr>
         </tbody>
-      
+
       </table>
-      
+
       <!-- Modal -->
       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -62,41 +48,37 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form [formGroup]="formValue">
+              <form >
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Select Crop</label>
+                  <label class="form-label">Select Crop</label>
                   <select class="form-control" formControlName="select">
                      <option>Maize</option>
-                     
+
                   </select>
                 </div>
-                
+
                 <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Enter  Crop Name</label>
                   <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
-      
+
                 </div>
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Status</label>
+                  <label class="form-label">Status</label>
                   <select class="form-control" formControlName="status">
                      <option>Active</option>
                      <option>Inactive</option>
                   </select>
                 </div>
-                
+
               </form>
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Add</button>
-              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-                class="btn btn-primary">Update</button>
             </div>
           </div>
         </div>
       </div>
-      
+
      </section>
- </main> 
- 
+ </main>
