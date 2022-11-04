@@ -13,11 +13,14 @@
 
       <nav class="navbar navbar-ligth">
         <div class="container-fluid">
-          <div class="text-right">
+          <div class="text-right flex-right">
             <button
               (click)="showModal()"
               class="justify-content-end btn btn-success" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Add New Crop</button>
+            <button
+              (click)="getCrops()"
+              class="justify-content-end btn btn-primary" type="button">Refresh Crop Variety</button>
           </div>
         </div>
       </nav>
