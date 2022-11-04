@@ -141,6 +141,7 @@ export class IconsBootstrapComponent implements OnInit {
           console.log('create resp', resp);
           this.resetForm();
           this.getCrops();
+          Swal.fire('Success!', 'Crop created successfully', 'success');
         },
         (err) => {
           console.log('crop err', err);
