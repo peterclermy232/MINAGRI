@@ -92,9 +92,7 @@ import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-
     PaymentComponent,
     PaidClaimComponent,
     SeasonsComponent,
-    WrittenComponent,
-    DataTableComponent,
-    ErrorSectionComponent,
+
   ],
   imports: [
     BrowserModule,
