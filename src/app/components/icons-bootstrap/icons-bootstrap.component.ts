@@ -13,7 +13,7 @@ import { finalize } from 'rxjs';
   styleUrls: ['./icons-bootstrap.component.css'],
 })
 export class IconsBootstrapComponent implements OnInit {
-  cropForm: FormGroup;
+  cropForm!: FormGroup;
   formSubmitted = false;
   currentCrop: null | Crop = null;
   modalMode = {
@@ -40,7 +40,7 @@ export class IconsBootstrapComponent implements OnInit {
         classes: '',
       },
       {
-        label: 'Organization',
+        label: 'Organisation',
         data: 'organisationId',
         classes: '',
       },

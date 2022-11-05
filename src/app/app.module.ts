@@ -27,7 +27,7 @@ import { PagesLoginComponent } from './pages/pages-login/pages-login.component';
 import { PagesError404Component } from './pages/pages-error404/pages-error404.component';
 import { PagesBlankComponent } from './pages/pages-blank/pages-blank.component';
 
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ManageProductComponent } from './manage-product/manage-product.component';
 import { ManageInsuranceComponent } from './manage-insurance/manage-insurance.component';
 import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.component';
@@ -61,13 +61,15 @@ import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-
     OrganizationComponent,
     AccordionComponent,
     BadgesComponent,
+    ErrorSectionComponent,
 
     FormsElementsComponent,
     ManageFarmerComponent,
 
     ChartsChartjsComponent,
     AssignlossComponent,
-    IconsBootstrapComponent,
+    WrittenComponent,
+     IconsBootstrapComponent,
 
     IconsBoxiconsComponent,
     UsersProfileComponent,
@@ -97,8 +99,10 @@ import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    
   ],
   providers: [
     // {
