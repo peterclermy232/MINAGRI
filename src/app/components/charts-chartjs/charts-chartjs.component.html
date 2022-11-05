@@ -11,7 +11,7 @@
    </div>
    <section class="section">
      
-      <nav class="navbar navbar-ligth bg-primary">
+      <nav class="navbar navbar-ligth ">
         <div class="container">
           <div class="d-flex">
             <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
@@ -48,7 +48,7 @@
             
             <td>
               <button  style="color: aliceblue;" (click)="onEdit( users)" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" class="btn btn-info">Edit</button>
+                data-bs-target="#exampleModal"class="btn btn-warning btn-sm">Edit</button>
               
             </td>
           </tr>
@@ -72,21 +72,21 @@
                <h3>Manage Loss Assessors</h3>
 
                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Select Organisation</label>
-                  <input type="text" formControlName="organization" class="form-control" id="exampleInputPassword1">
+                  <label  class="form-label">Select Organisation</label>
+                  <input type="text" formControlName="organization" class="form-control" >
                 </div>
                  <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Select User</label>
-                  <input type="text" formControlName="user" class="form-control" id="exampleInputPassword1">
+                  <label  class="form-label">Select User</label>
+                  <input type="text" formControlName="user" class="form-control" >
                 </div>
 
                <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Practice Number</label>
-                 <input type="text" formControlName="practiceNumber" class="form-control" id="exampleInputPassword1">
+                 <label  class="form-label">Practice Number</label>
+                 <input type="text" formControlName="practiceNumber" class="form-control" >
                </div>
                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Status</label>
-                  <select formControlName="status">
+                  <label  class="form-label">Status</label>
+                  <select class="form-control" formControlName="status">
                      <option>Acredited</option>
                     <option>Blacklisted</option>
                     <option>Disable</option>

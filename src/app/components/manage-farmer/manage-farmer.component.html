@@ -15,7 +15,7 @@
     
      <nav class="navbar navbar-ligth ">
        <div class="container">
-         <div class="d-flex">
+         <div class="flex-centered">
            <button  class="btn btn-success" type="button" (click)="clickAddEmployee()" data-bs-toggle="modal"
              data-bs-target="#exampleModal">Add New Farmer</button>
          </div>
@@ -88,7 +88,7 @@
             -->
             <td>
               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" (click)="onEdit(column)" class="btn btn-info">Edit</button>
+                data-bs-target="#exampleModal" (click)="onEdit(column)" class="btn btn-warning btn-sm">Edit</button>
               <button  class="btn btn-danger mx-3">Delete</button>
             </td>
          </tr>
@@ -108,59 +108,59 @@
              <form [formGroup]="formValue">
               <div class="row">
                <div class="col mb-3">
-                 <label for="exampleInputEmail1" class="form-label">First Name</label>
-                 <input type="text" formControlName="firstName" class="form-control" id="exampleInputEmail1"
+                 <label  class="form-label">First Name</label>
+                 <input type="text" formControlName="firstName" class="form-control" 
                    aria-describedby="emailHelp">
                </div>
                <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Last Name</label>
-                <input type="text" formControlName="lastName" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Last Name</label>
+                <input type="text" formControlName="lastName" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
             </div>
                 
             <div class="row">
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Phone Number</label>
-                <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Phone Number</label>
+                <input type="number" formControlName="phoneNumber" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Email Address</label>
-                <input type="email" formControlName="emailAddress" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Email Address</label>
+                <input type="email" formControlName="emailAddress" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">ID NUMBER</label>
-                <input type="number" formControlName="idNumber" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">ID NUMBER</label>
+                <input type="number" formControlName="idNumber" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
         
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Physical Address</label>
-                <input type="email" formControlName="physicalAddress" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Physical Address</label>
+                <input type="email" formControlName="physicalAddress" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Farmer Catagory</label>
-                <input type="text" formControlName="category" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Farmer Catagory</label>
+                <input type="text" formControlName="category" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Date of Registration</label>
-                <input type="date" formControlName="date" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Date of Registration</label>
+                <input type="date" formControlName="date" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
              </div>
-              <h2>Farm Section</h2>
+              <h2 class="text-center">Farm Section</h2>
                <div class="row">
               <div class="col mb-3">
-                <label for="exampleInputPassword1" class="form-label">Select Location Province</label>
-                <select class="form-control">
+                <label  class="form-label">Select Location Province</label>
+                <select class="form-control" formControlName="location">
                     <option>District</option>
                     <option>Sector</option>
                   </select>
@@ -169,81 +169,81 @@
            
              
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Farm Name</label>
-                <input type="text" formControlName="farmName" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Farm Name</label>
+                <input type="text" formControlName="farmName" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Farm Size</label>
-                <input type="number" formControlName="farmSize" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Farm Size</label>
+                <input type="number" formControlName="farmSize" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
               
             
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter UPI NO.</label>
-                <input type="number" formControlName="upi" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter UPI NO.</label>
+                <input type="number" formControlName="upi" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
             </div>
 
-              <h1>Bank Details</h1>
+              <h1 class="text-center">Bank Details</h1>
               <div class="row">
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Bank Name</label>
-                <input type="text" formControlName="bankName" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Bank Name</label>
+                <input type="text" formControlName="bankName" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Account Number</label>
-                <input type="number" formControlName="accountNumber" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Account Number</label>
+                <input type="number" formControlName="accountNumber" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
               </div>
            
              
               <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Account Address</label>
-                <input type="email" formControlName="accountAddress" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">Enter Account Address</label>
+                <input type="email" formControlName="accountAddress" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
 
-              <h4>Next of Kin</h4>
+              <h4 class="text-center">Next of Kin</h4>
                    <div class="row">
               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">First Name</label>
-                <input type="text" formControlName="firstName" class="form-control" id="exampleInputEmail1"
+                <label  class="form-label">First Name</label>
+                <input type="text" formControlName="firstName" class="form-control" 
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
-               <label for="exampleInputEmail1" class="form-label">Last Name</label>
-               <input type="text" formControlName="lastName" class="form-control" id="exampleInputEmail1"
+               <label  class="form-label">Last Name</label>
+               <input type="text" formControlName="lastName" class="form-control" 
                  aria-describedby="emailHelp">
              </div>
             </div>
             <div class="row">
              <div class="col mb-3">
-               <label for="exampleInputEmail1" class="form-label">Phone Number</label>
-               <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
+               <label  class="form-label">Phone Number</label>
+               <input type="number" formControlName="phoneNumber" class="form-control" 
                  aria-describedby="emailHelp">
              </div>
              <div class="col mb-3">
-               <label for="exampleInputEmail1" class="form-label">Enter Email Address</label>
-               <input type="email" formControlName="emailAddress" class="form-control" id="exampleInputEmail1"
+               <label  class="form-label">Enter Email Address</label>
+               <input type="email" formControlName="emailAddress" class="form-control" 
                  aria-describedby="emailHelp">
              </div>
             </div>
             <div class="row">
              <div class="col mb-3">
-               <label for="exampleInputEmail1" class="form-label">ID NUMBER</label>
-               <input type="number" formControlName="id" class="form-control" id="exampleInputEmail1"
+               <label  class="form-label">ID NUMBER</label>
+               <input type="number" formControlName="id" class="form-control" 
                  aria-describedby="emailHelp">
              </div>
              <div class="col mb-3">
-              <label for="exampleInputEmail1" class="form-label">Enter Relationship</label>
-              <input type="text" formControlName="relationship" class="form-control" id="exampleInputEmail1"
+              <label  class="form-label">Enter Relationship</label>
+              <input type="text" formControlName="relationship" class="form-control" 
                 aria-describedby="emailHelp">
             </div>
           </div>
