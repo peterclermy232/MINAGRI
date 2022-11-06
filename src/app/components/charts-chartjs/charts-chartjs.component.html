@@ -15,7 +15,7 @@
         <div class="container">
           <div class="d-flex">
             <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
-              data-bs-target="#exampleModal">Create New Loss </button>
+              data-bs-target="#exampleModal">Create New Loss Assessors</button>
           </div>
         </div>
       </nav>
@@ -61,7 +61,7 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Organisation Type</h5>
+              <h5 class="modal-title" id="exampleModalLabel">Manage Loss Assesor</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -73,7 +73,12 @@
 
                 <div class="mb-3">
                   <label  class="form-label">Select Organisation</label>
-                  <input type="text" formControlName="organization" class="form-control" >
+                 
+                  <select class="form-select" formControlName="status">
+                     <option>organisation</option>
+                    <!-- <option>Blacklisted</option>
+                    <option>Disable</option> -->
+                  </select>
                 </div>
                  <div class="mb-3">
                   <label  class="form-label">Select User</label>
@@ -96,7 +101,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Add</button>
+              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Save</button>
               <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                 class="btn btn-primary">Update</button>
             </div>

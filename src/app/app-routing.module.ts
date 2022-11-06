@@ -40,6 +40,7 @@ import { SeasonsComponent } from './seasons/seasons.component';
 import { WrittenComponent } from './written/written.component';
 import { ForcastComponent } from './forcast/forcast.component';
 import { HistoricalComponent } from './historical/historical.component';
+import { AdvisoryComponent } from './advisory/advisory.component';
 
 const routes: Routes = [
   { path: '', component: PagesLoginComponent },
@@ -75,6 +76,7 @@ const routes: Routes = [
 
   { path: 'manage-farmer', component: ManageFarmerComponent },
   {path: 'forecast', component: ForcastComponent},
+  {path:'advisory', component: AdvisoryComponent},
   {path: 'historical', component: HistoricalComponent},
   { path: 'pages-blank', component: PagesBlankComponent },
   { path: 'pages-contact', component: PagesContactComponent },

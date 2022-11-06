@@ -52,6 +52,7 @@ import { DataTableComponent } from './ReUsableComponents/data-table/data-table.c
 import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-section.component';
 import { ForcastComponent } from './forcast/forcast.component';
 import { HistoricalComponent } from './historical/historical.component';
+import { AdvisoryComponent } from './advisory/advisory.component';
 
 @NgModule({
   declarations: [
@@ -98,6 +99,7 @@ import { HistoricalComponent } from './historical/historical.component';
     SeasonsComponent,
     ForcastComponent,
     HistoricalComponent,
+    AdvisoryComponent,
 
   ],
   imports: [
