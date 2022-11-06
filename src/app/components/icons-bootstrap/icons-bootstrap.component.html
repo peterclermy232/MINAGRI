@@ -20,7 +20,7 @@
               data-bs-target="#exampleModal">Add New Crop</button>
             <button
               (click)="getCrops()"
-              class="justify-content-end btn btn-primary" type="button">Refresh Crop Variety</button>
+              class="justify-content-end btn btn-primary" type="button">Refresh Crops</button>
           </div>
         </div>
       </nav>
@@ -50,8 +50,11 @@
           </td>
         </tr>
         <tr *ngFor="let dt of crops.data">
-          <td>{{dt.crop}}</td>
-          <td>{{dt.organisationId}}</td>
+          <ng-container *ngFor="let col of dataTable.columns">
+            <td [class]="col.classes" *ngIf="col.dynamic">
+              {{dt[col.data]}}
+            </td>
+          </ng-container>
           <td class="text-center" >
             <div>
               <span *ngIf="dt.status" class="en-badge-success">Active</span>
@@ -59,16 +62,14 @@
             </div>
           </td>
           <td>
-            <div class="flex-centered">
+            <div class="text-center">
               <button
                 (click)="showModal(dt)"
                 type="button"
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModal"
                 class="btn btn-warning btn-sm">Edit</button>
-              <button (click)="confirmBox(dt)" class="btn btn-danger btn-sm">Delete</button>
             </div>
-
           </td>
         </tr>
         </tbody>

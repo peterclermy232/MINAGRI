@@ -6,6 +6,7 @@ import { AuthService } from '../../shared/auth.service';
 import { UserService } from '../../shared/user.service';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
+import { NotifierService } from '../../services/notifier.service';
 
 @Component({
   selector: 'app-icons-boxicons',
@@ -25,16 +26,10 @@ export class IconsBoxiconsComponent implements OnInit {
     text: 'Create Crop Variety',
     classes: 'btn btn-primary',
   };
+  crops: Crop[] = [];
   cropVarieties: {
     loading: boolean;
-    data: CropVariety[];
-  } = {
-    loading: false,
-    data: [],
-  };
-  crops: {
-    loading: boolean;
-    data: Crop[];
+    data: Crop[] | any[];
   } = {
     loading: false,
     data: [],
@@ -44,21 +39,25 @@ export class IconsBoxiconsComponent implements OnInit {
       {
         label: 'Crop Variety',
         data: 'cropVariety',
+        dynamic: true,
         classes: '',
       },
       {
         label: 'Crop',
         data: 'crop',
+        dynamic: true,
         classes: '',
       },
       {
         label: 'Organization',
-        data: 'organisationId',
+        data: 'organisation',
+        dynamic: true,
         classes: '',
       },
       {
         label: 'Status',
         data: 'status',
+        dynamic: false,
         classes: 'text-center',
       },
     ],
@@ -67,6 +66,7 @@ export class IconsBoxiconsComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private cropService: CropService,
+    private notifierService: NotifierService,
     private fb: FormBuilder
   ) {
     this.cropVarietyForm = this.fb.group({
@@ -78,7 +78,6 @@ export class IconsBoxiconsComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getCropVarieties();
-    this.getCrops();
   }
 
   showModal(crop?: CropVariety) {
@@ -109,10 +108,6 @@ export class IconsBoxiconsComponent implements OnInit {
     this.cropVarietyForm.get('status')!.setValue(crop.status);
     this.cropVarietyForm.get('cropVarietyId')!.setValue(crop.cropVarietyId);
   }
-  getItems() {
-    this.getCrops();
-    this.getCropVarieties();
-  }
   getCropVarieties() {
     this.cropVarieties.loading = true;
     this.cropService
@@ -123,26 +118,23 @@ export class IconsBoxiconsComponent implements OnInit {
         })
       )
       .subscribe(
-        (resp) => {
-          this.cropVarieties.data = resp;
-        },
-        (err) => {
-          console.log('crop var err', err);
-        }
-      );
-  }
-  getCrops() {
-    this.cropVarieties.loading = true;
-    this.cropService
-      .getCrops()
-      .pipe(
-        finalize(() => {
-          this.crops.loading = false;
-        })
-      )
-      .subscribe(
-        (resp) => {
-          this.crops.data = resp;
+        (resp: any) => {
+          // this.crops.data = resp;
+          const orgs = resp.orgsResponse.results;
+          const crop = resp.cropsResponse;
+          console.log('cropvars resp', resp);
+          this.crops = crop;
+          this.cropVarieties.data = resp.cropVarResponse.map((cropVar: any) => {
+            const org = orgs.find(
+              (typ: any) => typ.organisation_id === cropVar.organisationId
+            );
+            const cr = crop.find((cp: any) => cp.cropId === cropVar.cropId);
+            return {
+              ...cropVar,
+              crop: cr ? cr.crop : 'none',
+              organisation: org ? org.organisation_name : 'none',
+            };
+          });
         },
         (err) => {
           console.log('crop err', err);
@@ -176,13 +168,22 @@ export class IconsBoxiconsComponent implements OnInit {
       .subscribe(
         (resp) => {
           console.log('create resp', resp);
-          Swal.fire('Success!', 'Crop Variety successfully created', 'success');
+          this.notifierService.showSweetAlert({
+            typ: 'success',
+            message: 'Crop variety successfully created!',
+            timer: true,
+          });
           this.resetForm();
           this.getCropVarieties();
         },
         (err) => {
           console.log('crop err', err);
-          this.alertWithError();
+          const errorMessage =
+            err.error.errors[0].message || 'Invalid data submitted';
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: errorMessage,
+          });
         }
       );
   }
@@ -219,32 +220,24 @@ export class IconsBoxiconsComponent implements OnInit {
       .subscribe(
         (resp) => {
           console.log('create resp', resp);
-          Swal.fire('Success!', 'Crop Variety successfully updated', 'success');
+          this.notifierService.showSweetAlert({
+            typ: 'success',
+            message: 'Crop variety successfully created!',
+            timer: true,
+          });
           this.resetForm();
           this.getCropVarieties();
         },
         (err) => {
           console.log('crop err', err);
-          this.alertWithError();
+          const errorMessage =
+            err.error.errors[0].message || 'Invalid data submitted';
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: errorMessage,
+          });
         }
       );
-  }
-
-  deleteCropVariety() {
-    const cId = this.currentCrop!.cropId;
-    if (!cId) {
-      return;
-    }
-    this.cropService.deleteCrop(cId).subscribe(
-      (resp) => {
-        Swal.fire('Deleted!', 'Crop Variety successfully deleted', 'success');
-        this.getCropVarieties();
-      },
-      (err) => {
-        console.log('crop err', err);
-        this.alertWithError();
-      }
-    );
   }
 
   resetForm() {
@@ -269,46 +262,6 @@ export class IconsBoxiconsComponent implements OnInit {
       this.updateCropVariety();
     } else {
       this.createCropVariety();
-    }
-  }
-
-  alertWithSuccess() {
-    Swal.fire('Thank you...', 'You submitted succesfully!', 'success');
-  }
-  alertWithError() {
-    Swal.fire('Error Occurred!', 'Try again later!', 'error');
-  }
-
-  confirmBox(crop: CropVariety) {
-    this.currentCrop = crop;
-    Swal.fire({
-      title: 'Are you sure want to delete crop variety?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep it',
-    }).then((result) => {
-      if (result.value) {
-        this.deleteCropVariety();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire('Cancelled', 'delete cancelled)', 'error');
-      }
-    });
-  }
-
-  get cropsWithVarieties() {
-    if (this.crops.data.length > 0 && this.cropVarieties.data.length > 0) {
-      return this.cropVarieties.data.map((cVar) => {
-        const cropName = this.crops.data.find(
-          (cp) => cp.cropId === cVar.cropId
-        );
-        return {
-          ...cVar,
-          crop: cropName ? cropName.crop : 'crop',
-        };
-      });
-    } else {
-      return [];
     }
   }
 }

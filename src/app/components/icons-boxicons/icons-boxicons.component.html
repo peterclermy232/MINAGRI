@@ -19,8 +19,8 @@
             class="justify-content-end btn btn-success" type="button" data-bs-toggle="modal"
             data-bs-target="#exampleModal">Add New Crop Variety</button>
           <button
-            (click)="getItems()"
-            class="justify-content-end btn btn-primary" type="button">Refresh Crop</button>
+            (click)="getCropVarieties()"
+            class="justify-content-end btn btn-primary" type="button">Refresh Crop Varieties</button>
       </div>
       </div>
     </nav>
@@ -45,14 +45,16 @@
       <tr *ngIf="cropVarieties.data.length  === 0 && !cropVarieties.loading" >
         <td colspan="5">
           <div class="text-center">
-            <p>No crops found</p>
+            <p>No crop varieties found</p>
           </div>
         </td>
       </tr>
-      <tr *ngFor="let dt of cropsWithVarieties">
-        <td>{{dt.cropVariety}}</td>
-        <td>{{dt.crop}}</td>
-        <td>{{dt.organisationId}}</td>
+      <tr *ngFor="let dt of cropVarieties.data">
+        <ng-container *ngFor="let col of dataTable.columns">
+          <td [class]="col.classes" *ngIf="col.dynamic">
+            {{dt[col.data]}}
+          </td>
+        </ng-container>
         <td class="text-center" >
           <div>
             <span *ngIf="dt.status" class="en-badge-success">Active</span>
@@ -60,20 +62,17 @@
           </div>
         </td>
         <td>
-          <div class="flex-centered">
+          <div class="text-center">
             <button
               (click)="showModal(dt)"
               type="button"
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
               class="btn btn-warning btn-sm">Edit</button>
-            <button (click)="confirmBox(dt)" class="btn btn-danger btn-sm">Delete</button>
           </div>
-
         </td>
       </tr>
       </tbody>
-
     </table>
 
     <!-- Modal -->
@@ -98,7 +97,7 @@
               <div class="mb-3">
                 <label class="form-label">Select Crop</label>
                 <select class="form-control" formControlName="crop_id">
-                  <option *ngFor="let crop of crops.data" [value]="crop.cropId">{{crop.crop}}</option>
+                  <option *ngFor="let crop of crops" [value]="crop.cropId">{{crop.crop}}</option>
                 </select>
                 <app-error-section
                   [formSubmitted]="formSubmitted"

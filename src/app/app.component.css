@@ -7,8 +7,20 @@
   border-radius: 10px;
 }
 .en-badge-warning{
-  background: #0070ff;
+  background: #ff8500;
   color: white;
   padding: 2px 13px;
   border-radius: 10px;
+}
+
+.flex-centered{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.flex-right{
+  display: flex;
+  justify-content: end;
+  gap: 10px;
 }
