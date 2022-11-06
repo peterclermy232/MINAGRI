@@ -50,6 +50,8 @@ import { ApiInterceptor } from './interceptors/api.interceptor';
 import { environment } from '../environments/environment';
 import { DataTableComponent } from './ReUsableComponents/data-table/data-table.component';
 import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-section.component';
+import { ForcastComponent } from './forcast/forcast.component';
+import { HistoricalComponent } from './historical/historical.component';
 
 @NgModule({
   declarations: [
@@ -94,6 +96,8 @@ import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-
     PaymentComponent,
     PaidClaimComponent,
     SeasonsComponent,
+    ForcastComponent,
+    HistoricalComponent,
 
   ],
   imports: [
