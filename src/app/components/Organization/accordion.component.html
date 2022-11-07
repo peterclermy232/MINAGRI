@@ -12,15 +12,24 @@
     <section class="section">
        
 
-       <nav class="navbar navbar-ligth ">
+       <!-- <nav class="navbar navbar-ligth ">
          <div class="container-fluid">
            <h1 style="color: aliceblue;">Add New Organisation Type</h1>
-           <div class="d-flex">
+           <div class="flex-centered">
              <button  (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
                data-bs-target="#exampleModal">Add New Organisation Type</button>
            </div>
          </div>
-       </nav>
+       </nav> -->
+
+       <nav class="navbar navbar-ligth ">
+        <div class="container">
+          <div class="flex-centered">
+            <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">Add New Organisation Type </button>
+          </div>
+        </div>
+      </nav>
        
        <table class="table mt-3">
          <thead>
@@ -86,7 +95,7 @@
              </div>
              <div class="modal-footer">
                <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+               <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button>
                <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                  class="btn btn-primary">Update</button>
              </div>
