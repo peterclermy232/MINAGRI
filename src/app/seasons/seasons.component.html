@@ -28,7 +28,15 @@
           </div>
         </div>
       </nav>
-       
+      
+      <!--search input-->
+      <div class="d-flex justify-content-lg-between mt-2">
+        <div class="search  ">
+        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
+        </div>
+        <button  class="btn btn-success btn-lg"  type="button">Export</button>
+       </div>
+
        <table class="table mt-3">
          <thead>
            <tr >
@@ -88,7 +96,7 @@
                  
                   <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">Status</label>
-                   <select class="form-control" formControlName="select">
+                   <select class="form-select" formControlName="select">
                     <option>Active</option>
                        <option>Inactive</option>
                        
