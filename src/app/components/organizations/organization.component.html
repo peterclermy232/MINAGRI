@@ -22,52 +22,7 @@
             (click)="getOrganizations()"
             class="justify-content-end btn btn-primary" type="button">Refresh Organizations</button>
         </div>
-      </div>
-    </nav>
-    <table class="table mt-3">
-      <thead>
-      <tr>
-        <th *ngFor="let col of dataTable.columns" [class]="col.classes">{{col.label}}</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngIf="organizations.loading">
-        <td colspan="10">
-          <div class="text-center">
-            <p>Loading Organization types...</p>
-          </div>
-          <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-          </div>
-        </td>
-      </tr>
-      <tr *ngIf="organizations.data.length  === 0 && !organizations.loading" >
-        <td colspan="10">
-          <div class="text-center">
-            <p>No organizations found</p>
-          </div>
-        </td>
-      </tr>
-      <tr *ngFor="let dt of organizations.data">
-        <ng-container *ngFor="let col of dataTable.columns">
-          <td [class]="col.classes" *ngIf="col.dynamic">
-              {{dt[col.data]}}
-          </td>
-        </ng-container>
-        <td class="text-center" >
-          <div>
-            <span class="en-badge-success">{{dt.organisation_status}}</span>
-          </div>
-        </td>
-        <td>
-          <div class="text-center">
-            <button
-              (click)="showModal(dt)"
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#exampleModal"
-              class="btn btn-warning btn-sm">Edit</button>
-          </div>
+
 
         </td>
       </tr>

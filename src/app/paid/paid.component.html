@@ -11,15 +11,22 @@
     </div>
     <section class="section">
 
-       <nav class="navbar navbar-ligth bg-primary">
-         <div class="container-fluid">
-           <h1 style="color: aliceblue;">Subsidy Approved Quotation</h1>
-           <div class="d-flex">
+       <nav class="navbar navbar-ligth ">
+         <div class="container">
+           <!-- <h1 style="color: aliceblue;">Subsidy Approved Quotation</h1> -->
+           <div class="flex-centered">
              <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
                data-bs-target="#exampleModal">Subsidy Approved Quotation</button>
            </div>
          </div>
        </nav>
+        <!--search input-->
+      <div class="d-flex justify-content-lg-between mt-2">
+        <div class="search  ">
+        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
+        </div>
+        <button  class="btn btn-success btn-lg"  type="button">Export</button>
+       </div>
 
        <table class="table mt-3">
          <thead>
@@ -73,7 +80,7 @@
 
                  <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label"> Select Farm</label>
-                  <select class="form-control" formControlName="assessor">
+                  <select class="form-select" formControlName="assessor">
                     <option>Accredit</option>
                     <!-- <option>Blacklisted</option>
                     <option>Disable</option> -->
@@ -89,7 +96,7 @@
              </div>
              <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label">Select Planting Window </label>
-              <select class="form-control" formControlName="planting">
+              <select class="form-select" formControlName="planting">
                 <option>Accredit</option>
                 <!-- <option>Blacklisted</option>
                 <option>Disable</option> -->
@@ -101,7 +108,7 @@
               </div>
               <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Select the Unit of Measure </label>
-                <select class="form-control" formControlName="measure">
+                <select class="form-select" formControlName="measure">
                   <option>Acre</option>
                    <option>Hectare</option>
 
@@ -111,7 +118,7 @@
              </div>
              <div class="modal-footer">
                <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+               <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button>
                <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                  class="btn btn-primary">Update</button>
              </div>

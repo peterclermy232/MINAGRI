@@ -13,9 +13,7 @@ import { NotifierService } from '../../services/notifier.service';
   templateUrl: './icons-bootstrap.component.html',
   styleUrls: ['./icons-bootstrap.component.css'],
 })
-export class IconsBootstrapComponent implements OnInit {
-  @ViewChild('modalButton') modalButton!: ElementRef;
-  cropForm: FormGroup;
+
   formSubmitted = false;
   currentCrop: null | Crop = null;
   modalMode = {
@@ -43,9 +41,7 @@ export class IconsBootstrapComponent implements OnInit {
         classes: '',
       },
       {
-        label: 'Organization',
-        data: 'organisation',
-        dynamic: true,
+
         classes: '',
       },
       {

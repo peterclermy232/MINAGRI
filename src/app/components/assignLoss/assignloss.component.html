@@ -11,21 +11,29 @@
    </div>
    <section class="section">
      
-      <nav class="navbar navbar-ligth bg-primary">
+      <nav class="navbar navbar-ligth">
         <div class="container-fluid">
-          <h1 style="color: aliceblue;">Assign Loss Assessors</h1>
-          <div class="d-flex">
+          
+          <div class="flex-centered">
             <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Assign Loss Assessors</button>
           </div>
         </div>
       </nav>
-      
+       <!--search input-->
+       <div class="d-flex justify-content-lg-between mt-2">
+        <div class="search  ">
+        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
+        </div>
+        <button  class="btn btn-success btn-lg"  type="button">Export</button>
+       </div>
+
       <table class="table mt-3">
         <thead>
           <tr>
            <th scope="col">Organization ID</th>
             <th scope="col">Assign Loss Assessors</th>
+            <th scope="col">Action</th>
             
           </tr>
         </thead>
@@ -36,7 +44,7 @@
             
             <td>
               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" (click)="onEdit( row)" class="btn btn-info">Edit</button>
+                data-bs-target="#exampleModal" (click)="onEdit( row)"  class="btn btn-warning btn-sm">Edit</button>
              
             </td>
           </tr>
@@ -49,7 +57,7 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Role Type</h5>
+              
               <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -63,6 +71,7 @@
                     <option>Blacklisted</option>
                     <option>Disable</option>
                     </select>
+                    <app-error-section></app-error-section>
                </div> 
                 <!-- <div class="mb-3">
                   <label for="exampleInputPassword1" class="form-label">Status</label>
@@ -72,7 +81,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+              <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button>
               <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
                 class="btn btn-primary">Update</button>
             </div>
