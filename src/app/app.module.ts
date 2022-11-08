@@ -53,6 +53,7 @@ import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-
 import { ForcastComponent } from './forcast/forcast.component';
 import { HistoricalComponent } from './historical/historical.component';
 import { AdvisoryComponent } from './advisory/advisory.component';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @NgModule({
   declarations: [
@@ -108,6 +109,7 @@ import { AdvisoryComponent } from './advisory/advisory.component';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    NgxPaginationModule
     
   ],
   providers: [

@@ -16,6 +16,7 @@ export class ChartsChartjsComponent implements OnInit {
   lossData !:any;
   showAdd!: boolean;
   showUpdate!:boolean;
+  
   constructor(private formbuilder: FormBuilder,
     private api : LossService) { }
 
