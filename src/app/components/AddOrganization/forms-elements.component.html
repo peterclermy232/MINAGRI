@@ -1,123 +1,168 @@
 <main id="main" class="main">
-    <div class="pagetitle">
-       <h1>Manage User</h1>
-       <nav>
-          <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Forms</li>
-             <li class="breadcrumb-item active">Manage User</li>
-          </ol>
-       </nav>
+  <div class="pagetitle">
+    <h1>Manage Users</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <ol class="breadcrumb-item active">Manage Users</ol>
+      </ol>
+    </nav>
+  </div>
+  <section class="section">
+
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <div class="text-right flex-right">
+          <button
+            (click)="showModal()"
+            class="justify-content-end btn btn-success" type="button" data-bs-toggle="modal"
+            data-bs-target="#exampleModal">Add New User</button>
+          <button
+            (click)="getUsers()"
+            class="justify-content-end btn btn-primary" type="button">Refresh Users</button>
+        </div>
+      </div>
+    </nav>
+    <table class="table mt-3">
+      <thead>
+      <tr>
+        <th *ngFor="let col of dataTable.columns" [class]="col.classes">{{col.label}}</th>
+        <th class="text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngIf="users.loading">
+        <td colspan="10">
+          <div class="text-center">
+            <p>Loading Users...</p>
+          </div>
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="users.data.length  === 0 && !users.loading" >
+        <td colspan="10">
+          <div class="text-center">
+            <p>No Users found</p>
+          </div>
+        </td>
+      </tr>
+      <tr *ngFor="let dt of users.data">
+        <ng-container *ngFor="let col of dataTable.columns">
+          <td [class]="col.classes" *ngIf="col.dynamic">
+            {{dt[col.data]}}
+          </td>
+        </ng-container>
+        <td class="text-center" >
+          <div>
+            <span class="en-badge-success">{{dt.organisation_status}}</span>
+          </div>
+        </td>
+        <td>
+          <div class="text-center">
+            <button
+              (click)="showModal(dt)"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+              class="btn btn-warning btn-sm">Edit</button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{modalMode.label}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form (ngSubmit)="handleSubmit()" [formGroup]="userForm" >
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">User Name</label>
+                <input type="text" formControlName="user_name" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="user_name"
+                  [inputObject]="this.userForm.get('user_name')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">User Email</label>
+                <input type="text" formControlName="user_email" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="user_email"
+                  [inputObject]="this.userForm.get('user_email')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">User Phone</label>
+                <input type="text" formControlName="user_msisdn" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="user_phone_number"
+                  [inputObject]="this.userForm.get('user_msisdn')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Organisation</label>
+                <select class="form-control" formControlName="organisation_id">
+                  <option *ngFor="let org of organizations" [value]="org.organisation_id">{{org.organisation_name}}</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="organisation"
+                  [inputObject]="this.userForm.get('organisation_id')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Country</label>
+                <select class="form-control" formControlName="country_id">
+                  <option *ngFor="let cty of countries" [value]="cty.country_id">{{cty.country}}</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="country"
+                  [inputObject]="this.userForm.get('country_id')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">{{this.userForm.get('userId')!.value ? 'Change': 'User'}} Password</label>
+                <input type="text" formControlName="new_password" class="form-control" [placeholder]="this.userForm.get('userId')!.value ? 'Leave blank to keep current password': 'Enter Password'">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="password"
+                  [inputObject]="this.userForm.get('new_password')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Status of User</label>
+                <select class="form-control" formControlName="user_status">
+                  <option value="ACTIVE">Active</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="status"
+                  [inputObject]="this.userForm.get('user_status')"
+                ></app-error-section>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button [disabled]="modalBtn.loading" type="submit" [class]="modalBtn.classes">{{modalBtn.text}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <section class="section">
-      
-       
-       <nav class="navbar navbar-ligth ">
-         <div class="container">
-           <div class="d-flex">
-             <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal">Add New User </button>
-           </div>
-         </div>
-       </nav>
-       
-       <table class="table mt-3">
-         <thead>
-           <tr>
-            <th scope="col">Organisation ID</th>
-             
-             <th scope="col">Organisation Name</th>
-             
-             <th scope="col">User Name</th>
-             <th scope="col">email</th>
-             <th scope="col">Phone Number</th>
-             <th scope="col">Password</th>
-             
-            
-             
-             <th scope="col">Action</th>
-             
-             
-           </tr>
-         </thead>
-         <tbody>
-           <tr *ngFor ="let row of userData">
-            <td>{{row.id}}</td>
-             <td>{{row.user_type}}</td>
-            
-             <td>{{row.user_name}}</td>
-             <td>{{row.user_email}}</td>
-             <td>{{row.user_msisdn}}</td>
-             <td>{{row.new_password}</td>
-             <!-- <td>{{row.confirm}}</td> -->
-            
-             
-             
-             <td>
-               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                 data-bs-target="#exampleModal" (click)="onEdit( row)" class="btn btn-info ">Edit</button>
-               <!-- <button  class="btn btn-danger mx-3">View</button> -->
-             </td>
-           </tr>
-         </tbody>
-       
-       </table>
-       
-       <!-- Modal -->
-       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-         <div class="modal-dialog">
-           <div class="modal-content">
-             <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">Organisation Type</h5>
-               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-             </div>
-             <div class="modal-body">
-               <form [formGroup]="formValue">
-                
-                 <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Enter Organisation Name</label>
-                  <input type="text" formControlName="user_type" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp">
-                </div>
-               
-                
 
-                 <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">User Name</label>
-                   <input type="text" formControlName="user_name" class="form-control" id="exampleInputPassword1">
-                 </div>
-                  <!-- <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Second Name</label>
-                   <input type="text" formControlName="secondName" class="form-control" id="exampleInputPassword1">
-                 </div> -->
-                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">email</label>
-                  <input type="text" formControlName="user_email" class="form-control" id="exampleInputPassword1">
-                </div>
-
-                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Password</label>
-                  <input type="password" formControlName="new_password" class="form-control" id="exampleInputPassword1">
-                </div>
-
-                <!-- <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">   Confirm  Password</label>
-                  <input type="number" formControlName="confirm" class="form-control" id="exampleInputPassword1">
-                </div>
-                 -->
-                
-               
-               </form>
-             </div>
-             <div class="modal-footer">
-               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Add</button>
-               <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-                 class="btn btn-primary">Update</button>
-             </div>
-           </div>
-         </div>
-       </div>
-       
-      </section>
- </main>
+  </section>
+</main>

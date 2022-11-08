@@ -70,7 +70,8 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "admindashboard:build:production"
+              "browserTarget": "admindashboard:build:production",
+              "proxyConfig": "src/proxy.conf.json"
             },
             "development": {
               "browserTarget": "admindashboard:build:development"

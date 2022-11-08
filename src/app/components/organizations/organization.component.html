@@ -1,208 +1,177 @@
 <main id="main" class="main">
-   <div class="pagetitle">
-      <h1>Manage Organisation</h1>
-      <nav>
-         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-            <li class="breadcrumb-item">Dashboard</li>
-            <li class="breadcrumb-item active">Manage Organisation</li>
-         </ol>
-      </nav>
-   </div>
-   <section class="section">
-     
-      <nav class="navbar navbar-ligth ">
-        <div class="container">
-          <div class="d-flex">
-            <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
-              data-bs-target="#exampleModal">Add New Organisation </button>
-          </div>
+  <div class="pagetitle">
+    <h1>Manage Organization</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <ol class="breadcrumb-item active">Manage Organizations</ol>
+      </ol>
+    </nav>
+  </div>
+  <section class="section">
+
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <div class="text-right flex-right">
+          <button
+            (click)="showModal()"
+            class="justify-content-end btn btn-success" type="button" data-bs-toggle="modal"
+            data-bs-target="#exampleModal">Add New Organization</button>
+          <button
+            (click)="getOrganizations()"
+            class="justify-content-end btn btn-primary" type="button">Refresh Organizations</button>
         </div>
-      </nav>
-      
-      <table class="table mt-3">
-        <thead>
-          <tr>
-           <th scope="col">Organisation ID</th>
-            <th scope="col">Organisation Type</th>
-            <th scope="col">Organisation Name</th>
-            <th scope="col">Main office</th>
-            <th scope="col">Official Email</th>
-            <th scope="col">Physical Email Address</th>
-            <th scope="col">Email Address</th>
-            <th scope="col">Phone Number</th>
-            <th scope="col">Upload logo(file)</th>
-            <th scope="col">Upload Registration Certificate(file)</th>
-            <th scope="col">Upload Practice License(file)</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Second Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Phone Number</th>
-            <th scope="col">Email Address</th>
-            <th scope="col">Title in the Organization</th>
-            <th scope="col">Action</th>
-            
-            
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of manageData">
-           <td>{{row.id}}</td>
-            <td>{{row.name}}</td>
-            <td>{{row.organisationName}}</td>
-            <td>{{row.mainOffice}}</td>
-            
-            <td>{{row.officialAddress}}</td>
-            <td>{{row.physicalAddress}}</td>
-            <td>{{row.email}}</td>
-            <td>{{row.phoneNumber}}</td>
-            <td>{{row.uploadLogo}}</td>
-            <td>{{row.uploadRegistration}}</td>
-            <td>{{row.uploadPractice}}</td>
-            <td>{{row.firstName}}</td>
-            <td>{{row.secondName}}</td>
-            <td>{{row.lastName}}</td>
-            <td>{{row.email}}</td>
-            <td>{{row.title}}</td>
+      </div>
+    </nav>
+    <table class="table mt-3">
+      <thead>
+      <tr>
+        <th *ngFor="let col of dataTable.columns" [class]="col.classes">{{col.label}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngIf="organizations.loading">
+        <td colspan="10">
+          <div class="text-center">
+            <p>Loading Organization types...</p>
+          </div>
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+          </div>
+        </td>
+      </tr>
+      <tr *ngIf="organizations.data.length  === 0 && !organizations.loading" >
+        <td colspan="10">
+          <div class="text-center">
+            <p>No organizations found</p>
+          </div>
+        </td>
+      </tr>
+      <tr *ngFor="let dt of organizations.data">
+        <ng-container *ngFor="let col of dataTable.columns">
+          <td [class]="col.classes" *ngIf="col.dynamic">
+              {{dt[col.data]}}
+          </td>
+        </ng-container>
+        <td class="text-center" >
+          <div>
+            <span class="en-badge-success">{{dt.organisation_status}}</span>
+          </div>
+        </td>
+        <td>
+          <div class="text-center">
+            <button
+              (click)="showModal(dt)"
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+              class="btn btn-warning btn-sm">Edit</button>
+          </div>
 
-            
-            <td>
-              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" (click)="onEdit(row)" class="btn btn-info">Edit</button>
-              <!-- <button  class="btn btn-danger">Delete</button> -->
-            </td>
-          </tr>
-        </tbody>
-      
-      </table>
-      
-      <!-- Modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Organisation Type</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body row align-items-start">
-              <form [formGroup]="formValue">
-                <div class="container text-center">
-                  <div class="row align-items-start">
-                <div class="col">
-                  <label for="exampleInputEmail1" class="form-label">Select Organisation </label>
-                  <!-- <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp"> -->
-                    <select class="form-control" formControlName="name">
-                      <option>maize</option>
-                    </select>
-                </div>
-                <div class="col ">
-                 <label for="exampleInputEmail1" class="form-label"> Organisation Name</label>
-                 <input type="text" formControlName="organisationName" class="form-control" id="exampleInputEmail1"
-                   aria-describedby="emailHelp">
-               </div>
-               <div class="col">
-                 <label for="exampleInputEmail1" class="form-label">Enter main office address</label>
-                 <input type="email" formControlName="mainOffice" class="form-control" id="exampleInputEmail1"
-                   aria-describedby="emailHelp">
-               </div>
+        </td>
+      </tr>
+      </tbody>
 
-               <div class="row align-items-start">
-               <div class="col mb-3">
-                 <label for="exampleInputEmail1" class="form-label">Enter Email Address</label>
-                 <input type="email" formControlName="email" class="form-control" id="exampleInputEmail1"
-                   aria-describedby="emailHelp">
-               </div>
-               <div class="col mb-3">
-                <label for="exampleInputEmail1" class="form-label">Enter Physical Address</label>
-                <input type="email" formControlName="email" class="form-control" id="exampleInputEmail1"
-                  aria-describedby="emailHelp">
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{modalMode.label}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form (ngSubmit)="handleSubmit()" [formGroup]="organizationForm" >
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Organization Code</label>
+                <input type="text" formControlName="organisation_code" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="organisation_code"
+                  [inputObject]="this.organizationForm.get('organisation_code')"
+                ></app-error-section>
               </div>
-               <div class="col mb-3">
-                 <label for="exampleInputEmail1" class="form-label">Enter Phone Number</label>
-                 <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
-                   aria-describedby="emailHelp">
-               </div>
+              <div class="mb-3">
+                <label class="form-label">Organization Name</label>
+                <input type="text" formControlName="organisation_name" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="organisation_name"
+                  [inputObject]="this.organizationForm.get('organisation_name')"
+                ></app-error-section>
               </div>
-
-               <h2>Organization Registration</h2>
-               <div class="row align-items-start">
-               <div class="input-group mb-3">
-                 <div class="input-group-prepend">
-                   <span class="input-group-text">Upload Logo</span>
-                 </div>
-                 <div class="custom-file">
-                   <input type="file" class="custom-file-input" formControlName="uploadLogo"  id="inputGroupFile01">
-                   
-                 </div>
-               </div>
-
-               <div class="input-group mb-3">
-                 <div class="input-group-prepend">
-                   <span class="input-group-text">Upload Registration Certificate</span>
-                 </div>
-                 <div class="custom-file">
-                   <input type="file" class="custom-file-input" formControlName="uploadRegistration" id="inputGroupFile01">
-                   
-                 </div>
-               </div>
-
-               <div class="input-group mb-3">
-                 <div class="input-group-prepend">
-                   <span class="input-group-text">Upload Practice License</span>
-                 </div>
-                 <div class="custom-file">
-                   <input type="file" class="custom-file-input" formControlName="uploadPractice" id="inputGroupFile01">
-                  
-                 </div>
-               </div>
-               </div>
-               <h3>Contact Practice Information</h3>
-               <div class="row align-items-start">
-                <div class="col mb-3">
-                  <label for="exampleInputPassword1" class="form-label">First Name</label>
-                  <input type="text" formControlName="firstName" class="form-control" id="exampleInputPassword1">
-                </div>
-                 <div class="col mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Second Name</label>
-                  <input type="text" formControlName="secondName" class="form-control" id="exampleInputPassword1">
-                </div>
-                <div class="col mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Last Name</label>
-                 <input type="text" formControlName="lastName" class="form-control" id="exampleInputPassword1">
-               </div>
-
-               </div>
-               <div class="row align-items-start">
-               <div class="col mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Enter Phone Number</label>
-                 <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputPassword1">
-               </div>
-
-               <div class="col mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Enter Email Address</label>
-                 <input type="email" formControlName="email" class="form-control" id="exampleInputPassword1">
-               </div>
-
-               <div class="col mb-3">
-                 <label for="exampleInputPassword1" class="form-label"> Organisation Title</label>
-                 <input type="text" formControlName="title" class="form-control" id="exampleInputPassword1">
-               </div>
+              <div class="mb-3">
+                <label class="form-label">Organization Email</label>
+                <input type="email" formControlName="organisation_email" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="organisation_email"
+                  [inputObject]="this.organizationForm.get('organisation_email')"
+                ></app-error-section>
               </div>
-
-               </div>
-               </div>
-              </form>
+              <div class="mb-3">
+                <label class="form-label">Organization Phone</label>
+                <input type="number" formControlName="organisation_msisdn" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="organisation_phone"
+                  [inputObject]="this.organizationForm.get('organisation_msisdn')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Organization Contact Person</label>
+                <input type="text" formControlName="organisation_contact" class="form-control" placeholder="name - phone number">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="organisation_contact"
+                  [inputObject]="this.organizationForm.get('organisation_contact')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Organization Type</label>
+                <select class="form-control" formControlName="organisation_type_id">
+                  <option *ngFor="let orgType of organizationTypes" [value]="orgType.organisation_type_id">{{orgType.organisation_type}}</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="organisation_type"
+                  [inputObject]="this.organizationForm.get('organisation_type_id')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Country</label>
+                <select class="form-control" formControlName="country_id">
+                  <option *ngFor="let cty of countries" [value]="cty.country_id">{{cty.country}}</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="country"
+                  [inputObject]="this.organizationForm.get('country_id')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-control" formControlName="organisation_status">
+                  <option value="ACTIVE">Active</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="status"
+                  [inputObject]="this.organizationForm.get('organisation_status')"
+                ></app-error-section>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Add</button>
-              <button type="button"  *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-                class="btn btn-primary">Update</button>
+              <button [disabled]="modalBtn.loading" type="submit" [class]="modalBtn.classes">{{modalBtn.text}}</button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
-      
-     </section>
+    </div>
+
+  </section>
 </main>
