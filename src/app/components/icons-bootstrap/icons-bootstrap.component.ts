@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Crop } from '../../types';
@@ -14,6 +14,7 @@ import { NotifierService } from '../../services/notifier.service';
   styleUrls: ['./icons-bootstrap.component.css'],
 })
 export class IconsBootstrapComponent implements OnInit {
+  @ViewChild('modalButton') modalButton!: ElementRef;
   cropForm: FormGroup;
   formSubmitted = false;
   currentCrop: null | Crop = null;
@@ -202,7 +203,7 @@ export class IconsBootstrapComponent implements OnInit {
       )
       .subscribe(
         (resp) => {
-          console.log('create resp', resp);
+          this.modalButton.nativeElement.click();
           this.resetForm();
           this.getCrops();
           this.notifierService.showSweetAlert({

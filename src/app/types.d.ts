@@ -209,6 +209,18 @@ export interface ProductCategory {
   description: string;
 }
 
+export interface Season {
+  deleted: boolean;
+  description: string;
+  organisationId: number;
+  recordVersion: number;
+  season: string;
+  seasonEndDate: string;
+  seasonId?: 2;
+  seasonStartDate: string;
+  status: boolean;
+}
+
 // organisation_id: number;
 // date_time_added: number;
 // added_by: any;

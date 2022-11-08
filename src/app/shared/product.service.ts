@@ -75,4 +75,39 @@ export class ProductService {
   getCoverTypes() {
     return this.http.get<any>('/api/v1/cover_types?request_type=cropApi');
   }
+
+  //season apis
+  postSeason(data: any) {
+    return this.http.post<any>('/api/v1/seasons', {
+      ...data,
+      request_type: 'cropApi',
+    });
+  }
+
+  getSeasons() {
+    return this.http.get<any>('/api/v1/seasons?request_type=cropApi').pipe(
+      switchMap((seasonsResponse) => {
+        return this.organisationService.getOrganizationsShallow().pipe(
+          map((organisationsResponse) => ({
+            seasonsResponse,
+            organisationsResponse,
+          }))
+        );
+      }),
+      tap(({ seasonsResponse, organisationsResponse }) => {
+        console.log('seasons, orgs', seasonsResponse, organisationsResponse);
+        return of({
+          seasonsResponse,
+          organisationsResponse,
+        });
+      })
+    );
+  }
+
+  updateSeason(data: any, index: number) {
+    return this.http.put<any>('/api/v1/seasons/' + index, {
+      ...data,
+      request_type: 'cropApi',
+    });
+  }
 }
