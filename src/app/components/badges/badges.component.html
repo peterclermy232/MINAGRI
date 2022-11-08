@@ -11,16 +11,32 @@
   </div>
   <section class="section">
     
-     <nav class="navbar navbar-ligth ">
-       <div class="container-fluid">
+     <!-- <nav class="navbar navbar-ligth ">
+       <div class="container">
          <h1 style="color: aliceblue;">Add New Role</h1>
-         <div class="d-flex">
+         <div class="flex-centered">
            <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
              data-bs-target="#exampleModal">Add New Role</button>
          </div>
        </div>
      </nav>
-     
+      -->
+      <nav class="navbar navbar-ligth ">
+        <div class="container">
+          <div class="flex-centered">
+            <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">Add New Role</button>
+          </div>
+        </div>
+      </nav>
+       <!--search input-->
+       <div class="d-flex justify-content-lg-between mt-2">
+        <div class="search  ">
+        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
+        </div>
+        <button  class="btn btn-success btn-lg"  type="button">Export</button>
+       </div>
+
      <table class="table mt-3">
        <thead>
          <tr >
@@ -74,7 +90,7 @@
                
                 <div class="mb-3">
                  <label for="exampleInputPassword1" class="form-label">Status</label>
-                 <select class="form-control" formControlName="select">
+                 <select class="form-select" formControlName="select">
                   <option>Active</option>
                      <option>Inactive</option>
                      

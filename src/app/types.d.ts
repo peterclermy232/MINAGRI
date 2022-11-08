@@ -6,6 +6,7 @@ export interface Crop {
   organisationId: number;
   recordVersion?: number;
   status: boolean;
+  
 }
 
 export interface CropVariety {
