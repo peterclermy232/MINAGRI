@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Crop } from '../../types';
@@ -6,14 +6,14 @@ import { AuthService } from '../../shared/auth.service';
 import { UserService } from '../../shared/user.service';
 import { CropService } from '../../shared/crop.service';
 import { finalize } from 'rxjs';
+import { NotifierService } from '../../services/notifier.service';
 
 @Component({
   selector: 'app-icons-bootstrap',
   templateUrl: './icons-bootstrap.component.html',
   styleUrls: ['./icons-bootstrap.component.css'],
 })
-export class IconsBootstrapComponent implements OnInit {
-  cropForm!: FormGroup;
+
   formSubmitted = false;
   currentCrop: null | Crop = null;
   modalMode = {
@@ -27,7 +27,7 @@ export class IconsBootstrapComponent implements OnInit {
   };
   crops: {
     loading: boolean;
-    data: Crop[];
+    data: Crop[] | any[];
   } = {
     loading: false,
     data: [],
@@ -37,16 +37,17 @@ export class IconsBootstrapComponent implements OnInit {
       {
         label: 'Crop',
         data: 'crop',
+        dynamic: true,
         classes: '',
       },
       {
-        label: 'Organisation',
-        data: 'organisationId',
+
         classes: '',
       },
       {
         label: 'Status',
         data: 'status',
+        dynamic: false,
         classes: 'text-center',
       },
     ],
@@ -55,6 +56,7 @@ export class IconsBootstrapComponent implements OnInit {
     private authService: AuthService,
     private userService: UserService,
     private cropService: CropService,
+    private notifierService: NotifierService,
     private fb: FormBuilder
   ) {
     this.cropForm = this.fb.group({
@@ -104,8 +106,17 @@ export class IconsBootstrapComponent implements OnInit {
         })
       )
       .subscribe(
-        (resp) => {
-          this.crops.data = resp;
+        (resp: any) => {
+          const orgs = resp.orgsResponse.results;
+          this.crops.data = resp.cropsResponse.map((crop: any) => {
+            const org = orgs.find(
+              (typ: any) => typ.organisation_id === crop.organisationId
+            );
+            return {
+              ...crop,
+              organisation: org ? org.organisation_name : 'none',
+            };
+          });
         },
         (err) => {
           console.log('crop err', err);
@@ -141,10 +152,20 @@ export class IconsBootstrapComponent implements OnInit {
           console.log('create resp', resp);
           this.resetForm();
           this.getCrops();
+          this.notifierService.showSweetAlert({
+            typ: 'success',
+            message: 'Crop successfully created!',
+            timer: true,
+          });
         },
         (err) => {
           console.log('crop err', err);
-          this.alertWithError();
+          const errorMessage =
+            err.error.errors[0].message || 'Invalid data submitted';
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: errorMessage,
+          });
         }
       );
   }
@@ -178,32 +199,25 @@ export class IconsBootstrapComponent implements OnInit {
       )
       .subscribe(
         (resp) => {
-          console.log('create resp', resp);
+          this.modalButton.nativeElement.click();
           this.resetForm();
           this.getCrops();
+          this.notifierService.showSweetAlert({
+            typ: 'success',
+            message: 'Crop successfully created!',
+            timer: true,
+          });
         },
         (err) => {
           console.log('crop err', err);
-          this.alertWithError();
+          const errorMessage =
+            err.error.errors[0].message || 'Invalid data submitted';
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: errorMessage,
+          });
         }
       );
-  }
-
-  deleteCrop() {
-    const cId = this.currentCrop!.cropId;
-    if (!cId) {
-      return;
-    }
-    this.cropService.deleteCrop(cId).subscribe(
-      (resp) => {
-        Swal.fire('Deleted!', 'Crop successfully deleted', 'success');
-        this.getCrops();
-      },
-      (err) => {
-        console.log('crop err', err);
-        this.alertWithError();
-      }
-    );
   }
 
   resetForm() {
@@ -229,29 +243,5 @@ export class IconsBootstrapComponent implements OnInit {
     } else {
       this.createCrop();
     }
-  }
-
-  alertWithSuccess() {
-    Swal.fire('Thank you...', 'You submitted succesfully!', 'success');
-  }
-  alertWithError() {
-    Swal.fire('Error Occurred!', 'Try again later!', 'error');
-  }
-
-  confirmBox(crop: Crop) {
-    this.currentCrop = crop;
-    Swal.fire({
-      title: 'Are you sure want to delete crop?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'No, keep it',
-    }).then((result) => {
-      if (result.value) {
-        this.deleteCrop();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-      }
-    });
   }
 }

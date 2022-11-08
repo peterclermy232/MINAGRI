@@ -6,13 +6,16 @@ import { ENV } from '../app/types';
 
 export const environment: ENV = {
   production: false,
-  consumer_key: 'phaIRZmh7WjBIae1VxcL_zMcjlca',
-  consumer_secret: 'FyoQGDIrMeNY0VERT4isrjI5Bq0a',
-  crop_baseurl:
-    'https://apim-minagri.wrightinteractives.com:8243/crop-insurance/1.0',
-  oauth_baseurl: 'https://apim-minagri.wrightinteractives.com:9443',
+  consumer_key: 'hpHBZ6V_SxZUzeJX2VuwPnpLwb4a',
+  consumer_secret: '6psbCCyfbTi3rrN0ybApNr4C2Wka',
+  user_consumer_key: 'Eric',
+  user_consumer_secret: 'w3lc0m3',
+  // crop_baseurl: 'https://apim-minagri.wrightinteractives.com',
+  crop_baseurl: 'https://crop-insurance-minagri.wrightinteractives.com',
+  auth_baseurl:
+    'https://apim-minagri.wrightinteractives.com/authentication/1.0.0',
+  oauth_baseurl: 'https://apim-minagri.wrightinteractives.com',
 };
-
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.

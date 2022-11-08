@@ -1,91 +1,69 @@
 <main id="main" class="main">
-   <div class="pagetitle">
-      <h1>Manage Crops Varieties</h1>
-      <nav>
-         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-            <li class="breadcrumb-item">Dashboard</li>
-            <ol class="breadcrumb-item active">Manage Crops Varieties</ol>
-         </ol>
-      </nav>
-   </div>
-   <section class="section">
+  <div class="pagetitle">
+    <h1>Manage Crop Varieties</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <ol class="breadcrumb-item active">Manage Crop Varieties</ol>
+      </ol>
+    </nav>
+  </div>
+  <section class="section">
 
-      <nav class="navbar navbar-ligth ">
-        <div class="container-fluid">
-          
-          <div class="flex-centered">
-            <button class="btn btn-success" type="button" data-bs-toggle="modal"
-              data-bs-target="#exampleModal">Add New Crop Variety</button>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">{{modalMode.label}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-        </div>
-      </nav>
-       <!--search input-->
-       <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
-        </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
-
-      <table class="table mt-3">
-        <thead>
-          <tr>
-           <th scope="col">Organisation ID</th>
-           <th scope="col">Crop Variety Name</th>
-           <th scope="col">Selected Crop</th>
-            <th scope="col">Status</th>
-            <th scope="col">Action</th>
-
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-          </tr>
-        </tbody>
-
-      </table>
-
-      <!-- Modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Add New Crop Variety</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+          <form (ngSubmit)="handleSubmit()" [formGroup]="cropVarietyForm" >
             <div class="modal-body">
-              <form >
-                <div class="mb-3">
-                  <label class="form-label">Select Crop</label>
-                  <select class="form-control" formControlName="select">
-                     <option>Maize</option>
-
-                  </select>
-                </div>
-
-                <div class="mb-3">
-                  <label for="exampleInputEmail1" class="form-label">Enter  Crop Name</label>
-                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp">
-
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Status</label>
-                  <select class="form-control" formControlName="status">
-                     <option>Active</option>
-                     <option>Inactive</option>
-                  </select>
-                </div>
-
-              </form>
+              <div class="mb-3">
+                <label class="form-label">Enter  Crop Variety Name</label>
+                <input type="text" formControlName="crop_variety" class="form-control">
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="crop_variety"
+                  [inputObject]="this.cropVarietyForm.get('crop_variety')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Select Crop</label>
+                <select class="form-control" formControlName="crop_id">
+                  <option *ngFor="let crop of crops" [value]="crop.cropId">{{crop.crop}}</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="crop"
+                  [inputObject]="this.cropVarietyForm.get('crop_id')"
+                ></app-error-section>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-control" formControlName="status">
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+                <app-error-section
+                  [formSubmitted]="formSubmitted"
+                  inputProperty="status"
+                  [inputObject]="this.cropVarietyForm.get('status')"
+                ></app-error-section>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button [disabled]="modalBtn.loading" type="submit" [class]="modalBtn.classes">{{modalBtn.text}}</button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
+    </div>
 
-     </section>
- </main>
+  </section>
+</main>
