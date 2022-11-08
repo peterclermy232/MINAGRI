@@ -13,7 +13,8 @@ import { NotifierService } from '../../services/notifier.service';
   templateUrl: './icons-bootstrap.component.html',
   styleUrls: ['./icons-bootstrap.component.css'],
 })
-
+export class IconsBootstrapComponent implements OnInit {
+  cropForm: FormGroup;
   formSubmitted = false;
   currentCrop: null | Crop = null;
   modalMode = {
@@ -52,6 +53,7 @@ import { NotifierService } from '../../services/notifier.service';
       },
     ],
   };
+  modalButton: any;
   constructor(
     private authService: AuthService,
     private userService: UserService,
