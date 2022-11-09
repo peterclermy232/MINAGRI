@@ -24,7 +24,7 @@
       <nav class="navbar navbar-ligth ">
         <div class="container">
           <div class="flex-centered">
-            <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
+            <button  class="btn btn-success" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal">Add New Role</button>
           </div>
         </div>
@@ -37,33 +37,61 @@
         <button  class="btn btn-success btn-lg"  type="button">Export</button>
        </div>
 
-     <table class="table mt-3">
-       <thead>
-         <tr >
-          <th scope="col">Organisation ID</th>
-           <th scope="col">Role Name</th>
-           <th scope="col">Description</th>
-           <th scope="col">Status</th>
-           <th scope="col">Action</th>
+       <table class="table mt-3">
+        <thead>
+          <tr>
            
-         </tr>
-       </thead>
-       <tbody>
-         <tr *ngFor ="let users of roleData">
-          <td>{{users.id}}</td>
-           <td>{{users.name}}</td>
-           <td>{{users.description}}</td>
-           <td>{{users.select}}</td>
+           <th *ngFor="let col of dataTable.columns" scope="col" [class]="col.classes">{{col.label}}</th>
            
-           <td>
-             <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal" (click)="onEdit( users)" class="btn btn-info">Edit</button>
-             <button  class="btn btn-danger mx-3">View</button>
-           </td>
-         </tr>
-       </tbody>
-     
-     </table>
+            <th class="text-center">Actions</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="roles.loading">
+            <td colspan="4">
+              <div class="text-center">
+                <p>Loading role...</p>
+              </div>
+              <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+              </div>
+            </td>
+          </tr>
+        <tr *ngIf="roles.data.length  === 0 && !roles.loading" >
+          <td colspan="3">
+            <div class="text-center">
+              <p>No roles found</p>
+            </div>
+          </td>
+        </tr>
+        <tr *ngFor="let dt of roles.data">
+          <ng-container *ngFor="let col of dataTable.columns">
+            <td [class]="col.classes" *ngIf="col.dynamic">
+              {{dt[col.data]}}
+            </td>
+          </ng-container>
+          <td class="text-center" >
+            <div>
+              <span *ngIf="dt.status" class="en-badge-success">Active</span>
+              <span *ngIf="!dt.status" class="en-badge-warning">Inactive</span>
+            </div>
+          </td>
+          <td>
+            <div class="text-center">
+              <button
+                (click)="showModal(dt)"
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                class="btn btn-warning btn-sm">Edit</button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+
+      </table>
+
      
      <!-- Modal -->
      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -74,35 +102,48 @@
              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
            </div>
            <div class="modal-body">
-             <form [formGroup]="formValue">
+             <form (ngSubmit)="handleSubmit()" [formGroup]="roleForm">
                <div class="mb-3">
                  <label for="exampleInputEmail1" class="form-label">Enter Role Name</label>
                  <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
                    aria-describedby="emailHelp">
-     
+                   <app-error-section
+                   [formSubmitted]="formSubmitted"
+                   inputProperty="role"
+                   [inputObject]="this.roleForm.get('role')"
+                 ></app-error-section>
                </div>
                <div class="mb-3">
                  <label for="exampleInputPassword1" class="form-label">Enter Role Description</label>
                  <input type="text" formControlName="description" class="form-control" id="exampleInputPassword1">
+                 <app-error-section
+                 [formSubmitted]="formSubmitted"
+                 inputProperty="role"
+                 [inputObject]="this.roleForm.get('role')"
+               ></app-error-section>
                </div>
 
 
                
                 <div class="mb-3">
                  <label for="exampleInputPassword1" class="form-label">Status</label>
-                 <select class="form-select" formControlName="select">
+                 <select class="form-select" formControlName="status">
                   <option>Active</option>
                      <option>Inactive</option>
                      
                  </select>
+                 <app-error-section
+                 [formSubmitted]="formSubmitted"
+                 inputProperty="status"
+                 [inputObject]="this.roleForm.get('status')"
+               ></app-error-section>
                </div> 
              </form>
            </div>
            <div class="modal-footer">
              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-             <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
-             <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-               class="btn btn-primary">Update</button>
+             <button [disabled]="modalBtn.loading" type="submit" [class]="modalBtn.classes">{{modalBtn.text}}</button>
+            
            </div>
          </div>
        </div>

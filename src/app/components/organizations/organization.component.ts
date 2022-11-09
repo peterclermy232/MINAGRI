@@ -18,12 +18,12 @@ export class OrganizationComponent implements OnInit {
   formSubmitted = false;
   currentOrg: null | Organization = null;
   modalMode = {
-    label: 'Create Organization',
+    label: 'Create Organisation',
     typ: 'Create',
   };
   modalBtn = {
     loading: false,
-    text: 'Create Organization',
+    text: 'Create Organisation',
     classes: 'btn btn-primary',
   };
   organizations: {
@@ -238,7 +238,7 @@ export class OrganizationComponent implements OnInit {
         finalize(() => {
           this.modalBtn = {
             loading: false,
-            text: 'Create Organization',
+            text: 'Create Organisation',
             classes: 'btn btn-primary',
           };
         })
@@ -251,7 +251,7 @@ export class OrganizationComponent implements OnInit {
           // Swal.fire('Success!', 'Organization created successfully', 'success');
           this.notifierService.showSweetAlert({
             typ: 'success',
-            message: 'Organization created successfully',
+            message: 'Organisation created successfully',
             timer: true,
           });
         },

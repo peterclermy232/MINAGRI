@@ -1,29 +1,29 @@
 <main id="main" class="main">
   <div class="pagetitle">
-    <h1>Manage Organization</h1>
+    <h1>Manage Organisation</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
         <li class="breadcrumb-item">Dashboard</li>
-        <ol class="breadcrumb-item active">Manage Organizations</ol>
+        <ol class="breadcrumb-item active">Manage Organisations</ol>
       </ol>
     </nav>
   </div>
   <section class="section">
 
     <nav class="navbar navbar-light">
-      <nav class="container-fluid">
+      <div class="container-fluid">
         <div class="text-right flex-right">
           <button
             (click)="showModal()"
             class="justify-content-end btn btn-success" type="button" data-bs-toggle="modal"
-            data-bs-target="#exampleModal">Add New Organization</button>
+            data-bs-target="#exampleModal">Add New Organisation</button>
           <button
             (click)="getOrganizations()"
-            class="justify-content-end btn btn-primary" type="button">Refresh Organizations</button>
+            class="justify-content-end btn btn-primary" type="button">Refresh Organisations</button>
         </div>
-      </nav>
-
+      </div>
+    </nav>
         <!-- </td>
       </tr>
       </tbody>
@@ -41,7 +41,7 @@
           <form (ngSubmit)="handleSubmit()" [formGroup]="organizationForm" >
             <div class="modal-body">
               <div class="mb-3">
-                <label class="form-label">Organization Code</label>
+                <label class="form-label">Organisation Code</label>
                 <input type="text" formControlName="organisation_code" class="form-control">
                 <app-error-section
                   [formSubmitted]="formSubmitted"
@@ -50,7 +50,7 @@
                 ></app-error-section>
               </div>
               <div class="mb-3">
-                <label class="form-label">Organization Name</label>
+                <label class="form-label">Organisation Name</label>
                 <input type="text" formControlName="organisation_name" class="form-control">
                 <app-error-section
                   [formSubmitted]="formSubmitted"
@@ -59,7 +59,7 @@
                 ></app-error-section>
               </div>
               <div class="mb-3">
-                <label class="form-label">Organization Email</label>
+                <label class="form-label">Organisation Email</label>
                 <input type="email" formControlName="organisation_email" class="form-control">
                 <app-error-section
                   [formSubmitted]="formSubmitted"
@@ -68,7 +68,7 @@
                 ></app-error-section>
               </div>
               <div class="mb-3">
-                <label class="form-label">Organization Phone</label>
+                <label class="form-label">Organisation Phone</label>
                 <input type="number" formControlName="organisation_msisdn" class="form-control">
                 <app-error-section
                   [formSubmitted]="formSubmitted"
@@ -77,7 +77,7 @@
                 ></app-error-section>
               </div>
               <div class="mb-3">
-                <label class="form-label">Organization Contact Person</label>
+                <label class="form-label">Organisation Contact Person</label>
                 <input type="text" formControlName="organisation_contact" class="form-control" placeholder="name - phone number">
                 <app-error-section
                   [formSubmitted]="formSubmitted"
@@ -86,7 +86,7 @@
                 ></app-error-section>
               </div>
               <div class="mb-3">
-                <label class="form-label">Organization Type</label>
+                <label class="form-label">Organisation Type</label>
                 <select class="form-control" formControlName="organisation_type_id">
                   <option *ngFor="let orgType of organizationTypes" [value]="orgType.organisation_type_id">{{orgType.organisation_type}}</option>
                 </select>

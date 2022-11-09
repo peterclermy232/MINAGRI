@@ -6,3 +6,5 @@ export class LossModel{
     status : string = '';
 
 }
+
+
