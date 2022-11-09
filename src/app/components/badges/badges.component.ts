@@ -77,6 +77,7 @@ formSubmitted = false;
   ) {
     this.roleForm = this.fb.group({
       role: ['', [Validators.required]],
+      description: ['', [Validators.required]],
       status: [true, Validators.required],
       roleId: [''],
     });
