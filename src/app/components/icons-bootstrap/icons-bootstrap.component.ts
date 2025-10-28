@@ -13,7 +13,10 @@ import { NotifierService } from '../../services/notifier.service';
   templateUrl: './icons-bootstrap.component.html',
   styleUrls: ['./icons-bootstrap.component.css'],
 })
+export class IconsBootstrapComponent implements OnInit {
+  @ViewChild('modalButton') modalButton!: ElementRef;
 
+  cropForm: FormGroup;
   formSubmitted = false;
   currentCrop: null | Crop = null;
   modalMode = {
@@ -41,7 +44,9 @@ import { NotifierService } from '../../services/notifier.service';
         classes: '',
       },
       {
-
+        label: 'Organization',
+        data: 'organisation',
+        dynamic: true,
         classes: '',
       },
       {
@@ -52,6 +57,7 @@ import { NotifierService } from '../../services/notifier.service';
       },
     ],
   };
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -65,11 +71,12 @@ import { NotifierService } from '../../services/notifier.service';
       cropId: [''],
     });
   }
+
   ngOnInit(): void {
     this.getCrops();
   }
 
-  showModal(crop?: Crop) {
+  showModal(crop?: Crop): void {
     if (crop) {
       this.modalMode.typ = 'edit';
       this.modalMode.label = 'Edit Crop';
@@ -91,12 +98,14 @@ import { NotifierService } from '../../services/notifier.service';
       this.resetForm();
     }
   }
-  setCropInfo(crop: Crop) {
+
+  setCropInfo(crop: Crop): void {
     this.cropForm.get('crop')!.setValue(crop.crop);
     this.cropForm.get('status')!.setValue(crop.status);
     this.cropForm.get('cropId')!.setValue(crop.cropId);
   }
-  getCrops() {
+
+  getCrops(): void {
     this.crops.loading = true;
     this.cropService
       .getCrops()
@@ -118,13 +127,13 @@ import { NotifierService } from '../../services/notifier.service';
             };
           });
         },
-        (err) => {
+        (err: any) => {
           console.log('crop err', err);
         }
       );
   }
 
-  createCrop() {
+  createCrop(): void {
     this.modalBtn = {
       loading: true,
       text: 'Processing...',
@@ -148,7 +157,7 @@ import { NotifierService } from '../../services/notifier.service';
         })
       )
       .subscribe(
-        (resp) => {
+        (resp: any) => {
           console.log('create resp', resp);
           this.resetForm();
           this.getCrops();
@@ -158,7 +167,7 @@ import { NotifierService } from '../../services/notifier.service';
             timer: true,
           });
         },
-        (err) => {
+        (err: any) => {
           console.log('crop err', err);
           const errorMessage =
             err.error.errors[0].message || 'Invalid data submitted';
@@ -169,7 +178,8 @@ import { NotifierService } from '../../services/notifier.service';
         }
       );
   }
-  updateCrop() {
+
+  updateCrop(): void {
     this.modalBtn = {
       loading: true,
       text: 'Processing...',
@@ -198,17 +208,17 @@ import { NotifierService } from '../../services/notifier.service';
         })
       )
       .subscribe(
-        (resp) => {
+        (resp: any) => {
           this.modalButton.nativeElement.click();
           this.resetForm();
           this.getCrops();
           this.notifierService.showSweetAlert({
             typ: 'success',
-            message: 'Crop successfully created!',
+            message: 'Crop successfully updated!',
             timer: true,
           });
         },
-        (err) => {
+        (err: any) => {
           console.log('crop err', err);
           const errorMessage =
             err.error.errors[0].message || 'Invalid data submitted';
@@ -220,7 +230,7 @@ import { NotifierService } from '../../services/notifier.service';
       );
   }
 
-  resetForm() {
+  resetForm(): void {
     this.cropForm.reset();
     this.cropForm.markAsPristine();
     this.modalBtn = {
@@ -230,7 +240,7 @@ import { NotifierService } from '../../services/notifier.service';
     };
   }
 
-  handleSubmit() {
+  handleSubmit(): void {
     if (this.cropForm.invalid) {
       console.log('invalid');
       this.formSubmitted = true;

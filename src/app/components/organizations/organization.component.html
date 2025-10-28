@@ -5,30 +5,64 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
         <li class="breadcrumb-item">Dashboard</li>
-        <ol class="breadcrumb-item active">Manage Organizations</ol>
+        <li class="breadcrumb-item active">Manage Organizations</li>
       </ol>
     </nav>
   </div>
-  <section class="section">
 
+  <section class="section">
     <nav class="navbar navbar-light">
       <div class="container-fluid">
         <div class="text-right flex-right">
           <button
             (click)="showModal()"
-            class="justify-content-end btn btn-success" type="button" data-bs-toggle="modal"
-            data-bs-target="#exampleModal">Add New Organization</button>
+            class="justify-content-end btn btn-success"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal">
+            Add New Organization
+          </button>
           <button
             (click)="getOrganizations()"
-            class="justify-content-end btn btn-primary" type="button">Refresh Organizations</button>
+            class="justify-content-end btn btn-primary"
+            type="button">
+            Refresh Organizations
+          </button>
         </div>
+      </div>
+    </nav>
 
-
-        </td>
-      </tr>
-      </tbody>
-
-    </table>
+    <!-- Add your table here if needed -->
+    <!-- Example table structure:
+    <div class="card">
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Organization Code</th>
+              <th>Organization Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let org of organizations">
+              <td>{{ org.organisation_code }}</td>
+              <td>{{ org.organisation_name }}</td>
+              <td>{{ org.organisation_email }}</td>
+              <td>{{ org.organisation_msisdn }}</td>
+              <td>{{ org.organisation_status }}</td>
+              <td>
+                <button (click)="showModal(org)" class="btn btn-sm btn-warning">Edit</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    -->
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -38,7 +72,7 @@
             <h5 class="modal-title" id="exampleModalLabel">{{modalMode.label}}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form (ngSubmit)="handleSubmit()" [formGroup]="organizationForm" >
+          <form (ngSubmit)="handleSubmit()" [formGroup]="organizationForm">
             <div class="modal-body">
               <div class="mb-3">
                 <label class="form-label">Organization Code</label>
@@ -127,6 +161,5 @@
         </div>
       </div>
     </div>
-
   </section>
 </main>

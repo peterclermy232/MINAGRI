@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../shared/auth.service';
 import { UserService } from '../../shared/user.service';
-import { OrganizationService } from '../../app/shared/organization.service';
+//import { OrganizationService } from '../../shared/organization.service';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -19,7 +19,12 @@ export class PagesLoginComponent implements OnInit {
     loading: false,
     text: 'Login',
   };
-  constructor(private authService: AuthService, private fb: FormBuilder) {
+
+  constructor(
+    private authService: AuthService,
+    private fb: FormBuilder,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', Validators.required],
@@ -28,10 +33,7 @@ export class PagesLoginComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  // handleLogin(){
-  //   this.router.navigateByUrl('/home')
-  // }
-  handleSubmit() {
+  handleSubmit(): void {
     this.formSubmitted = false;
     if (this.loginForm.invalid) {
       this.formSubmitted = true;
@@ -40,7 +42,7 @@ export class PagesLoginComponent implements OnInit {
     this.handleLogin();
   }
 
-  handleLogin() {
+  handleLogin(): void {
     this.loginBtn = {
       text: 'Processing...',
       loading: true,
@@ -59,53 +61,89 @@ export class PagesLoginComponent implements OnInit {
         })
       )
       .subscribe(
-        (resp) => {
+        (resp: any) => {
           console.log('login resp', resp);
+
+          // Store authentication data if needed
+          if (resp.token || resp.access_token) {
+            localStorage.setItem('token', resp.token || resp.access_token);
+          }
+          if (resp.user) {
+            localStorage.setItem('user', JSON.stringify(resp.user));
+          }
+
           this.resetForm();
           this.showToast();
+
+          // Navigate to dashboard or home after successful login
+          // Uncomment and adjust route as needed
+          // this.router.navigate(['/dashboard']);
         },
-        (err) => {
-          console.log('err login', err.error);
+        (err: any) => {
+          console.log('err login', err);
           this.handleLoginError(err);
         }
       );
   }
 
-  async handleLoginError(err: {
-    error: { description: string; message: string };
-  }) {
-    if (
-      err &&
-      err.error.description &&
-      this.isWs02TokenInvalid(err.error.description)
-    ) {
-      await this.authService.removeApiUserToken();
-      this.handleLogin();
-    } else {
-      this.showErrorMessage(err.error);
+  async handleLoginError(err: any): Promise<void> {
+    try {
+      // Check if error exists and has the expected structure
+      if (
+        err?.error?.description &&
+        this.isWs02TokenInvalid(err.error.description)
+      ) {
+        await this.authService.removeApiUserToken();
+        this.handleLogin();
+      } else {
+        this.showErrorMessage(err?.error || err);
+      }
+    } catch (error) {
+      console.error('Error handling login error:', error);
+      this.showErrorMessage({
+        message: 'An unexpected error occurred. Please try again.'
+      });
     }
   }
 
-  isWs02TokenInvalid(errorMessage: string) {
+  isWs02TokenInvalid(errorMessage: string): boolean {
     console.log('error message', errorMessage);
-    return errorMessage.includes('Invalid JWT token');
+    return errorMessage?.includes('Invalid JWT token') || false;
   }
 
-  showErrorMessage(err: any) {
-    const message =
-      err.message.message ||
-      err.description ||
-      'error occurred, try again later';
+  showErrorMessage(err: any): void {
+    // Safely extract error message with multiple fallbacks
+    let message = 'An error occurred, please try again later';
+
+    try {
+      if (err) {
+        // Try different error message locations
+        if (err.message?.message) {
+          message = err.message.message;
+        } else if (err.message) {
+          message = typeof err.message === 'string' ? err.message : message;
+        } else if (err.description) {
+          message = err.description;
+        } else if (err.error?.message) {
+          message = err.error.message;
+        } else if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+          message = err.errors[0]?.message || message;
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing error message:', e);
+    }
+
     Swal.fire('Error Occurred!', message, 'error');
   }
 
-  resetForm() {
+  resetForm(): void {
     this.loginForm.reset();
     this.loginForm.markAsPristine();
     this.formSubmitted = false;
   }
 
-  showToast() {
+  showToast(): void {
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
