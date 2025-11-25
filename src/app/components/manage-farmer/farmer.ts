@@ -15,4 +15,5 @@ export class FarmerModel{
       emailAddres : string = '';
       phoneNumber : number = 0;
       relationship : string = '';
+  emailAddress: any;
 }

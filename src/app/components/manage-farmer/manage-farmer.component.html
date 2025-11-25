@@ -12,7 +12,7 @@
      </nav>
   </div>
   <section class="section">
-    
+
      <nav class="navbar navbar-ligth ">
        <div class="container">
          <div class="flex-centered">
@@ -22,87 +22,110 @@
        </div>
      </nav>
       <!--search input-->
-      <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
-        </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
+      <!-- SEARCH + EXPORT -->
+<div class="d-flex justify-content-lg-between mt-2">
+  <div class="search">
+    <input
+  class="form-control mt-2 mb-2 input-sm"
+  type="text"
+  placeholder="Search farmer..."
+  [(ngModel)]="searchText"
+  (ngModelChange)="onSearchChange()"
+/>
+  </div>
 
-     <table class="table mt-3">
-       <thead>
-         <tr>
-          <th scope="col">Organisation ID</th>
-           <th scope="col">First Name</th>
-           <th scope="col">Last Name</th>
-           <th scope="col">Phone Numbers</th>
-           <th scope="col">Email Address</th>
-           <th scope="col">ID NUMBER</th>
-           <th scope="col">Physical Address</th>
-           <th scope="col">Farmer Category</th>
-           <th scope="col">Date of Registration</th>
+  <button class="btn btn-success btn-lg" type="button">
+    Export
+  </button>
+</div>
 
-           <!-- <th scope="col">Location Province</th> -->
-           <th scope="col">Farm Name</th>
-           <th scope="col">Farm Size</th>
-           <th scope="col">UPI NO.</th>
+<!-- TABLE -->
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-hover mt-3 w-100">
+    <thead>
+      <tr>
+        <th>Organisation ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Phone Number</th>
+        <th>Email Address</th>
+        <th>ID Number</th>
+        <th>Physical Address</th>
+        <th>Farmer Category</th>
+        <th>Date of Registration</th>
+        <th>Farm Name</th>
+        <th>Farm Size</th>
+        <th>UPI No.</th>
+        <th>Bank Name</th>
+        <th>Account Number</th>
+        <th>Relationship</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <!-- Add this debug line temporarily -->
+      <tr *ngIf="filteredFarmers.length === 0">
+        <td colspan="16" class="text-center">
+          No farmers found. Total farmers: {{ farmerData.length }}
+        </td>
+      </tr>
+
+      <tr *ngFor="let column of filteredFarmers; let i = index">
+        <td>{{ column.id }}</td>
+        <td>{{ column.firstName }}</td>
+        <td>{{ column.lastName }}</td>
+        <td>{{ column.phoneNumber }}</td>
+        <td>{{ column.emailAddress }}</td>
+        <td>{{ column.idNumber }}</td>
+        <td>{{ column.physicalAddress }}</td>
+        <td>{{ column.category }}</td>
+        <td>{{ column.date }}</td>
+        <td>{{ column.farmName }}</td>
+        <td>{{ column.farmSize }}</td>
+        <td>{{ column.upi }}</td>
+        <td>{{ column.bankName }}</td>
+        <td>{{ column.accountNumber }}</td>
+        <td>{{ column.relationship }}</td>
+
+        <td>
+          <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal"
+            data-bs-target="#exampleModal" (click)="onEdit(column)">Edit</button>
+          <button class="btn btn-danger btn-sm">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 
-           <th scope="col">Bank Name</th>
-           <th scope="col">Account Number</th>
-           <!-- <th scope="col">Account Name</th> -->
+<!-- PAGINATION -->
+<div class="d-flex justify-content-between align-items-center mt-3">
+  <div>
+    <button
+      class="btn btn-secondary btn-sm"
+      [disabled]="page === 1"
+      (click)="page = page - 1"
+    >
+      Previous
+    </button>
 
-           <th scope="col">First Name</th>
-           <th scope="col">Last Name</th>
-           <th scope="col">ID Number</th>
-           <th scope="col">Phone Numberz</th>
-           <th scope="col">Email Addres</th>
-           <th scope="col">Relationship</th>
+    <button
+      class="btn btn-secondary btn-sm ms-2"
+      [disabled]="page === totalPages"
+      (click)="page = page + 1"
+    >
+      Next
+    </button>
+  </div>
 
-           <th scope="col">Action</th>
-
-         </tr>
-       </thead>
-       <tbody>
-         <tr *ngFor="let column of farmerData" >
-          <td>{{column.id}}</td>
-           <td>{{column.firstName}}</td>
-           <td>{{column.lastName}}</td>
-           <td>{{column.phoneNumber}}</td>
-           <td>{{column.emailAddress}}</td>
-           <td>{{column.idNumber}}</td>
-           <td>{{column.physicalAddress}}</td>
-           <td>{{column.category}}</td>
-           <td>{{column.date}}</td>
+  <div>
+    Page {{ page }} of {{ totalPages }}
+  </div>
+</div>
 
 
-           <td>{{column.farmName}}</td>
-           <td>{{column.farmSize}}</td>
-           <td>{{column.upi}}</td>
 
-           <!-- <td>Nairobi</td> -->
-           <td>{{column.bankName}}</td>
-           <td>{{column.accountNumber}}</td>
-           <td>{{column.firstName}}</td>
-
-           <td>{{column.lastName}}</td>
-           <td>{{column.idNumber}}</td>
-           <td>{{column.phoneNumber}}</td>
-           <td>{{column.emailAddress}}</td>
-           <td>{{column.relationship}}</td>
-           <!-- <td>Email@gmail.com</td>
-           <td>Mother</td>
-            -->
-            <td>
-              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" (click)="onEdit(column)" class="btn btn-warning btn-sm">Edit</button>
-              <button  class="btn btn-danger mx-3">Delete</button>
-            </td>
-         </tr>
-       </tbody>
-     
-     </table>
-     
      <!-- Modal -->
      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
        <div class="modal-dialog modal-lg">
@@ -116,50 +139,50 @@
               <div class="row">
                <div class="col mb-3">
                  <label  class="form-label">First Name</label>
-                 <input type="text" formControlName="firstName" class="form-control" 
+                 <input type="text" formControlName="firstName" class="form-control"
                    aria-describedby="emailHelp">
                </div>
                <div class="col mb-3">
                 <label  class="form-label">Last Name</label>
-                <input type="text" formControlName="lastName" class="form-control" 
+                <input type="text" formControlName="lastName" class="form-control"
                   aria-describedby="emailHelp">
               </div>
             </div>
-                
+
             <div class="row">
               <div class="col mb-3">
                 <label  class="form-label">Phone Number</label>
-                <input type="number" formControlName="phoneNumber" class="form-control" 
+                <input type="number" formControlName="phoneNumber" class="form-control"
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
                 <label  class="form-label">Enter Email Address</label>
-                <input type="email" formControlName="emailAddress" class="form-control" 
+                <input type="email" formControlName="emailAddress" class="form-control"
                   aria-describedby="emailHelp">
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
                 <label  class="form-label">ID NUMBER</label>
-                <input type="number" formControlName="idNumber" class="form-control" 
+                <input type="number" formControlName="idNumber" class="form-control"
                   aria-describedby="emailHelp">
               </div>
-        
+
               <div class="col mb-3">
                 <label  class="form-label">Enter Physical Address</label>
-                <input type="email" formControlName="physicalAddress" class="form-control" 
+                <input type="email" formControlName="physicalAddress" class="form-control"
                   aria-describedby="emailHelp">
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
                 <label  class="form-label">Enter Farmer Catagory</label>
-                <input type="text" formControlName="category" class="form-control" 
+                <input type="text" formControlName="category" class="form-control"
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
                 <label  class="form-label">Enter Date of Registration</label>
-                <input type="date" formControlName="date" class="form-control" 
+                <input type="date" formControlName="date" class="form-control"
                   aria-describedby="emailHelp">
               </div>
              </div>
@@ -171,27 +194,27 @@
                     <option>District</option>
                     <option>Sector</option>
                   </select>
-             </div> 
-            
-           
-             
+             </div>
+
+
+
               <div class="col mb-3">
                 <label  class="form-label">Enter Farm Name</label>
-                <input type="text" formControlName="farmName" class="form-control" 
+                <input type="text" formControlName="farmName" class="form-control"
                   aria-describedby="emailHelp">
               </div>
             </div>
             <div class="row">
               <div class="col mb-3">
                 <label  class="form-label">Enter Farm Size</label>
-                <input type="number" formControlName="farmSize" class="form-control" 
+                <input type="number" formControlName="farmSize" class="form-control"
                   aria-describedby="emailHelp">
               </div>
-              
-            
+
+
               <div class="col mb-3">
                 <label  class="form-label">Enter UPI NO.</label>
-                <input type="number" formControlName="upi" class="form-control" 
+                <input type="number" formControlName="upi" class="form-control"
                   aria-describedby="emailHelp">
               </div>
             </div>
@@ -200,20 +223,20 @@
               <div class="row">
               <div class="col mb-3">
                 <label  class="form-label">Enter Bank Name</label>
-                <input type="text" formControlName="bankName" class="form-control" 
+                <input type="text" formControlName="bankName" class="form-control"
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
                 <label  class="form-label">Enter Account Number</label>
-                <input type="number" formControlName="accountNumber" class="form-control" 
+                <input type="number" formControlName="accountNumber" class="form-control"
                   aria-describedby="emailHelp">
               </div>
               </div>
-           
-             
+
+
               <div class="mb-3">
                 <label  class="form-label">Enter Account Address</label>
-                <input type="email" formControlName="accountAddress" class="form-control" 
+                <input type="email" formControlName="accountAddress" class="form-control"
                   aria-describedby="emailHelp">
               </div>
 
@@ -221,40 +244,40 @@
                    <div class="row">
               <div class="col mb-3">
                 <label  class="form-label">First Name</label>
-                <input type="text" formControlName="firstName" class="form-control" 
+                <input type="text" formControlName="firstName" class="form-control"
                   aria-describedby="emailHelp">
               </div>
               <div class="col mb-3">
                <label  class="form-label">Last Name</label>
-               <input type="text" formControlName="lastName" class="form-control" 
+               <input type="text" formControlName="lastName" class="form-control"
                  aria-describedby="emailHelp">
              </div>
             </div>
             <div class="row">
              <div class="col mb-3">
                <label  class="form-label">Phone Number</label>
-               <input type="number" formControlName="phoneNumber" class="form-control" 
+               <input type="number" formControlName="phoneNumber" class="form-control"
                  aria-describedby="emailHelp">
              </div>
              <div class="col mb-3">
                <label  class="form-label">Enter Email Address</label>
-               <input type="email" formControlName="emailAddress" class="form-control" 
+               <input type="email" formControlName="emailAddress" class="form-control"
                  aria-describedby="emailHelp">
              </div>
             </div>
             <div class="row">
              <div class="col mb-3">
                <label  class="form-label">ID NUMBER</label>
-               <input type="number" formControlName="id" class="form-control" 
+               <input type="number" formControlName="id" class="form-control"
                  aria-describedby="emailHelp">
              </div>
              <div class="col mb-3">
               <label  class="form-label">Enter Relationship</label>
-              <input type="text" formControlName="relationship" class="form-control" 
+              <input type="text" formControlName="relationship" class="form-control"
                 aria-describedby="emailHelp">
             </div>
           </div>
-              
+
              </form>
            </div>
            <div class="modal-footer">
@@ -266,6 +289,6 @@
          </div>
        </div>
      </div>
-     
+
     </section>
 </main>

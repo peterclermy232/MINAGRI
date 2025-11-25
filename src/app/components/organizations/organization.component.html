@@ -33,10 +33,9 @@
     </nav>
 
     <!-- Add your table here if needed -->
-    <!-- Example table structure:
-    <div class="card">
-      <div class="card-body">
-        <table class="table">
+    <div>
+      <div >
+        <table class="table table-bordered table-striped table-hover mt-3 w-100">
           <thead>
             <tr>
               <th>Organization Code</th>
@@ -48,21 +47,21 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let org of organizations">
-              <td>{{ org.organisation_code }}</td>
-              <td>{{ org.organisation_name }}</td>
-              <td>{{ org.organisation_email }}</td>
-              <td>{{ org.organisation_msisdn }}</td>
-              <td>{{ org.organisation_status }}</td>
+            <tr>
+              <td>organisation_code</td>
+              <td>organisation_name</td>
+              <td>organisation_email</td>
+              <td>organisation_msisdn </td>
+              <td>organisation_status</td>
               <td>
-                <button (click)="showModal(org)" class="btn btn-sm btn-warning">Edit</button>
+                <button (click)="showModal()" class="btn btn-sm btn-warning">Edit</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    -->
+
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

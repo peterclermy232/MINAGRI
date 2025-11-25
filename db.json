@@ -168,5 +168,35 @@
           "branch_status": null
       }
   ],
+  "users": [
+    {
+      "user_id": 1,
+      "user_name": "Mike",
+      "user_email": "mike.njonge@gmail.com",
+      "user_password": "$2a$12$NGcho49MhZlNH2PC1USe0u5H1eGfElymhiErAkDuKOafM5cXNM/k2",
+      "user_status": "ACTIVE"
+    },
+    {
+      "user_id": 2,
+      "user_name": "eric",
+      "user_email": "ericribia@gmail.com",
+      "user_password": "$2a$12$3mvyrYSTYYTMMCx2x04tduL0z5D/dCX0qvm44p138WS1wSVE1oKMq",
+      "user_status": "ACTIVE"
+    },
+    {
+      "user_id": 3,
+      "user_name": "mundu",
+      "user_email": "mikemundu@gmail.com",
+      "user_password": "$2a$12$kV9awe89uz6sPGaQFLBES.uKH4mKVhLtyhHvf.pQuBLxcefgA7qGe",
+      "user_status": "ACTIVE"
+    },
+    {
+      "user_id": 4,
+      "user_name": "olsa",
+      "user_email": "olsa@gmail.com",
+      "user_password": "$2a$12$9SdKpX2NedcVWZBYidBaceneBhPmKKcyFFKJ9/VNokvtlQXS8f8NG",
+      "user_status": "ACTIVE"
+    }
+  ],
   "page_size": 10
 }

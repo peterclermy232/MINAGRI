@@ -13,8 +13,8 @@ export const environment: ENV = {
   // crop_baseurl: 'https://apim-minagri.wrightinteractives.com',
   crop_baseurl: 'https://crop-insurance-minagri.wrightinteractives.com',
   auth_baseurl:
-    'https://apim-minagri.wrightinteractives.com/authentication/1.0.0',
-  oauth_baseurl: 'https://apim-minagri.wrightinteractives.com',
+    'http://localhost:3000/users',
+  oauth_baseurl: 'http://localhost:3000/users',
 };
 /*
  * For easier debugging in development mode, you can import the following file

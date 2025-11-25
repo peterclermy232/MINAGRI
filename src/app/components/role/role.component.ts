@@ -4,11 +4,11 @@ import { RoleService } from 'src/app/shared/role.service';
 import { RoleModel } from './role-name';
 
 @Component({
-  selector: 'app-badges',
-  templateUrl: './badges.component.html',
-  styleUrls: ['./badges.component.css']
+  selector: 'app-role',
+  templateUrl: './role.component.html',
+  styleUrls: ['./role.component.css']
 })
-export class BadgesComponent implements OnInit {
+export class RoleComponent implements OnInit {
 
   formValue !:FormGroup;
   roleModelObj : RoleModel = new RoleModel();
@@ -36,9 +36,9 @@ export class BadgesComponent implements OnInit {
   postEmployeeDetails(){
     this.  roleModelObj.name = this.formValue.value.name;
     this.  roleModelObj.description = this.formValue.value. description;
-   
+
     this. roleModelObj.select = this.formValue.value.select;
-    
+
     this.api.postLoss(this.  roleModelObj)
     .subscribe(res=>{
       console.log(res);
@@ -71,17 +71,17 @@ export class BadgesComponent implements OnInit {
     this.  roleModelObj.id =  users.id;
     this.formValue.controls['name'].setValue( users.organization);
     this.formValue.controls['description'].setValue( users. description);
-   
+
     this.formValue.controls['select'].setValue( users.select)
-   
+
   }
   updateEmployeeDetails(){
     this.  roleModelObj.name = this.formValue.value.name;
     this.  roleModelObj.description = this.formValue.value. description;
-   
+
     this. roleModelObj.select = this.formValue.value.select;
-    
-    
+
+
     this.api.updateLoss(this.  roleModelObj,this.  roleModelObj.id)
     .subscribe(res=>{
       alert("Updated Successfully")
@@ -90,7 +90,7 @@ export class BadgesComponent implements OnInit {
       this.formValue.reset();
       this.getAllEmployee();
     })
-   
+
   }
 
 }

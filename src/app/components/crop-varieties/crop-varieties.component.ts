@@ -9,11 +9,11 @@ import Swal from 'sweetalert2';
 import { NotifierService } from '../../services/notifier.service';
 
 @Component({
-  selector: 'app-icons-boxicons',
-  templateUrl: './icons-boxicons.component.html',
-  styleUrls: ['./icons-boxicons.component.css'],
+  selector: 'app-crop-varieties',
+  templateUrl: './crop-varieties.component.html',
+  styleUrls: ['./crop-varieties.component.css'],
 })
-export class IconsBoxiconsComponent implements OnInit {
+export class CropVarietiesComponent implements OnInit {
   cropVarietyForm: FormGroup;
   formSubmitted = false;
   currentCrop: null | CropVariety = null;

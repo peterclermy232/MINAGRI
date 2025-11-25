@@ -8,17 +8,16 @@ import { FooterComponent } from './layouts/footer/footer.component';
 import { SidebarComponent } from './layouts/sidebar/sidebar.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { OrganizationComponent } from './components/organizations/organization.component';
-import { AccordionComponent } from './components/Organization/accordion.component';
-import { BadgesComponent } from './components/badges/badges.component';
+import { OrganizationTypeComponent } from './components/Organization/organization-type.component';
+import {  RoleComponent } from './components/role/role.component';
 
 import { FormsElementsComponent } from './components/AddOrganization/forms-elements.component';
 import { ManageFarmerComponent } from './components/manage-farmer/manage-farmer.component';
 
-import { ChartsChartjsComponent } from './components/charts-chartjs/charts-chartjs.component';
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
-import { IconsBootstrapComponent } from './components/icons-bootstrap/icons-bootstrap.component';
+import { ManageCrops } from './components/manage-crops/manage-crops.component';
 
-import { IconsBoxiconsComponent } from './components/icons-boxicons/icons-boxicons.component';
+import { CropVarietiesComponent } from './components/crop-varieties/crop-varieties.component';
 import { UsersProfileComponent } from './pages/users-profile/users-profile.component';
 import { PagesFaqComponent } from './pages/pages-faq/pages-faq.component';
 import { PagesContactComponent } from './pages/pages-contact/pages-contact.component';
@@ -54,6 +53,8 @@ import { ForcastComponent } from './forcast/forcast.component';
 import { HistoricalComponent } from './historical/historical.component';
 import { AdvisoryComponent } from './advisory/advisory.component';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { CommonModule } from '@angular/common';
+import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.component';
 
 @NgModule({
   declarations: [
@@ -63,19 +64,19 @@ import { NgxPaginationModule } from 'ngx-pagination';
     SidebarComponent,
     DashboardComponent,
     OrganizationComponent,
-    AccordionComponent,
-    BadgesComponent,
+    OrganizationTypeComponent,
+    RoleComponent,
     ErrorSectionComponent,
 
     FormsElementsComponent,
     ManageFarmerComponent,
 
-    ChartsChartjsComponent,
+    LossAssesor,
     AssignlossComponent,
     WrittenComponent,
-     IconsBootstrapComponent,
+     ManageCrops,
 
-    IconsBoxiconsComponent,
+    CropVarietiesComponent,
     UsersProfileComponent,
     PagesFaqComponent,
     PagesContactComponent,
@@ -106,11 +107,12 @@ import { NgxPaginationModule } from 'ngx-pagination';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
     NgxPaginationModule
-    
+
   ],
   providers: [
     // {

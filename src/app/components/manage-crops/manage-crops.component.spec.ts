@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BadgesComponent } from './badges.component';
+import { ManageCrops } from './manage-crops.component';
 
-describe('BadgesComponent', () => {
-  let component: BadgesComponent;
-  let fixture: ComponentFixture<BadgesComponent>;
+describe('ManageCrops', () => {
+  let component: ManageCrops;
+  let fixture: ComponentFixture<ManageCrops>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BadgesComponent ]
+      declarations: [ ManageCrops ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BadgesComponent);
+    fixture = TestBed.createComponent(ManageCrops);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

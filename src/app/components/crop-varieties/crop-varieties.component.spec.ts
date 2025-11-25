@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { IconsBootstrapComponent } from './icons-bootstrap.component';
+import { CropVarietiesComponent } from './crop-varieties.component';
 
-describe('IconsBootstrapComponent', () => {
-  let component: IconsBootstrapComponent;
-  let fixture: ComponentFixture<IconsBootstrapComponent>;
+describe('CropVarietiesComponent', () => {
+  let component: CropVarietiesComponent;
+  let fixture: ComponentFixture<CropVarietiesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ IconsBootstrapComponent ]
+      declarations: [ CropVarietiesComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(IconsBootstrapComponent);
+    fixture = TestBed.createComponent(CropVarietiesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

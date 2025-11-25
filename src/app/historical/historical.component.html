@@ -10,10 +10,10 @@
        </nav>
     </div>
     <section class="section">
-      
+
        <nav class="navbar navbar-ligth">
          <div class="container-fluid">
-           
+
            <div class="flex-centered">
              <!-- <button  class="btn btn-success"  type="button" data-bs-toggle="modal"
                data-bs-target="#exampleModal">Add Historical Data</button> -->
@@ -23,12 +23,12 @@
        <!--search input-->
        <div class="d-flex justify-content-lg-between mt-2">
         <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
+        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
         </div>
         <button  class="btn btn-success btn-lg"  type="button">Export</button>
        </div>
 
-       <table class="table mt-3">
+       <table class="table table-bordered table-striped table-hover mt-3 w-100">
          <thead>
            <tr>
             <!-- <th scope="col">Organization ID</th> -->
@@ -37,7 +37,7 @@
              <th scope="col">End Date</th>
              <th scope="col">Historical</th>
              <!-- <th scope="col">Action</th> -->
-             
+
            </tr>
          </thead>
          <tbody>
@@ -46,23 +46,23 @@
              <td>Start</td>
              <td>End</td>
              <td>Historical</td>
-             
+
              <td>
                <!-- <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
                  data-bs-target="#exampleModal"   class="btn btn-warning btn-sm">Edit</button> -->
-              
+
              </td>
            </tr>
          </tbody>
-       
+
        </table>
-       
+
        <!-- Modal -->
        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
          <div class="modal-dialog">
            <div class="modal-content">
              <div class="modal-header">
-               
+
                <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
              </div>
              <div class="modal-body">
@@ -71,19 +71,19 @@
                   <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">Date Time Added</label>
                    <input type="datetime" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div> 
+                 </div>
 
                   <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">Start Date</label>
                    <input type="date" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div> 
+                 </div>
 
                   <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">End Date</label>
                    <input type="date" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div> 
-                 
- 
+                 </div>
+
+
                  <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">Historical Status</label>
                    <select class="form-select" formControlName="assessor">
@@ -92,7 +92,7 @@
                      <option>Disable</option> -->
                      </select>
                      <app-error-section></app-error-section>
-                </div> 
+                </div>
                  <!-- <div class="mb-3">
                    <label for="exampleInputPassword1" class="form-label">Status</label>
                    <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
@@ -107,8 +107,8 @@
            </div>
          </div>
        </div>
-       
+
       </section>
-  </main> 
-  
+  </main>
+
 

@@ -10,7 +10,7 @@
       </nav>
    </div>
    <section class="section">
-     
+
       <nav class="navbar navbar-ligth ">
         <div class="container">
           <div class="d-flex">
@@ -22,29 +22,29 @@
        <!--search input-->
        <div class="d-flex justify-content-lg-between mt-2">
         <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
+        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
         </div>
         <button  class="btn btn-success btn-lg"  type="button">Export</button>
        </div>
 
-      <table class="table mt-3">
+      <table class="table table-bordered table-striped table-hover mt-3 w-100">
         <thead>
           <tr>
            <th scope="col">Organisation ID</th>
-   
+
             <th scope="col">Organisation</th>
             <th scope="col">User</th>
             <th scope="col">Practice Number</th>
             <th scope="col">Status</th>
             <th scope="col">Action</th>
-            
-            
+
+
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let  users of lossData" >
            <td>{{ users.id}}</td>
-            
+
             <td>{{ users.organization}}</td>
             <td>{{ users.user}}</td>
             <td>{{ users.practiceNumber}}</td>
@@ -52,17 +52,17 @@
                {{ users.status}}
             </td>
 
-            
+
             <td>
               <button  style="color: aliceblue;" (click)="onEdit( users)" type="button" data-bs-toggle="modal"
                 data-bs-target="#exampleModal"class="btn btn-warning btn-sm">Edit</button>
-              
+
             </td>
           </tr>
         </tbody>
-       
+
       </table>
-    
+
       <!-- Modal -->
       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -73,14 +73,14 @@
             </div>
             <div class="modal-body">
               <form [formGroup]="formValue">
-               
+
 
 
                <h3>Manage Loss Assessors</h3>
 
                 <div class="mb-3">
                   <label  class="form-label">Select Organisation</label>
-                 
+
                   <select class="form-select" formControlName="status">
                      <option>organisation</option>
                     <!-- <option>Blacklisted</option>
@@ -115,6 +115,6 @@
           </div>
         </div>
       </div>
-      
+
      </section>
 </main>

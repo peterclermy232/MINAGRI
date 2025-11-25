@@ -9,11 +9,11 @@ import { finalize } from 'rxjs';
 import { NotifierService } from '../../services/notifier.service';
 
 @Component({
-  selector: 'app-icons-bootstrap',
-  templateUrl: './icons-bootstrap.component.html',
-  styleUrls: ['./icons-bootstrap.component.css'],
+  selector: 'app-manage-crops',
+  templateUrl: './manage-crops.component.html',
+  styleUrls: ['./manage-crops.component.css'],
 })
-export class IconsBootstrapComponent implements OnInit {
+export class ManageCrops implements OnInit {
   @ViewChild('modalButton') modalButton!: ElementRef;
 
   cropForm: FormGroup;

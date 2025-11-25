@@ -42,49 +42,71 @@ export class PagesLoginComponent implements OnInit {
     this.handleLogin();
   }
 
+  // handleLogin(): void {
+  //   this.loginBtn = {
+  //     text: 'Processing...',
+  //     loading: true,
+  //   };
+  //   this.authService
+  //     .appUserLogin({
+  //       username: this.loginForm.get('username')!.value,
+  //       password: this.loginForm.get('password')!.value,
+  //     })
+  //     .pipe(
+  //       finalize(() => {
+  //         this.loginBtn = {
+  //           text: 'Login',
+  //           loading: false,
+  //         };
+  //       })
+  //     )
+  //     .subscribe(
+  //       (resp: any) => {
+  //         console.log('login resp', resp);
+
+  //         // Store authentication data if needed
+  //         if (resp.token || resp.access_token) {
+  //           localStorage.setItem('token', resp.token || resp.access_token);
+  //         }
+  //         if (resp.user) {
+  //           localStorage.setItem('user', JSON.stringify(resp.user));
+  //         }
+
+  //         this.resetForm();
+  //         this.showToast();
+
+  //         // Navigate to dashboard or home after successful login
+  //         // Uncomment and adjust route as needed
+  //          this.router.navigate(['/dashboard']);
+  //       },
+  //       (err: any) => {
+  //         console.log('err login', err);
+  //         this.handleLoginError(err);
+  //       }
+  //     );
+  // }
+
   handleLogin(): void {
+  this.loginBtn = {
+    text: 'Processing...',
+    loading: true,
+  };
+
+  // 🚀 Skip any validation or API call — just navigate
+  setTimeout(() => {
     this.loginBtn = {
-      text: 'Processing...',
-      loading: true,
+      text: 'Login',
+      loading: false,
     };
-    this.authService
-      .appUserLogin({
-        username: this.loginForm.get('username')!.value,
-        password: this.loginForm.get('password')!.value,
-      })
-      .pipe(
-        finalize(() => {
-          this.loginBtn = {
-            text: 'Login',
-            loading: false,
-          };
-        })
-      )
-      .subscribe(
-        (resp: any) => {
-          console.log('login resp', resp);
 
-          // Store authentication data if needed
-          if (resp.token || resp.access_token) {
-            localStorage.setItem('token', resp.token || resp.access_token);
-          }
-          if (resp.user) {
-            localStorage.setItem('user', JSON.stringify(resp.user));
-          }
+    // Show success toast
+    this.showToast();
 
-          this.resetForm();
-          this.showToast();
+    // Navigate directly to dashboard
+    this.router.navigate(['/dashboard']);
+  }, 1000); // optional short delay for UI feedback
+}
 
-          // Navigate to dashboard or home after successful login
-          // Uncomment and adjust route as needed
-          // this.router.navigate(['/dashboard']);
-        },
-        (err: any) => {
-          console.log('err login', err);
-          this.handleLoginError(err);
-        }
-      );
-  }
 
   async handleLoginError(err: any): Promise<void> {
     try {

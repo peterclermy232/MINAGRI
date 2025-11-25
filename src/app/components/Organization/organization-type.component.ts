@@ -16,11 +16,11 @@ import Swal from 'sweetalert2';
 import { OrganizationService } from '../../app/shared/organization.service';
 
 @Component({
-  selector: 'app-accordion',
-  templateUrl: './accordion.component.html',
-  styleUrls: ['./accordion.component.css'],
+  selector: 'app-organization-type',
+  templateUrl: './organization-type.component.html',
+  styleUrls: ['./organization-type.component.css'],
 })
-export class AccordionComponent implements OnInit {
+export class OrganizationTypeComponent implements OnInit {
   organizationTypeForm: FormGroup;
   formSubmitted = false;
   currentOrgType: null | OrganizationType = null;

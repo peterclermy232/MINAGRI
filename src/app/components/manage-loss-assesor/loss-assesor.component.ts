@@ -4,19 +4,19 @@ import { LossService } from 'src/app/shared/loss.service';
 import { LossModel } from './loss';
 
 @Component({
-  selector: 'app-charts-chartjs',
-  templateUrl: './charts-chartjs.component.html',
-  styleUrls: ['./charts-chartjs.component.css']
+  selector: 'app-loss-assesor',
+  templateUrl: './loss-assesor.component.html',
+  styleUrls: ['./loss-assesor.component.css']
 })
-export class ChartsChartjsComponent implements OnInit {
+export class LossAssesor implements OnInit {
 
-  
+
   formValue !:FormGroup;
   lossModelObj : LossModel = new LossModel();
   lossData !:any;
   showAdd!: boolean;
   showUpdate!:boolean;
-  
+
   constructor(private formbuilder: FormBuilder,
     private api : LossService) { }
 
@@ -41,7 +41,7 @@ export class ChartsChartjsComponent implements OnInit {
     this. lossModelObj.user = this.formValue.value. user;
     this.lossModelObj.practiceNumber = this.formValue.value.practiceNumber;
     this.lossModelObj.status = this.formValue.value.status;
-    
+
     this.api.postLoss(this. lossModelObj)
     .subscribe(res=>{
       console.log(res);
@@ -76,14 +76,14 @@ export class ChartsChartjsComponent implements OnInit {
     this.formValue.controls[' user'].setValue( users. user);
     this.formValue.controls['practiceNumber'].setValue( users.practiceNumber)
     this.formValue.controls['status'].setValue( users.status)
-   
+
   }
   updateEmployeeDetails(){
     this. lossModelObj.organization = this.formValue.value.organization;
     this. lossModelObj. user = this.formValue.value. user;
     this.lossModelObj.practiceNumber = this.formValue.value.practiceNumber;
     this.lossModelObj.status = this.formValue.value.status;
-    
+
     this.api.updateLoss(this. lossModelObj,this. lossModelObj.id)
     .subscribe(res=>{
       alert("Updated Successfully")
@@ -92,6 +92,6 @@ export class ChartsChartjsComponent implements OnInit {
       this.formValue.reset();
       this.getAllEmployee();
     })
-   
+
   }
 }

@@ -1,0 +1,22 @@
+table.table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+table.table th,
+table.table td {
+  border: 1px solid #dee2e6 !important;
+  padding: 8px !important;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+thead th {
+  background: #f8f9fa !important;
+  font-weight: bold;
+  text-align: center;
+}

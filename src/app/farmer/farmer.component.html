@@ -10,7 +10,7 @@
        </nav>
     </div>
     <section class="section">
-      
+
        <nav class="navbar navbar-ligth ">
          <div class="container">
            <div class="d-flex">
@@ -22,12 +22,12 @@
       <!--search input-->
       <div class="d-flex justify-content-lg-between mt-2">
         <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" /> 
+        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
         </div>
         <button  class="btn btn-success btn-lg"  type="button">Export</button>
        </div>
- 
-       <table class="table mt-3">
+
+       <table class="table table-bordered table-striped table-hover mt-3 w-100">
          <thead>
            <tr>
             <th scope="col">Organisation ID</th>
@@ -37,21 +37,21 @@
              <th scope="col">Phone Number</th>
              <th scope="col">ID NUMBER</th>
              <th scope="col">Action</th>
-             
-             
+
+
            </tr>
          </thead>
          <tbody>
            <tr *ngFor="let row of registrationData">
             <td>{{row.id}}</td>
-             
+
              <td>{{row.firstName}} </td>
              <td>{{row.secondName}}</td>
              <td>{{row.lastName}}</td>
              <td>{{row.phoneNumber}}</td>
              <td>{{row.idNumber}}</td>
- 
-             
+
+
              <td>
                <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
                  data-bs-target="#exampleModal" (click)="onEdit(row)" class="btn btn-info">Edit</button>
@@ -59,9 +59,9 @@
              </td>
            </tr>
          </tbody>
-       
+
        </table>
-       
+
        <!-- Modal -->
        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
          <div class="modal-dialog">
@@ -87,7 +87,7 @@
                   <input type="text" formControlName="lastName" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
                 </div>
-               
+
                 <div class="mb-3">
                   <label for="exampleInputEmail1" class="form-label">Phone Number</label>
                   <input type="number" formControlName="phoneNumber" class="form-control" id="exampleInputEmail1"
@@ -99,8 +99,8 @@
                     <input type="number" formControlName="idNumber" class="form-control" id="exampleInputEmail1"
                       aria-describedby="emailHelp">
                   </div>
-                
- 
+
+
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <span class="input-group-text">Upload Practice License</span>
@@ -110,7 +110,7 @@
                     <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
                   </div>
                 </div>
-               
+
                </form>
              </div>
              <div class="modal-footer">
@@ -122,6 +122,6 @@
            </div>
          </div>
        </div>
-       
+
       </section>
  </main>

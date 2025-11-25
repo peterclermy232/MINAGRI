@@ -2,15 +2,15 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { OrganizationComponent } from './components/organizations/organization.component';
-import { AccordionComponent } from './components/Organization/accordion.component';
-import { BadgesComponent } from './components/badges/badges.component';
+import { OrganizationTypeComponent } from './components/Organization/organization-type.component';
+import { RoleComponent } from './components/role/role.component';
 
 
-import { ChartsChartjsComponent } from './components/charts-chartjs/charts-chartjs.component';
+import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.component';
 import { FormsElementsComponent } from './components/AddOrganization/forms-elements.component';
 
-import { IconsBootstrapComponent } from './components/icons-bootstrap/icons-bootstrap.component';
-import { IconsBoxiconsComponent } from './components/icons-boxicons/icons-boxicons.component';
+import { ManageCrops } from './components/manage-crops/manage-crops.component';
+import { CropVarietiesComponent } from './components/crop-varieties/crop-varieties.component';
 
 import { ManageFarmerComponent } from './components/manage-farmer/manage-farmer.component';
 
@@ -49,10 +49,10 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
 
   { path: 'organization', component: OrganizationComponent },
-  { path: 'accordion', component: AccordionComponent },
-  { path: 'badges', component: BadgesComponent },
+  { path: 'accordion', component: OrganizationTypeComponent },
+  { path: 'badges', component: RoleComponent },
   {path: 'assignloss', component: AssignlossComponent},
-  { path: 'charts-chartjs', component: ChartsChartjsComponent },
+  { path: 'charts-chartjs', component: LossAssesor },
   {path: 'invoice', component: InvoiceComponent},
   {path: 'approved', component: ApprovedComponent},
   {path:'pending', component: PendingComponent},
@@ -71,8 +71,8 @@ const routes: Routes = [
   {path: 'payment', component: PaymentComponent},
   {path: 'peid', component: PaidClaimComponent },
   {path: 'claim', component: ClaimComponent},
-  { path: 'crop', component: IconsBootstrapComponent },
-  { path: 'crop-varieties', component: IconsBoxiconsComponent },
+  { path: 'crop', component: ManageCrops },
+  { path: 'crop-varieties', component: CropVarietiesComponent },
 
   { path: 'manage-farmer', component: ManageFarmerComponent },
   {path: 'forecast', component: ForcastComponent},
