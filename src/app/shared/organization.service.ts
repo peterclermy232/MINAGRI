@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { CropResponse, OrganizationTypeResponse } from '../../types';
 import { HttpClient } from '@angular/common/http';
 import { of, switchMap, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { OrganizationTypeResponse } from '../types';
 
 @Injectable({
   providedIn: 'root',
@@ -12,34 +12,28 @@ export class OrganizationService {
 
   //organization type apis
   postOrganizationType(data: any) {
-    return this.http.post<any>('/api/v1/organisation_types', {
-      ...data,
-      request_type: 'authApi',
-    });
-  }
-  getOrganizationTypes() {
-    return this.http.get<OrganizationTypeResponse[]>(
-      '/api/v1/organisation_types?all=true&request_type=authApi'
-    );
-  }
-  updateOrganizationType(data: any, id: number) {
-    return this.http.put<any>('/api/v1/organisation_types/' + id, {
-      ...data,
-      request_type: 'authApi',
-    });
+    return this.http.post<any>('/api/v1/organisation_types', data);
   }
 
-  //organization type apis
-  postOrganization(data: any) {
-    return this.http.post<any>('/api/v1/organisations', {
-      ...data,
-      request_type: 'authApi',
-    });
+  getOrganizationTypes() {
+    return this.http.get<OrganizationTypeResponse[]>(
+      '/api/v1/organisation_types?all=true'
+    );
   }
+
+  updateOrganizationType(data: any, id: number) {
+    return this.http.put<any>('/api/v1/organisation_types/' + id, data);
+  }
+
+  //organization APIs
+  postOrganization(data: any) {
+    return this.http.post<any>('/api/v1/organisations', data);
+  }
+
   getOrganizations() {
     return this.http
       .get<OrganizationTypeResponse[]>(
-        '/api/v1/organisations?all=true&request_type=authApi'
+        '/api/v1/organisations?all=true'
       )
       .pipe(
         switchMap((orgsResponse) => {
@@ -73,21 +67,28 @@ export class OrganizationService {
   }
 
   getOrganizationsShallow() {
+    console.log('OrganizationService.getOrganizationsShallow() called');
     return this.http.get<OrganizationTypeResponse[]>(
-      '/api/v1/organisations?all=true&request_type=authApi'
+      '/api/v1/organisations?all=true'
+    ).pipe(
+      tap((response) => {
+        console.log('getOrganizationsShallow response:', response);
+      })
     );
   }
 
   updateOrganization(data: any, id: number) {
-    return this.http.put<any>('/api/v1/organisations/' + id, {
-      ...data,
-      request_type: 'authApi',
-    });
+    return this.http.put<any>('/api/v1/organisations/' + id, data);
   }
 
   getCountries() {
+    console.log('OrganizationService.getCountries() called');
     return this.http.get<any>(
-      '/api/v1/countries?all=true&request_type=authApi'
+      '/api/v1/countries?all=true'
+    ).pipe(
+      tap((response) => {
+        console.log('getCountries response:', response);
+      })
     );
   }
 }

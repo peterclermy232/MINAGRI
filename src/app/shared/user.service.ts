@@ -1,74 +1,33 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
-import { UsersResponse } from '../types';
-import { of, switchMap, tap } from 'rxjs';
-import { OrganizationService } from '../app/shared/organization.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable, forkJoin } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class UserService {
-  constructor(
-    private http: HttpClient,
-    private organizationsService: OrganizationService
-  ) {}
+  private apiUrl = 'api'; // in-memory API root
 
-  postUser(data: any) {
-    return this.http
-      .post<any>('/api/v1/users', {
-        ...data,
-        request_type: 'authApi',
-      })
-      .pipe(
-        map((res: any) => {
-          return res;
-        })
-      );
+  constructor(private http: HttpClient) {}
+
+  // 🚀 Fetch Users + Orgs + Countries together
+  getUsers(): Observable<any> {
+    return forkJoin({
+      usersResponse: this.http.get<any>(`${this.apiUrl}/users`),
+      orgsResponse: this.http.get<any>(`${this.apiUrl}/organisations`),
+      countriesResponse: this.http.get<any>(`${this.apiUrl}/countries`)
+    });
   }
-  getUsers() {
-    return this.http
-      .get<UsersResponse>('/api/v1/users?all=true&request_type=authApi')
-      .pipe(
-        switchMap((usersResponse) => {
-          return this.organizationsService
-            .getOrganizationsShallow()
-            .pipe(map((orgsResponse) => ({ usersResponse, orgsResponse })));
-        }),
-        switchMap((usersandOrgs) => {
-          return this.organizationsService.getCountries().pipe(
-            map((countriesResponse) => ({
-              orgsResponse: usersandOrgs.orgsResponse,
-              usersResponse: usersandOrgs.usersResponse,
-              countriesResponse,
-            }))
-          );
-        }),
-        tap(({ orgsResponse, usersResponse, countriesResponse }) => {
-          console.log(
-            'orgs, users, countries',
-            orgsResponse,
-            usersResponse,
-            countriesResponse
-          );
-          return of({
-            usersResponse,
-            orgsResponse,
-            countriesResponse,
-          });
-        })
-      );
+
+  postUser(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users`, data);
   }
-  updateUser(data: any, id: number) {
-    return this.http
-      .put<any>('/api/v1/users/' + id, {
-        ...data,
-        request_type: 'authApi',
-      })
-      .pipe(
-        map((res: any) => {
-          return res;
-        })
-      );
+
+  updateUser(data: any, id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${id}`, data);
+  }
+
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/users/${id}`);
   }
 }

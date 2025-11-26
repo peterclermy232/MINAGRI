@@ -11,7 +11,7 @@ import { OrganizationComponent } from './components/organizations/organization.c
 import { OrganizationTypeComponent } from './components/Organization/organization-type.component';
 import {  RoleComponent } from './components/role/role.component';
 
-import { FormsElementsComponent } from './components/AddOrganization/forms-elements.component';
+import { AddOrganizationComponent } from './components/AddOrganization/add-organization.component';
 import { ManageFarmerComponent } from './components/manage-farmer/manage-farmer.component';
 
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
@@ -36,10 +36,10 @@ import { QuotationComponent } from './quotation/quotation.component';
 import { InsuranceComponent } from './insurance/insurance.component';
 import { PaidComponent } from './paid/paid.component';
 import { InvoiceComponent } from './invoice/invoice.component';
-import { ApprovedComponent } from './approved/approved.component';
+import { ApprovedComponent } from './components/approved/approved.component';
 import { PendingComponent } from './pending/pending.component';
 import { SettledComponent } from './settled/settled.component';
-import { ClaimComponent } from './claim/claim.component';
+import { ClaimComponent } from './components/claim/claim.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
@@ -51,10 +51,15 @@ import { DataTableComponent } from './ReUsableComponents/data-table/data-table.c
 import { ErrorSectionComponent } from './ReUsableComponents/error-section/error-section.component';
 import { ForcastComponent } from './forcast/forcast.component';
 import { HistoricalComponent } from './historical/historical.component';
-import { AdvisoryComponent } from './advisory/advisory.component';
+import { AdvisoryComponent } from './components/advisory/advisory.component';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { CommonModule } from '@angular/common';
 import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.component';
+import { AdvisoryService } from './shared/advisory.service';
+import { FilterPipe } from './pipes/filter.pipe';
+import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { MockBackendInterceptor } from './interceptors/mock-backend.interceptor';
+import { InMemoryDataService } from './shared/in-memory-data.service';
 
 @NgModule({
   declarations: [
@@ -68,7 +73,7 @@ import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.compo
     RoleComponent,
     ErrorSectionComponent,
 
-    FormsElementsComponent,
+    AddOrganizationComponent,
     ManageFarmerComponent,
 
     LossAssesor,
@@ -102,6 +107,7 @@ import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.compo
     ForcastComponent,
     HistoricalComponent,
     AdvisoryComponent,
+    FilterPipe
 
   ],
   imports: [
@@ -111,20 +117,32 @@ import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.compo
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {
+         dataEncapsulation: false,
+         delay: 500, // Simulated network delay (ms)
+         passThruUnknownUrl: true,
+         //apiBase: 'api/v1/',
+       }),
 
   ],
   providers: [
     // {
     //   provide: HTTP_INTERCEPTORS,
-    //   useClass: AuthHeaderInterceptor,
+    //   useClass:AuthHeaderInterceptor,
     //   multi: true,
     // },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: ApiInterceptor,
+      useClass: MockBackendInterceptor,
       multi: true,
     },
+    AdvisoryService,
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: ApiInterceptor,
+    //   multi: true,
+    // },
     { provide: 'OAUTH_BASE_URL', useValue: environment.oauth_baseurl },
     { provide: 'CROP_BASE_URL', useValue: environment.crop_baseurl },
   ],

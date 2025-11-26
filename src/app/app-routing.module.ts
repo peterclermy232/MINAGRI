@@ -7,7 +7,7 @@ import { RoleComponent } from './components/role/role.component';
 
 
 import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.component';
-import { FormsElementsComponent } from './components/AddOrganization/forms-elements.component';
+import { AddOrganizationComponent } from './components/AddOrganization/add-organization.component';
 
 import { ManageCrops } from './components/manage-crops/manage-crops.component';
 import { CropVarietiesComponent } from './components/crop-varieties/crop-varieties.component';
@@ -30,17 +30,17 @@ import { QuotationComponent } from './quotation/quotation.component';
 import { InsuranceComponent } from './insurance/insurance.component';
 import { PaidComponent } from './paid/paid.component';
 import { InvoiceComponent } from './invoice/invoice.component';
-import { ApprovedComponent } from './approved/approved.component';
+import { ApprovedComponent } from './components/approved/approved.component';
 import { PendingComponent } from './pending/pending.component';
 import { SettledComponent } from './settled/settled.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
-import { ClaimComponent } from './claim/claim.component';
+import { ClaimComponent } from './components/claim/claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
 import { WrittenComponent } from './written/written.component';
 import { ForcastComponent } from './forcast/forcast.component';
 import { HistoricalComponent } from './historical/historical.component';
-import { AdvisoryComponent } from './advisory/advisory.component';
+import { AdvisoryComponent } from './components/advisory/advisory.component';
 
 const routes: Routes = [
   { path: '', component: PagesLoginComponent },
@@ -49,8 +49,8 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
 
   { path: 'organization', component: OrganizationComponent },
-  { path: 'accordion', component: OrganizationTypeComponent },
-  { path: 'badges', component: RoleComponent },
+  { path: 'organization-type', component: OrganizationTypeComponent },
+  { path: 'roles', component: RoleComponent },
   {path: 'assignloss', component: AssignlossComponent},
   { path: 'charts-chartjs', component: LossAssesor },
   {path: 'invoice', component: InvoiceComponent},
@@ -63,7 +63,7 @@ const routes: Routes = [
   {path: 'manage-product', component: ManageProductComponent},
   {path: 'manage-insurance', component: ManageInsuranceComponent},
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
-  { path: 'form-elements', component: FormsElementsComponent },
+  { path: 'add-organization', component: AddOrganizationComponent },
   {path: 'farmer', component: FarmerComponent},
   {path: 'quotation', component: QuotationComponent},
   {path: 'insurance', component: InsuranceComponent},

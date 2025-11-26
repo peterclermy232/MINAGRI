@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Organization, OrganizationType } from '../../types';
 import { AuthService } from '../../shared/auth.service';
 import { UserService } from '../../shared/user.service';
-import { OrganizationService } from '../../app/shared/organization.service';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { NotifierService } from '../../services/notifier.service';
+import { OrganizationService } from 'src/app/shared/organization.service';
 
 @Component({
   selector: 'app-organization',

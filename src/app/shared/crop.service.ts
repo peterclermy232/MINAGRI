@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CropResponse, CropVariety } from '../types';
-import { OrganizationService } from '../app/shared/organization.service';
 import { of, switchMap, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { OrganizationService } from './organization.service';
 
 @Injectable({
   providedIn: 'root',

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RoleComponent } from './role.component';
 
-describe('BadgesComponent', () => {
+describe('RoleComponent', () => {
   let component: RoleComponent;
   let fixture: ComponentFixture<RoleComponent>;
 

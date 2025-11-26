@@ -1,0 +1,399 @@
+<!-- src/app/advisory/advisory.component.html -->
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Advisory Services</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <li class="breadcrumb-item active">Advisory</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <!-- Action Buttons -->
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <div class="flex-centered">
+          <button class="btn btn-success" (click)="clickAddAdvisory()" type="button"
+                  data-bs-toggle="modal" data-bs-target="#advisoryModal">
+            <i class="bi bi-plus-circle"></i> Send New Advisory
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search and Export Section -->
+    <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+      <div class="search flex-grow-1 me-2">
+        <div class="input-group">
+          <input class="form-control" type="text" [(ngModel)]="searchTerm"
+                 (input)="searchAdvisories()"
+                 placeholder="Search by province, district, sector, message..." />
+          <button class="btn btn-outline-secondary" type="button" (click)="searchAdvisories()">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-success" type="button" (click)="exportData()">
+        <i class="bi bi-download"></i> Export
+      </button>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <div class="card info-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Advisories</h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                <i class="bi bi-envelope"></i>
+              </div>
+              <div class="ps-3">
+                <h6>{{ advisoryData.length }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card info-card">
+          <div class="card-body">
+            <h5 class="card-title">Sent</h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success">
+                <i class="bi bi-check-circle text-white"></i>
+              </div>
+              <div class="ps-3">
+                <h6>{{ (advisoryData | filter:'status':'Sent').length }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card info-card">
+          <div class="card-body">
+            <h5 class="card-title">Scheduled</h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning">
+                <i class="bi bi-clock text-white"></i>
+              </div>
+              <div class="ps-3">
+                <h6>{{ (advisoryData | filter:'status':'Scheduled').length }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card info-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Recipients</h5>
+            <div class="d-flex align-items-center">
+              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-info">
+                <i class="bi bi-people text-white"></i>
+              </div>
+              <div class="ps-3">
+                <h6>{{ getTotalRecipients() }}</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading advisories...</p>
+    </div>
+
+    <!-- Advisory Table -->
+    <div *ngIf="!isLoading" class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Date Sent</th>
+                <th scope="col">Province</th>
+                <th scope="col">District</th>
+                <th scope="col">Sector</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Policy Status</th>
+                <th scope="col">Message</th>
+                <th scope="col">Recipients</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="filteredAdvisories.length === 0">
+                <td colspan="11" class="text-center">
+                  <p class="my-3">No advisories found</p>
+                </td>
+              </tr>
+              <tr *ngFor="let item of filteredAdvisories | paginate: { itemsPerPage: pageSize, currentPage: page }">
+                <td>{{ item.id }}</td>
+                <td>{{ item.dateTimeAdded | date:'short' }}</td>
+                <td>{{ item.province }}</td>
+                <td>{{ item.district }}</td>
+                <td>{{ item.sector }}</td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-primary': item.gender === 'All',
+                    'bg-info': item.gender === 'Male',
+                    'bg-warning': item.gender === 'Female'
+                  }">{{ item.gender }}</span>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-success': item.policyStatus === 'Active',
+                    'bg-warning': item.policyStatus === 'Pending',
+                    'bg-danger': item.policyStatus === 'Expired'
+                  }">{{ item.policyStatus }}</span>
+                </td>
+                <td>
+                  <span [title]="item.message">
+                    {{ item.message.length > 50 ? (item.message | slice:0:50) + '...' : item.message }}
+                  </span>
+                </td>
+                <td>
+                  <strong>{{ item.recipientsCount }}</strong>
+                </td>
+                <td>
+                  <span [ngClass]="getStatusBadgeClass(item.status)">
+                    {{ item.status }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary"
+        data-bs-toggle="modal" data-bs-target="#advisoryModal"
+        (click)="onEdit(item)"
+        title="Edit">
+  <i class="bi bi-pencil"></i>
+</button>
+
+<button type="button" class="btn btn-outline-success"
+        (click)="resendAdvisory(item)"
+        *ngIf="item.status === 'Sent'"
+        title="Resend">
+  <i class="bi bi-arrow-repeat"></i>
+</button>
+
+                    <button type="button" class="btn btn-outline-danger"
+                            (click)="deleteAdvisory(item)"
+                            title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="filteredAdvisories.length > pageSize">
+          <div>
+            Showing {{ ((page - 1) * pageSize) + 1 }} to
+            {{ (page * pageSize) > filteredAdvisories.length ? filteredAdvisories.length : (page * pageSize) }}
+            of {{ filteredAdvisories.length }} entries
+          </div>
+          <pagination-controls (pageChange)="page = $event"></pagination-controls>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="advisoryModal" tabindex="-1"
+         aria-labelledby="advisoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="advisoryModalLabel">
+              <i class="bi bi-envelope-plus"></i>
+              {{ showAdd ? 'Send New Advisory' : 'Edit Advisory' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <form [formGroup]="formValue">
+              <!-- Target Selection -->
+              <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                  <h6 class="mb-0"><i class="bi bi-bullseye"></i> Target Audience</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Province *</label>
+                      <select class="form-select" formControlName="province">
+                        <option value="">Select Province</option>
+                        <option *ngFor="let province of provinces" [value]="province">
+                          {{ province }}
+                        </option>
+                      </select>
+                      <app-error-section
+                        [formSubmitted]="formSubmitted"
+                        inputProperty="province"
+                        [inputObject]="formValue.get('province')">
+                      </app-error-section>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">District *</label>
+                      <select class="form-select" formControlName="district"
+                              [disabled]="!formValue.get('province')?.value">
+                        <option value="">Select District</option>
+                        <option *ngFor="let district of districts" [value]="district">
+                          {{ district }}
+                        </option>
+                      </select>
+                      <app-error-section
+                        [formSubmitted]="formSubmitted"
+                        inputProperty="district"
+                        [inputObject]="formValue.get('district')">
+                      </app-error-section>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Sector *</label>
+                      <select class="form-select" formControlName="sector">
+                        <option value="">Select Sector</option>
+                        <option *ngFor="let sector of sectors" [value]="sector">
+                          {{ sector }}
+                        </option>
+                      </select>
+                      <app-error-section
+                        [formSubmitted]="formSubmitted"
+                        inputProperty="sector"
+                        [inputObject]="formValue.get('sector')">
+                      </app-error-section>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Gender *</label>
+                      <select class="form-select" formControlName="gender">
+                        <option *ngFor="let gender of genders" [value]="gender">
+                          {{ gender }}
+                        </option>
+                      </select>
+                      <app-error-section
+                        [formSubmitted]="formSubmitted"
+                        inputProperty="gender"
+                        [inputObject]="formValue.get('gender')">
+                      </app-error-section>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Policy Status *</label>
+                      <select class="form-select" formControlName="policyStatus">
+                        <option *ngFor="let status of policyStatuses" [value]="status">
+                          {{ status }}
+                        </option>
+                      </select>
+                      <app-error-section
+                        [formSubmitted]="formSubmitted"
+                        inputProperty="policy_status"
+                        [inputObject]="formValue.get('policyStatus')">
+                      </app-error-section>
+                    </div>
+                  </div>
+
+                  <!-- Estimated Recipients -->
+                  <div class="alert alert-info" *ngIf="estimatedRecipients > 0">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Estimated Recipients:</strong> {{ estimatedRecipients }} farmers
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message Content -->
+              <div class="card mb-3">
+                <div class="card-header bg-success text-white">
+                  <h6 class="mb-0"><i class="bi bi-chat-text"></i> Message Content</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="messageTextarea" class="form-label">Message *</label>
+                    <textarea class="form-control" formControlName="message"
+                              id="messageTextarea" rows="5"
+                              placeholder="Write your advisory message here..."
+                              maxlength="500"></textarea>
+                    <div class="form-text">
+                      {{ formValue.get('message')?.value?.length || 0 }} / 500 characters
+                    </div>
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="message"
+                      [inputObject]="formValue.get('message')">
+                    </app-error-section>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Scheduling Options -->
+              <div class="card">
+                <div class="card-header bg-warning">
+                  <h6 class="mb-0"><i class="bi bi-clock"></i> Scheduling Options</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox"
+                             formControlName="sendNow" id="sendNowCheck">
+                      <label class="form-check-label" for="sendNowCheck">
+                        <strong>Send Now</strong>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="mb-3" *ngIf="!formValue.get('sendNow')?.value">
+                    <label class="form-label">Schedule Date and Time *</label>
+                    <input type="datetime-local" class="form-control"
+                           formControlName="scheduledDateTime"
+                           [min]="minDateTime">
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="scheduled_date_time"
+                      [inputObject]="formValue.get('scheduledDateTime')">
+                    </app-error-section>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" id="cancel" class="btn btn-secondary"
+                    data-bs-dismiss="modal" [disabled]="isSending">
+              <i class="bi bi-x-circle"></i> Close
+            </button>
+            <button type="button" class="btn btn-primary"
+                    (click)="sendAdvisory()" [disabled]="isSending">
+              <span *ngIf="!isSending">
+                <i class="bi bi-send"></i>
+                {{ formValue.get('sendNow')?.value ? 'Send Advisory' : 'Schedule Advisory' }}
+              </span>
+              <span *ngIf="isSending">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Sending...
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

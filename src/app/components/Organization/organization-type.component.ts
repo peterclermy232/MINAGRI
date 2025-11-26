@@ -13,7 +13,8 @@ import { UserService } from '../../shared/user.service';
 import { CropService } from '../../shared/crop.service';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-import { OrganizationService } from '../../app/shared/organization.service';
+import { OrganizationService } from 'src/app/shared/organization.service';
+
 
 @Component({
   selector: 'app-organization-type',
