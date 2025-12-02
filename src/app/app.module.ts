@@ -118,12 +118,12 @@ import { InMemoryDataService } from './shared/in-memory-data.service';
     ReactiveFormsModule,
     HttpClientModule,
     NgxPaginationModule,
-    HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {
-         dataEncapsulation: false,
-         delay: 500, // Simulated network delay (ms)
-         passThruUnknownUrl: true,
-         //apiBase: 'api/v1/',
-       }),
+    // HttpClientInMemoryWebApiModule.forRoot(InMemoryDataService, {
+    //      dataEncapsulation: false,
+    //      delay: 500, // Simulated network delay (ms)
+    //      passThruUnknownUrl: true,
+    //      //apiBase: 'api/v1/',
+    //    }),
 
   ],
   providers: [
@@ -132,17 +132,17 @@ import { InMemoryDataService } from './shared/in-memory-data.service';
     //   useClass:AuthHeaderInterceptor,
     //   multi: true,
     // },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: MockBackendInterceptor,
-      multi: true,
-    },
-    AdvisoryService,
     // {
     //   provide: HTTP_INTERCEPTORS,
-    //   useClass: ApiInterceptor,
+    //   useClass: MockBackendInterceptor,
     //   multi: true,
     // },
+    AdvisoryService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiInterceptor,
+      multi: true,
+    },
     { provide: 'OAUTH_BASE_URL', useValue: environment.oauth_baseurl },
     { provide: 'CROP_BASE_URL', useValue: environment.crop_baseurl },
   ],

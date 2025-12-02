@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FarmerService } from 'src/app/shared/farmer.service';
 import { FarmerModel } from './farmer';
 
@@ -20,6 +20,7 @@ export class ManageFarmerComponent implements OnInit {
   page: number = 1;
   pageSize: number = 5;
   totalPages: number = 1;
+  isLoading: boolean = false;
 
   constructor(
     private formbuilder: FormBuilder,
@@ -29,236 +30,260 @@ export class ManageFarmerComponent implements OnInit {
   ngOnInit(): void {
     console.log('=== Component Initializing ===');
 
+    // Initialize form
     this.formValue = this.formbuilder.group({
-      name: [''],
-      firstName: [''],
-      lastName: [''],
-      physicalAddress: [''],
-      idNumber: [''],
-      category: [''],
-      date: [''],
-      location: [''],        // ADDED - was missing
-      upi: [''],
-      farmName: [''],
-      farmSize: [''],
-      bankName: [''],
-      accountNumber: [''],
-      accountAddress: [''],  // ADDED - was missing
-      emailAddress: [''],
-      phoneNumber: [''],
-      id: [''],              // ADDED - was missing (for next of kin ID)
-      relationship: ['']
+      first_name: ['', Validators.required],
+      last_name: ['', Validators.required],
+      id_number: ['', Validators.required],
+      phone_number: ['', Validators.required],
+      email: ['', [Validators.email]],
+      gender: [''],
+      date_of_birth: [''],
+      farmer_category: [''],
+      organisation: [1], // Default organization ID
+      country: [1], // Default country ID
+      status: ['ACTIVE']
     });
 
-    // Load dummy data
-    this.loadDummyData();
+    // Initialize arrays to empty to prevent iteration errors
+    this.farmerData = [];
+    this.filteredFarmers = [];
 
-    // Apply filters immediately
-    this.applyFilters();
-
-    console.log('=== After initialization ===');
-    console.log('farmerData:', this.farmerData);
-    console.log('filteredFarmers:', this.filteredFarmers);
+    // Load data from backend
+    this.getAllFarmers();
   }
 
   clickAddEmployee() {
     this.formValue.reset();
+    this.formValue.patchValue({
+      organisation: 1,
+      country: 1,
+      status: 'ACTIVE'
+    });
     this.showAdd = true;
     this.showUpdate = false;
   }
 
-  loadDummyData() {
-    console.log('=== Loading Dummy Data ===');
+  /**
+   * Get all farmers from backend API
+   */
+  getAllFarmers() {
+    this.isLoading = true;
+    this.api.getFarmer(this.searchText).subscribe({
+      next: (res) => {
+        console.log('Farmers loaded from API:', res);
 
-    this.farmerData = [
-      {
-        id: 1,
-        name: "Peter",
-        firstName: "John",
-        lastName: "Odhiambo",
-        physicalAddress: "Nairobi, Kenya",
-        idNumber: "34567890",
-        category: "Dairy Farmer",
-        date: "2024-10-12",
-        upi: "UPI-12345",
-        farmName: "Green Valley Farm",
-        farmSize: "3 Acres",
-        bankName: "Equity Bank",
-        accountNumber: "123456789",
-        emailAddress: "john@example.com",
-        phoneNumber: "0712345678",
-        relationship: "Spouse"
+        // Handle different response formats
+        if (Array.isArray(res)) {
+          this.farmerData = res;
+        } else if (res && Array.isArray(res.results)) {
+          this.farmerData = res.results;
+        } else if (res && res.data && Array.isArray(res.data)) {
+          this.farmerData = res.data;
+        } else {
+          console.error('Unexpected response format:', res);
+          this.farmerData = [];
+        }
+
+        this.applyFilters();
+        this.isLoading = false;
       },
-      {
-        id: 2,
-        name: "Mary",
-        firstName: "Grace",
-        lastName: "Achieng",
-        physicalAddress: "Kisumu, Kenya",
-        idNumber: "56789012",
-        category: "Crop Farmer",
-        date: "2023-08-20",
-        upi: "UPI-98765",
-        farmName: "Sunrise Farm",
-        farmSize: "5 Acres",
-        bankName: "KCB Bank",
-        accountNumber: "987654321",
-        emailAddress: "grace@example.com",
-        phoneNumber: "0722334455",
-        relationship: "Mother"
-      },
-      {
-        id: 3,
-        name: "Brian",
-        firstName: "Kevin",
-        lastName: "Otieno",
-        physicalAddress: "Eldoret, Kenya",
-        idNumber: "12345678",
-        category: "Mixed Farmer",
-        date: "2024-05-01",
-        upi: "UPI-45678",
-        farmName: "Highland Farm",
-        farmSize: "2 Acres",
-        bankName: "Cooperative Bank",
-        accountNumber: "445566778",
-        emailAddress: "kevin@example.com",
-        phoneNumber: "0799887766",
-        relationship: "Brother"
+      error: (error) => {
+        console.error('Error loading farmers:', error);
+        this.farmerData = [];
+        this.filteredFarmers = [];
+        this.isLoading = false;
+        alert('Failed to load farmers. Please try again.');
       }
-    ];
-
-    console.log('Loaded farmerData length:', this.farmerData.length);
-    console.log('Loaded farmerData:', JSON.stringify(this.farmerData, null, 2));
+    });
   }
 
+  /**
+   * Create a new farmer
+   */
   postEmployeeDetails() {
-    this.farmerModelObj.name = this.formValue.value.name;
-    this.farmerModelObj.firstName = this.formValue.value.firstName;
-    this.farmerModelObj.lastName = this.formValue.value.lastName;
-    this.farmerModelObj.physicalAddress = this.formValue.value.physicalAddress;
-    this.farmerModelObj.idNumber = this.formValue.value.idNumber;
-    this.farmerModelObj.category = this.formValue.value.category;
-    this.farmerModelObj.date = this.formValue.value.date;
-    this.farmerModelObj.upi = this.formValue.value.upi;
-    this.farmerModelObj.farmName = this.formValue.value.farmName;
-    this.farmerModelObj.farmSize = this.formValue.value.farmSize;
-    this.farmerModelObj.bankName = this.formValue.value.bankName;
-    this.farmerModelObj.accountNumber = this.formValue.value.accountNumber;
-    this.farmerModelObj.emailAddress = this.formValue.value.emailAddress;
-    this.farmerModelObj.phoneNumber = this.formValue.value.phoneNumber;
-    this.farmerModelObj.relationship = this.formValue.value.relationship;
+    // Mark all fields as touched to show validation errors
+    Object.keys(this.formValue.controls).forEach(key => {
+      this.formValue.get(key)?.markAsTouched();
+    });
 
-    this.api.postFarmer(this.farmerModelObj).subscribe(
-      res => {
-        console.log(res);
-        alert("Farmer Added Successfully");
+    if (this.formValue.invalid) {
+      alert('Please fill in all required fields correctly');
+      return;
+    }
+
+    this.isLoading = true;
+    const farmerData = this.formValue.value;
+
+    this.api.postFarmer(farmerData).subscribe({
+      next: (res) => {
+        console.log('Farmer created:', res);
+        alert('Farmer Added Successfully');
         let ref = document.getElementById('cancel');
         ref?.click();
         this.formValue.reset();
-        this.loadDummyData();
-        this.applyFilters();
+        this.formValue.patchValue({
+          organisation: 1,
+          country: 1,
+          status: 'ACTIVE'
+        });
+        this.getAllFarmers();
+        this.isLoading = false;
       },
-      error => {
-        alert("Something went wrong");
+      error: (error) => {
+        console.error('Error creating farmer:', error);
+        this.isLoading = false;
+        const errorMsg = error.error?.detail || error.error?.message || 'Something went wrong';
+        alert(`Failed to add farmer: ${errorMsg}`);
       }
-    );
-  }
-
-  getAllEmployee() {
-    this.api.getFarmer().subscribe(res => {
-      this.farmerData = res;
-      this.applyFilters();
     });
   }
 
-  onEdit(column: any) {
-    console.log('Editing farmer:', column);
+  /**
+   * Load farmer data for editing
+   */
+  onEdit(farmer: any) {
+    console.log('Editing farmer:', farmer);
     this.showAdd = false;
     this.showUpdate = true;
-    this.farmerModelObj.id = column.id;
+    this.farmerModelObj.id = farmer.farmer_id;
 
     this.formValue.patchValue({
-      name: column.name,
-      firstName: column.firstName,
-      lastName: column.lastName,
-      physicalAddress: column.physicalAddress,
-      idNumber: column.idNumber,
-      category: column.category,
-      date: column.date,
-      location: column.location || '',
-      upi: column.upi,
-      farmName: column.farmName,
-      farmSize: column.farmSize,
-      bankName: column.bankName,
-      accountNumber: column.accountNumber,
-      accountAddress: column.accountAddress || '',
-      emailAddress: column.emailAddress,
-      phoneNumber: column.phoneNumber,
-      id: column.id,
-      relationship: column.relationship
+      first_name: farmer.first_name,
+      last_name: farmer.last_name,
+      id_number: farmer.id_number,
+      phone_number: farmer.phone_number,
+      email: farmer.email || '',
+      gender: farmer.gender || '',
+      date_of_birth: farmer.date_of_birth || '',
+      farmer_category: farmer.farmer_category || '',
+      organisation: farmer.organisation,
+      country: farmer.country,
+      status: farmer.status
     });
   }
 
+  /**
+   * Update existing farmer
+   */
   updateEmployeeDetails() {
-    this.farmerModelObj.name = this.formValue.value.name;
-    this.farmerModelObj.firstName = this.formValue.value.firstName;
-    this.farmerModelObj.lastName = this.formValue.value.lastName;
-    this.farmerModelObj.physicalAddress = this.formValue.value.physicalAddress;
-    this.farmerModelObj.idNumber = this.formValue.value.idNumber;
-    this.farmerModelObj.category = this.formValue.value.category;
-    this.farmerModelObj.date = this.formValue.value.date;
-    this.farmerModelObj.upi = this.formValue.value.upi;
-    this.farmerModelObj.farmName = this.formValue.value.farmName;
-    this.farmerModelObj.farmSize = this.formValue.value.farmSize;
-    this.farmerModelObj.bankName = this.formValue.value.bankName;
-    this.farmerModelObj.accountNumber = this.formValue.value.accountNumber;
-    this.farmerModelObj.emailAddress = this.formValue.value.emailAddress;
-    this.farmerModelObj.phoneNumber = this.formValue.value.phoneNumber;
-    this.farmerModelObj.relationship = this.formValue.value.relationship;
+    // Mark all fields as touched to show validation errors
+    Object.keys(this.formValue.controls).forEach(key => {
+      this.formValue.get(key)?.markAsTouched();
+    });
 
-    this.api.updateFarmer(this.farmerModelObj, this.farmerModelObj.id).subscribe(res => {
-      alert("Updated Successfully");
-      let ref = document.getElementById('cancel');
-      ref?.click();
-      this.formValue.reset();
-      this.loadDummyData();
-      this.applyFilters();
+    if (this.formValue.invalid) {
+      alert('Please fill in all required fields correctly');
+      return;
+    }
+
+    if (!this.farmerModelObj.id) {
+      alert('Invalid farmer ID');
+      return;
+    }
+
+    this.isLoading = true;
+    const farmerData = this.formValue.value;
+
+    this.api.updateFarmer(farmerData, this.farmerModelObj.id).subscribe({
+      next: (res) => {
+        console.log('Farmer updated:', res);
+        alert('Updated Successfully');
+        let ref = document.getElementById('cancel');
+        ref?.click();
+        this.formValue.reset();
+        this.formValue.patchValue({
+          organisation: 1,
+          country: 1,
+          status: 'ACTIVE'
+        });
+        this.getAllFarmers();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error updating farmer:', error);
+        this.isLoading = false;
+        const errorMsg = error.error?.detail || error.error?.message || 'Something went wrong';
+        alert(`Failed to update farmer: ${errorMsg}`);
+      }
     });
   }
 
+  /**
+   * Delete farmer
+   */
+  deleteFarmer(id: number) {
+    if (confirm('Are you sure you want to delete this farmer?')) {
+      this.isLoading = true;
+      this.api.deleteFarmer(id).subscribe({
+        next: (res) => {
+          console.log('Farmer deleted:', res);
+          alert('Farmer deleted successfully');
+          this.getAllFarmers();
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error deleting farmer:', error);
+          this.isLoading = false;
+          alert('Failed to delete farmer');
+        }
+      });
+    }
+  }
+
+  /**
+   * Handle search text change
+   */
   onSearchChange() {
     console.log('Search text changed:', this.searchText);
     this.page = 1;
-    this.applyFilters();
+
+    // If using backend search (recommended for large datasets)
+    this.getAllFarmers();
+
+    // If using client-side filtering (for small datasets)
+    // this.applyFilters();
   }
 
+  /**
+   * Apply client-side filters and pagination
+   */
   applyFilters() {
     console.log('=== Applying Filters ===');
     console.log('Current page:', this.page);
     console.log('Page size:', this.pageSize);
-    console.log('Search text:', this.searchText);
-    console.log('Total farmerData:', this.farmerData.length);
+    console.log('Total farmerData:', this.farmerData?.length || 0);
+
+    // Ensure farmerData is an array
+    if (!Array.isArray(this.farmerData)) {
+      console.error('farmerData is not an array:', this.farmerData);
+      this.farmerData = [];
+      this.filteredFarmers = [];
+      this.totalPages = 1;
+      return;
+    }
 
     // Start with all data
     let data = [...this.farmerData];
 
-    // Apply search filter if search text exists
+    // Note: Search filtering is now handled by backend
+    // This client-side filtering can be removed if using backend search
     if (this.searchText && this.searchText.trim() !== '') {
       const searchLower = this.searchText.toLowerCase().trim();
-      console.log('Filtering by:', searchLower);
+      console.log('Client-side filtering by:', searchLower);
 
       data = data.filter(item => {
-        const firstName = (item.firstName || '').toLowerCase();
-        const lastName = (item.lastName || '').toLowerCase();
-        const emailAddress = (item.emailAddress || '').toLowerCase();
-        const phoneNumber = (item.phoneNumber || '').toString();
-        const farmName = (item.farmName || '').toLowerCase();
+        const firstName = (item.first_name || '').toLowerCase();
+        const lastName = (item.last_name || '').toLowerCase();
+        const email = (item.email || '').toLowerCase();
+        const phoneNumber = (item.phone_number || '').toString();
+        const idNumber = (item.id_number || '').toString();
 
         return firstName.includes(searchLower) ||
                lastName.includes(searchLower) ||
-               emailAddress.includes(searchLower) ||
+               email.includes(searchLower) ||
                phoneNumber.includes(searchLower) ||
-               farmName.includes(searchLower);
+               idNumber.includes(searchLower);
       });
 
       console.log('After filtering:', data.length, 'items');
@@ -285,7 +310,6 @@ export class ManageFarmerComponent implements OnInit {
     this.filteredFarmers = data.slice(start, end);
 
     console.log('Final filteredFarmers length:', this.filteredFarmers.length);
-    console.log('Final filteredFarmers:', this.filteredFarmers);
   }
 
   nextPage() {

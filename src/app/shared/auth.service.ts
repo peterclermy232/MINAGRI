@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { of, switchMap, tap } from 'rxjs';
+import { Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiClientTokenResponse } from '../types';
 import * as moment from 'moment';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
-
+  private baseUrl = `${environment.authUrl}/`;
   apiUserLogin() {
     return this.http
       .post(`/oauth2/token`, {
@@ -30,34 +30,34 @@ export class AuthService {
           console.log('api login store', storageData);
           await this.setApiClientToken(storageData);
         }),
-        map((resp) => {
+        map((resp: any) => {
           return resp.access_token;
         })
       );
   }
 
-  appUserLogin(data: any) {
+  appUserLogin(username: string, password: string) {
     return this.http
-      .post(`/oauth/token`, {
-        consumer_key: environment.user_consumer_key,
-        consumer_secret: environment.user_consumer_secret,
-        request_type: 'userLogin',
+      .post(`${this.baseUrl}login/`, {
+        username: username,
+        password: password,
       })
       .pipe(
         tap(async (data: any) => {
           const storageData = {
             userToken: data.token,
+            refreshToken: data.refresh,  // Store refresh token
             expiry: moment()
-              .add('seconds', data.lifetime)
+              .add('seconds', data.expires_in || 3600)
               .subtract('seconds', 60)
               .format('YYYY-MM-DD, h:mm:ss a'),
           };
           await this.setAppClientToken(storageData);
-          this.router.navigateByUrl('/organization');
+          this.router.navigateByUrl('/dashboard');
         }),
-        map((resp) => {
+        map((resp: any) => {
           console.log('app user response', resp);
-          return resp.access_token;
+          return resp.token;
         })
       );
   }
@@ -82,9 +82,91 @@ export class AuthService {
     await localStorage.removeItem('userToken');
   }
 
-  async setAppClientToken(data: { userToken: string; expiry: string }) {
+  async setAppClientToken(data: { userToken: string; refreshToken?: string; expiry: string }) {
     const jsonData = JSON.stringify(data);
     await localStorage.setItem('userToken', jsonData);
+  }
+
+  // NEW METHOD: Get current token synchronously for interceptor
+  getToken(): string | null {
+    const tokenData = this.getStoredTokenData();
+    if (tokenData) {
+      const isExpired = moment().isAfter(tokenData.expiry);
+      if (!isExpired) {
+        return tokenData.userToken;
+      }
+    }
+    return null;
+  }
+
+  // NEW METHOD: Get stored token data
+  private getStoredTokenData(): { userToken: string; refreshToken?: string; expiry: string } | null {
+    const jsonDt = localStorage.getItem('userToken');
+    if (jsonDt) {
+      try {
+        return JSON.parse(jsonDt);
+      } catch (error) {
+        console.error('Error parsing stored token data:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  // NEW METHOD: Get refresh token
+  private getRefreshToken(): string | null {
+    const tokenData = this.getStoredTokenData();
+    return tokenData?.refreshToken || null;
+  }
+
+  // NEW METHOD: Refresh token using Django endpoint
+  refreshToken(): Observable<any> {
+    const refreshToken = this.getRefreshToken();
+
+    if (!refreshToken) {
+      // No refresh token available, force re-login
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    return this.http
+      .post(`/api/auth/token/refresh/`, {
+        refresh: refreshToken,
+      })
+      .pipe(
+        tap(async (data: any) => {
+          // Update stored token with new access token
+          const currentData = this.getStoredTokenData();
+          if (currentData) {
+            const storageData = {
+              userToken: data.token,
+              refreshToken: currentData.refreshToken, // Keep existing refresh token
+              expiry: moment()
+                .add('seconds', data.expires_in || 3600)
+                .subtract('seconds', 60)
+                .format('YYYY-MM-DD, h:mm:ss a'),
+            };
+            await this.setAppClientToken(storageData);
+          }
+        }),
+        catchError((error) => {
+          console.error('Token refresh failed:', error);
+          // If refresh fails, clear tokens and force re-login
+          this.removeStorage();
+          return throwError(() => error);
+        })
+      );
+  }
+
+  // NEW METHOD: Logout observable for interceptor
+  logout(): Observable<void> {
+    return new Observable((observer) => {
+      this.handleLogout().then(() => {
+        observer.next();
+        observer.complete();
+      }).catch((error) => {
+        observer.error(error);
+      });
+    });
   }
 
   getOauthToken() {
@@ -122,7 +204,7 @@ export class AuthService {
   }
 
   getBothTokens() {
-    this.getOauthToken().pipe(
+    return this.getOauthToken().pipe(
       switchMap((tokenResponse) => {
         return this.getAuthToken();
       })
@@ -141,12 +223,33 @@ export class AuthService {
         return of({ wso2Token, userToken });
       })
     );
-
-    // combineAndPrintMsg(res1, res2) {
-    //   console.log(`${res1.message}${res2?.message}`);
-    // }
   }
 
-  isOauthTokenUsable() {}
-  isloggedInUserTokenUsable() {}
+  // NEW METHOD: Check if OAuth token is usable
+  isOauthTokenUsable(): boolean {
+    const jsonDt = localStorage.getItem('apiToken');
+    if (jsonDt) {
+      try {
+        const jsonParsed: { apiToken: string; expiry: string } = JSON.parse(jsonDt);
+        return !moment().isAfter(jsonParsed.expiry);
+      } catch (error) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  // NEW METHOD: Check if logged in user token is usable
+  isloggedInUserTokenUsable(): boolean {
+    const jsonDt = localStorage.getItem('userToken');
+    if (jsonDt) {
+      try {
+        const jsonParsed: { userToken: string; expiry: string } = JSON.parse(jsonDt);
+        return !moment().isAfter(jsonParsed.expiry);
+      } catch (error) {
+        return false;
+      }
+    }
+    return false;
+  }
 }

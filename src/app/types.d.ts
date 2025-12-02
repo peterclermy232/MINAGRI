@@ -6,7 +6,7 @@ export interface Crop {
   organisationId: number;
   recordVersion?: number;
   status: boolean;
-  
+
 }
 
 export interface CropVariety {
@@ -28,6 +28,8 @@ export interface ENV {
   auth_baseurl: string;
   user_consumer_key: string;
   user_consumer_secret: string;
+  apiUrl: string;
+  authUrl: string;
 }
 
 export interface ApiClientTokenResponse {

@@ -1,93 +1,193 @@
 <main id="main" class="main">
-   <div class="pagetitle">
-      <h1>Assign Loss Assessors</h1>
-      <nav>
-         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-            <li class="breadcrumb-item">Dashboard</li>
-            <ol class="breadcrumb-item active">Assign Loss Assessors</ol>
-         </ol>
-      </nav>
-   </div>
-   <section class="section">
+  <div class="pagetitle">
+    <h1>Assign Loss Assessors</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <li class="breadcrumb-item active">Assign Loss Assessors</li>
+      </ol>
+    </nav>
+  </div>
 
-      <nav class="navbar navbar-ligth">
-        <div class="container-fluid">
-
-          <div class="flex-centered">
-            <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
-              data-bs-target="#exampleModal">Assign Loss Assessors</button>
-          </div>
+  <section class="section">
+    <!-- Header Actions -->
+    <nav class="navbar navbar-light bg-light">
+      <div class="container-fluid">
+        <div class="flex-centered">
+          <button
+            class="btn btn-success"
+            (click)="clickAddEmployee()"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal">
+            <i class="bi bi-plus-circle me-2"></i>Assign Loss Assessor
+          </button>
         </div>
-      </nav>
-       <!--search input-->
-       <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
-        </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
+      </div>
+    </nav>
 
-      <table class="table table-bordered table-striped table-hover mt-3 w-100">
-        <thead>
+    <!-- Search and Export -->
+    <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+      <div class="search flex-grow-1 me-3" style="max-width: 400px;">
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Search by ID or assessor name"
+          (input)="onSearch($event)"
+          [(ngModel)]="searchTerm" />
+      </div>
+      <button
+        class="btn btn-success"
+        type="button"
+        (click)="exportToCSV()">
+        <i class="bi bi-download me-2"></i>Export
+      </button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover mt-3">
+        <thead class="table-light">
           <tr>
-           <th scope="col">Organization ID</th>
-            <th scope="col">Assign Loss Assessors</th>
-            <th scope="col">Action</th>
-
+            <th scope="col">Organization ID</th>
+            <th scope="col">Loss Assessor Status</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor ="let row of assignData">
-           <td>{{row.id}}</td>
-            <td>{{row.assessor}}</td>
-
+          <tr *ngFor="let row of filteredData">
+            <td>{{ row.id }}</td>
             <td>
-              <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal" (click)="onEdit( row)"  class="btn btn-warning btn-sm">Edit</button>
-
+              <span
+                class="badge"
+                [ngClass]="{
+                  'bg-success': row.assessor === 'Accredit',
+                  'bg-danger': row.assessor === 'Blacklisted',
+                  'bg-secondary': row.assessor === 'Disable'
+                }">
+                {{ row.assessor }}
+              </span>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-warning btn-sm me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                (click)="onEdit(row)">
+                <i class="bi bi-pencil me-1"></i>Edit
+              </button>
+              <!-- Uncomment if delete functionality is needed -->
+              <!-- <button
+                type="button"
+                class="btn btn-danger btn-sm"
+                (click)="deleteAssignment(row)">
+                <i class="bi bi-trash me-1"></i>Delete
+              </button> -->
+            </td>
+          </tr>
+          <tr *ngIf="!isLoading && filteredData.length === 0">
+            <td colspan="3" class="text-center text-muted py-4">
+              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+              {{ searchTerm ? 'No results found' : 'No assignments yet' }}
             </td>
           </tr>
         </tbody>
-
       </table>
+    </div>
 
-      <!-- Modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              {{ showAdd ? 'Assign Loss Assessor' : 'Update Loss Assessor' }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close">
+            </button>
+          </div>
 
-              <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form [formGroup]="formValue">
+          <div class="modal-body">
+            <form [formGroup]="formValue">
+              <div class="mb-3">
+                <label for="assessorSelect" class="form-label">
+                  Select Loss Assessor Status <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="assessorSelect"
+                  class="form-select"
+                  formControlName="assessor"
+                  [class.is-invalid]="hasError('assessor', 'required')">
+                  <option value="" selected disabled>-- Select Status --</option>
+                  <option *ngFor="let option of assessorOptions" [value]="option">
+                    {{ option }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="hasError('assessor', 'required')">
+                  Loss assessor status is required
+                </div>
+              </div>
 
+              <!-- Additional Information -->
+              <div class="alert alert-info" role="alert">
+                <small>
+                  <strong>Status Descriptions:</strong><br>
+                  <strong>Accredit:</strong> Approved and active<br>
+                  <strong>Blacklisted:</strong> Not allowed to assess<br>
+                  <strong>Disable:</strong> Temporarily inactive
+                </small>
+              </div>
+            </form>
+          </div>
 
-                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Select Loss Assessors</label>
-                  <select class="form-control" formControlName="assessor">
-                    <option>Accredit</option>
-                    <option>Blacklisted</option>
-                    <option>Disable</option>
-                    </select>
-                    <app-error-section></app-error-section>
-               </div>
-                <!-- <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Status</label>
-                  <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
-                </div> -->
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button>
-              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-                class="btn btn-primary">Update</button>
-            </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              id="cancel"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              [disabled]="isLoading">
+              Close
+            </button>
+            <button
+              type="button"
+              *ngIf="showAdd"
+              (click)="postEmployeeDetails()"
+              class="btn btn-primary"
+              [disabled]="isLoading || formValue.invalid">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Saving...' : 'Save' }}
+            </button>
+            <button
+              type="button"
+              *ngIf="showUpdate"
+              (click)="updateEmployeeDetails()"
+              class="btn btn-primary"
+              [disabled]="isLoading || formValue.invalid">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isLoading ? 'Updating...' : 'Update' }}
+            </button>
           </div>
         </div>
       </div>
-
-     </section>
- </main>
+    </div>
+  </section>
+</main>

@@ -38,7 +38,7 @@
          </tr>
        </thead>
        <tbody>
-         <tr *ngFor ="let users of roleData">
+         <tr *ngFor ="let users of users">
           <td>{{users.id}}</td>
            <td>{{users.name}}</td>
            <td>{{users.description}}</td>
@@ -89,8 +89,8 @@
            </div>
            <div class="modal-footer">
              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-             <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
-             <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
+             <!-- <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button> -->
+             <button type="button" *ngIf="showUpdate" (click)="updateUserRole()"
                class="btn btn-primary">Update</button>
            </div>
          </div>

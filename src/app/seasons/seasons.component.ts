@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SeasonsService } from '../shared/seasons.service';
 import { SeasonModel } from './season';
 
@@ -10,91 +10,139 @@ import { SeasonModel } from './season';
 })
 export class SeasonsComponent implements OnInit {
 
-  formValue !:FormGroup;
-  roleModelObj : SeasonModel = new SeasonModel();
-  roleData !:any;
-  showAdd!: boolean;
-  showUpdate!:boolean;
-  constructor(private formbuilder:FormBuilder,
-    private api : SeasonsService
-    ) { }
+  formValue!: FormGroup;
+  seasonModelObj: SeasonModel = new SeasonModel();
+  roleData: any[] = [];
+  showAdd: boolean = false;
+  showUpdate: boolean = false;
+
+  constructor(
+    private formbuilder: FormBuilder,
+    private api: SeasonsService
+  ) { }
 
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
-      name : [''],
-      date: [''],
-      end : [''],
-      select : [''],
-    })
-    this.getAllEmployee();
+      season: ['', Validators.required],
+      start_date: ['', Validators.required],
+      end_date: ['', Validators.required],
+      status: [true, Validators.required],
+      organisation: ['', Validators.required]
+    });
+
+    this.getAllSeasons();
   }
-  clickAddEmployee(){
-    this.formValue.reset();
+
+  clickAddEmployee() {
+    this.formValue.reset({
+      status: true
+    });
     this.showAdd = true;
     this.showUpdate = false;
+    this.seasonModelObj = new SeasonModel();
   }
 
-  postEmployeeDetails(){
-    this.  roleModelObj.name = this.formValue.value.name;
-    this.  roleModelObj.date= this.formValue.value. date;
-    this.  roleModelObj.end= this.formValue.value. end;
-   
-    this. roleModelObj.select = this.formValue.value.select;
-    
-    this.api.postSeasons(this.  roleModelObj)
-    .subscribe(res=>{
-      console.log(res);
-      alert("Organization Added Successfully");
-      let ref = document.getElementById('cancel')
-      ref?.click();
-      this.formValue.reset();
-      this.getAllEmployee();
-    },
-    error=>{
-      alert("something went wrong");
-    })
+  postEmployeeDetails() {
+    if (this.formValue.invalid) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    this.seasonModelObj.season = this.formValue.value.season;
+    this.seasonModelObj.start_date = this.formValue.value.start_date;
+    this.seasonModelObj.end_date = this.formValue.value.end_date;
+    this.seasonModelObj.status = this.formValue.value.status === 'Active' || this.formValue.value.status === true;
+    this.seasonModelObj.organisation = this.formValue.value.organisation;
+
+    this.api.postSeasons(this.seasonModelObj)
+      .subscribe({
+        next: (res) => {
+          console.log(res);
+          alert("Season Added Successfully");
+          let ref = document.getElementById('cancel');
+          ref?.click();
+          this.formValue.reset();
+          this.getAllSeasons();
+        },
+        error: (error) => {
+          console.error('Error adding season:', error);
+          alert("Something went wrong: " + (error.message || 'Unknown error'));
+        }
+      });
   }
-  getAllEmployee(){
+
+  getAllSeasons() {
     this.api.getSeasons()
-    .subscribe(res=>{
-      this.roleData = res;
-    })
+      .subscribe({
+        next: (res) => {
+          this.roleData = res;
+          console.log('Seasons loaded:', res);
+        },
+        error: (error) => {
+          console.error('Error loading seasons:', error);
+          alert("Error loading seasons");
+        }
+      });
   }
-  // deleteEmployee( users:any){
-  //   this.api.deleteEmployee( users.id)
-  //   .subscribe(res=>{
-  //     alert("Employee Deleted")
-  //     this.getAllEmployee();
-  //   })
-  // }
-  onEdit( users:any){
+
+  onEdit(season: any) {
     this.showAdd = false;
     this.showUpdate = true;
-    this.  roleModelObj.id =  users.id;
-    this.formValue.controls['name'].setValue( users.organization);
-    this.formValue.controls['date'].setValue( users. date);
-    this.formValue.controls['end'].setValue(users.end);
-   
-    this.formValue.controls['select'].setValue( users.select)
-   
-  }
-  updateEmployeeDetails(){
-    this.  roleModelObj.name = this.formValue.value.name;
-    this.  roleModelObj.date= this.formValue.value. date;
-    this.  roleModelObj.end= this.formValue.value. end;
-   
-    this. roleModelObj.select = this.formValue.value.select;
-    
-    
-    this.api.updateSeasons(this.  roleModelObj,this.  roleModelObj.id)
-    .subscribe(res=>{
-      alert("Updated Successfully")
-      let ref = document.getElementById('cancel')
-      ref?.click();
-      this.formValue.reset();
-      this.getAllEmployee();
-    })
-   
+    this.seasonModelObj.season_id = season.season_id;
+    this.seasonModelObj.id = season.season_id;
+
+    this.formValue.controls['season'].setValue(season.season);
+    this.formValue.controls['start_date'].setValue(season.start_date);
+    this.formValue.controls['end_date'].setValue(season.end_date);
+    this.formValue.controls['status'].setValue(season.status);
+    this.formValue.controls['organisation'].setValue(season.organisation);
   }
 
+  updateEmployeeDetails() {
+    if (this.formValue.invalid) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    this.seasonModelObj.season = this.formValue.value.season;
+    this.seasonModelObj.start_date = this.formValue.value.start_date;
+    this.seasonModelObj.end_date = this.formValue.value.end_date;
+    this.seasonModelObj.status = this.formValue.value.status === 'Active' || this.formValue.value.status === true;
+    this.seasonModelObj.organisation = this.formValue.value.organisation;
+
+    this.api.updateSeasons(this.seasonModelObj, this.seasonModelObj.season_id)
+      .subscribe({
+        next: (res) => {
+          alert("Updated Successfully");
+          let ref = document.getElementById('cancel');
+          ref?.click();
+          this.formValue.reset();
+          this.getAllSeasons();
+        },
+        error: (error) => {
+          console.error('Error updating season:', error);
+          alert("Something went wrong: " + (error.message || 'Unknown error'));
+        }
+      });
+  }
+
+  deleteSeason(season: any) {
+    if (confirm('Are you sure you want to delete this season?')) {
+      this.api.deleteSeason(season.season_id)
+        .subscribe({
+          next: (res) => {
+            alert("Season Deleted Successfully");
+            this.getAllSeasons();
+          },
+          error: (error) => {
+            console.error('Error deleting season:', error);
+            alert("Error deleting season");
+          }
+        });
+    }
+  }
+
+  getStatusDisplay(status: boolean): string {
+    return status ? 'Active' : 'Inactive';
+  }
 }

@@ -286,7 +286,7 @@ export class AddOrganizationComponent implements OnInit {
     };
 
     this.userService
-      .postUser(userData)
+      .createUser(userData)
       .pipe(
         finalize(() => {
           this.modalBtn = {

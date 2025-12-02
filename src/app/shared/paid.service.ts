@@ -1,30 +1,39 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PaidService {
+  private baseUrl = `${environment.apiUrl}/quotations`;
 
-  constructor( private http : HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-  postPaid(data:any){
-    return this.http.post<any>("http://localhost:3000/posts",data)
-    .pipe(map((res:any)=>{
-      return res;
-    }))
+  getPaidQuotations(): Observable<any> {
+    let params = new HttpParams().set('status', 'PAID');
+
+    return this.http.get<any>(`${this.baseUrl}/`, { params })
+      .pipe(
+        map((res: any) => Array.isArray(res) ? res : res?.results || []),
+        catchError(this.handleError)
+      );
   }
-  getPaid(){
-    return this.http.get<any>("http://localhost:3000/posts")
-    .pipe(map((res:any)=>{
-      return res;
-    }))
+
+  writePolicy(id: number): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/${id}/write_policy/`, {})
+      .pipe(catchError(this.handleError));
   }
-  updatePaid(data:any,id:number){
-    return this.http.put<any>("http://localhost:3000/posts/"+id,data)
-    .pipe(map((res:any)=>{
-      return res;
-    }))
-}
+
+  updatePaidQuotation(data: any, id: number): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${id}/`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  private handleError(error: any) {
+    console.error('An error occurred:', error);
+    return throwError(() => error);
+  }
 }

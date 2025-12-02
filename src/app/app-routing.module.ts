@@ -44,6 +44,7 @@ import { AdvisoryComponent } from './components/advisory/advisory.component';
 
 const routes: Routes = [
   { path: '', component: PagesLoginComponent },
+  { path: 'login', component: PagesLoginComponent },
   { path: 'register', component: PagesRegisterComponent },
   { path: 'home', component: DashboardComponent },
   { path: 'dashboard', component: DashboardComponent },

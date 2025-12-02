@@ -35,7 +35,7 @@ export class InsuranceComponent implements OnInit {
       this.showAdd = true;
       this.showUpdate = false;
     }
-  
+
     postEmployeeDetails(){
       this.insuranceModelObj.id= this.formValue.value.id;
     this.insuranceModelObj.idNumber= this.formValue.value.idNumber;
@@ -44,10 +44,10 @@ export class InsuranceComponent implements OnInit {
     this.insuranceModelObj.planting = this.formValue.value.planting;
     this.insuranceModelObj.landSize = this.formValue.value.landSize;
     this.insuranceModelObj.measure = this.formValue.value.measure;
-      
-      
-      
-      this.api.postPolicy(this.  insuranceModelObj)
+
+
+
+      this.api.createInsuranceProduct(this.  insuranceModelObj)
       .subscribe(res=>{
         console.log(res);
         alert("Organization Added Successfully");
@@ -61,7 +61,7 @@ export class InsuranceComponent implements OnInit {
       })
     }
     getAllEmployee(){
-      this.api.getPolicy()
+      this.api.getInsuranceProducts()
       .subscribe(res=>{
         this.insuranceData = res;
       })
@@ -85,10 +85,10 @@ export class InsuranceComponent implements OnInit {
       this.formValue.controls['assessor'].setValue( row.assessor);
       this.formValue.controls['measure'].setValue( row.measure);
 
-      
-     
-     
-     
+
+
+
+
     }
     updateEmployeeDetails(){
     this.insuranceModelObj.idNumber= this.formValue.value.idNumber;
@@ -97,10 +97,10 @@ export class InsuranceComponent implements OnInit {
     this.insuranceModelObj.planting = this.formValue.value.planting;
     this.insuranceModelObj.landSize = this.formValue.value.landSize;
     this.insuranceModelObj.measure = this.formValue.value.measure;
-      
-      
-      
-       this.api.updatePolicy(this.  insuranceModelObj,this.  insuranceModelObj.id)
+
+
+
+       this.api.updateInsuranceProduct(this.  insuranceModelObj,this.  insuranceModelObj.id)
       .subscribe(res=>{
         alert("Updated Successfully")
         let ref = document.getElementById('cancel')
@@ -108,7 +108,7 @@ export class InsuranceComponent implements OnInit {
         this.formValue.reset();
         this.getAllEmployee();
       })
-     
+
   }
 
 }

@@ -1,53 +1,235 @@
-<main>
+<!-- pages-register.component.html -->
+<main style="
+    background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #ffffff 68.27%,
+        rgba(217, 217, 217, 0) 97.68%
+      ),
+      url('assets/img/authbg.jpeg') no-repeat scroll center 10px / cover;
+  ">
     <div class="container">
        <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
           <div class="container">
              <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                   <div class="d-flex justify-content-center py-4"> <a routerLink="/" class="logo d-flex align-items-center w-auto"> <img src="assets/img/logo.png" alt=""> <span class="d-none d-lg-block">Admin</span> </a></div>
+                <div class="col-lg-5 col-md-7 d-flex flex-column align-items-center justify-content-center">
+                   <div class="d-flex justify-content-center py-4">
+                      <a routerLink="/" class="logo d-flex align-items-center w-auto">
+                         <img src="assets/img/logo.png" alt="Logo">
+                      </a>
+                   </div>
+
                    <div class="card mb-3">
                       <div class="card-body">
                          <div class="pt-4 pb-2">
                             <h5 class="card-title text-center pb-0 fs-4">Create an Account</h5>
                             <p class="text-center small">Enter your personal details to create account</p>
                          </div>
-                         <form class="row g-3 needs-validation" novalidate>
-                            <div class="col-12">
-                               <label for="yourName" class="form-label">Your Name</label> <input type="text" name="name" class="form-control" id="yourName" required>
-                               <div class="invalid-feedback">Please, enter your name!</div>
-                            </div>
-                            <div class="col-12">
-                               <label for="yourEmail" class="form-label">Your Email</label> <input type="email" name="email" class="form-control" id="yourEmail" required>
-                               <div class="invalid-feedback">Please enter a valid Email adddress!</div>
-                            </div>
-                            <div class="col-12">
-                               <label for="yourUsername" class="form-label">Username</label>
-                               <div class="input-group has-validation">
-                                  <span class="input-group-text" id="inputGroupPrepend">@</span> <input type="text" name="username" class="form-control" id="yourUsername" required>
-                                  <div class="invalid-feedback">Please choose a username.</div>
+
+                         <form class="row g-3 needs-validation"
+                               [formGroup]="registerForm"
+                               (ngSubmit)="handleSubmit()"
+                               novalidate>
+
+                            <!-- First Name -->
+                            <div class="col-md-6">
+                               <label for="firstName" class="form-label">First Name</label>
+                               <input
+                                 type="text"
+                                 name="first_name"
+                                 class="form-control"
+                                 id="firstName"
+                                 formControlName="first_name"
+                                 [class.is-invalid]="formSubmitted && f['first_name'].invalid"
+                                 placeholder="John">
+
+                               <div class="invalid-feedback d-block"
+                                    *ngIf="formSubmitted && f['first_name'].invalid">
+                                  <div *ngIf="f['first_name'].errors?.['required']">
+                                    First name is required
+                                  </div>
+                                  <div *ngIf="f['first_name'].errors?.['minlength']">
+                                    First name must be at least 2 characters
+                                  </div>
                                </div>
                             </div>
-                            <div class="col-12">
-                               <label for="yourPassword" class="form-label">Password</label> <input type="password" name="password" class="form-control" id="yourPassword" required>
-                               <div class="invalid-feedback">Please enter your password!</div>
+
+                            <!-- Last Name -->
+                            <div class="col-md-6">
+                               <label for="lastName" class="form-label">Last Name</label>
+                               <input
+                                 type="text"
+                                 name="last_name"
+                                 class="form-control"
+                                 id="lastName"
+                                 formControlName="last_name"
+                                 [class.is-invalid]="formSubmitted && f['last_name'].invalid"
+                                 placeholder="Doe">
+
+                               <div class="invalid-feedback d-block"
+                                    *ngIf="formSubmitted && f['last_name'].invalid">
+                                  <div *ngIf="f['last_name'].errors?.['required']">
+                                    Last name is required
+                                  </div>
+                                  <div *ngIf="f['last_name'].errors?.['minlength']">
+                                    Last name must be at least 2 characters
+                                  </div>
+                               </div>
                             </div>
+
+                            <!-- Email -->
+                            <div class="col-12">
+                               <label for="yourEmail" class="form-label">Your Email</label>
+                               <input
+                                 type="email"
+                                 name="email"
+                                 class="form-control"
+                                 id="yourEmail"
+                                 formControlName="user_email"
+                                 [class.is-invalid]="formSubmitted && f['user_email'].invalid"
+                                 placeholder="user@example.com">
+
+                               <div class="invalid-feedback d-block"
+                                    *ngIf="formSubmitted && f['user_email'].invalid">
+                                  <div *ngIf="f['user_email'].errors?.['required']">
+                                    Email is required
+                                  </div>
+                                  <div *ngIf="f['user_email'].errors?.['email']">
+                                    Please enter a valid email address
+                                  </div>
+                               </div>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="col-12">
+                               <label for="phoneNumber" class="form-label">Phone Number (Optional)</label>
+                               <input
+                                 type="tel"
+                                 name="phone"
+                                 class="form-control"
+                                 id="phoneNumber"
+                                 formControlName="user_phone_number"
+                                 [class.is-invalid]="formSubmitted && f['user_phone_number'].invalid"
+                                 placeholder="0712345678">
+
+                               <div class="invalid-feedback d-block"
+                                    *ngIf="formSubmitted && f['user_phone_number'].invalid">
+                                  <div *ngIf="f['user_phone_number'].errors?.['pattern']">
+                                    Please enter a valid phone number (10-15 digits)
+                                  </div>
+                               </div>
+                            </div>
+
+                            <!-- Organization (Optional) -->
+                            <div class="col-12" *ngIf="organizations.length > 0">
+                               <label for="organization" class="form-label">Organization (Optional)</label>
+                               <select
+                                 class="form-select"
+                                 id="organization"
+                                 formControlName="organisation_id">
+                                 <option value="">Select Organization</option>
+                                 <option *ngFor="let org of organizations"
+                                         [value]="org.organisation_id">
+                                   {{ org.organisation_name }}
+                                 </option>
+                               </select>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="col-12">
+                               <label for="yourPassword" class="form-label">Password</label>
+                               <input
+                                 type="password"
+                                 name="password"
+                                 class="form-control"
+                                 id="yourPassword"
+                                 formControlName="password"
+                                 [class.is-invalid]="formSubmitted && f['password'].invalid"
+                                 placeholder="Minimum 8 characters">
+
+                               <div class="invalid-feedback d-block"
+                                    *ngIf="formSubmitted && f['password'].invalid">
+                                  <div *ngIf="f['password'].errors?.['required']">
+                                    Password is required
+                                  </div>
+                                  <div *ngIf="f['password'].errors?.['minlength']">
+                                    Password must be at least 8 characters
+                                  </div>
+                               </div>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="col-12">
+                               <label for="confirmPassword" class="form-label">Confirm Password</label>
+                               <input
+                                 type="password"
+                                 name="confirmPassword"
+                                 class="form-control"
+                                 id="confirmPassword"
+                                 formControlName="confirmPassword"
+                                 [class.is-invalid]="formSubmitted && f['confirmPassword'].invalid"
+                                 placeholder="Re-enter your password">
+
+                               <div class="invalid-feedback d-block"
+                                    *ngIf="formSubmitted && f['confirmPassword'].invalid">
+                                  <div *ngIf="f['confirmPassword'].errors?.['required']">
+                                    Please confirm your password
+                                  </div>
+                                  <div *ngIf="f['confirmPassword'].errors?.['passwordMismatch']">
+                                    Passwords do not match
+                                  </div>
+                               </div>
+                            </div>
+
+                            <!-- Terms and Conditions -->
                             <div class="col-12">
                                <div class="form-check">
-                                  <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required> <label class="form-check-label" for="acceptTerms">I agree and accept the <a href="#">terms and conditions</a></label>
-                                  <div class="invalid-feedback">You must agree before submitting.</div>
+                                  <input
+                                    class="form-check-input"
+                                    name="terms"
+                                    type="checkbox"
+                                    id="acceptTerms"
+                                    formControlName="terms"
+                                    [class.is-invalid]="formSubmitted && f['terms'].invalid">
+                                  <label class="form-check-label" for="acceptTerms">
+                                    I agree and accept the
+                                    <a href="#" target="_blank">terms and conditions</a>
+                                  </label>
+
+                                  <div class="invalid-feedback d-block"
+                                       *ngIf="formSubmitted && f['terms'].invalid">
+                                     You must agree to the terms and conditions
+                                  </div>
                                </div>
                             </div>
-                            <div class="col-12"> <button class="btn btn-primary w-100" type="submit">Create Account</button></div>
+
+                            <!-- Submit Button -->
                             <div class="col-12">
-                               <p class="small mb-0">Already have an account? <a routerLink="/pages-login">Log in</a></p>
+                               <button
+                                 class="btn btn-primary w-100"
+                                 type="submit"
+                                 [disabled]="registerBtn.loading">
+                                 <span *ngIf="registerBtn.loading"
+                                       class="spinner-border spinner-border-sm me-2"
+                                       role="status"
+                                       aria-hidden="true"></span>
+                                 {{ registerBtn.text }}
+                               </button>
+                            </div>
+
+                            <!-- Login Link -->
+                            <div class="col-12">
+                               <p class="small mb-0 text-center">
+                                 Already have an account?
+                                 <a routerLink="/login">Log in</a>
+                               </p>
                             </div>
                          </form>
                       </div>
                    </div>
-                   <div class="credits"> Loved by <a href="https://freeetemplates.com/">FreeeTemplates</a></div>
                 </div>
              </div>
           </div>
        </section>
     </div>
- </main>
+</main>

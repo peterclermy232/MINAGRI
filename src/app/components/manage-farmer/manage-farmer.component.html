@@ -1,6 +1,4 @@
-
-
- <main id="main" class="main">
+<main id="main" class="main">
   <div class="pagetitle">
      <h1>Manage Farmer</h1>
      <nav>
@@ -16,275 +14,237 @@
      <nav class="navbar navbar-ligth ">
        <div class="container">
          <div class="flex-centered">
-           <button  class="btn btn-success" type="button" (click)="clickAddEmployee()" data-bs-toggle="modal"
+           <button class="btn btn-success" type="button" (click)="clickAddEmployee()" data-bs-toggle="modal"
              data-bs-target="#exampleModal">Add New Farmer</button>
          </div>
        </div>
      </nav>
-      <!--search input-->
+
       <!-- SEARCH + EXPORT -->
-<div class="d-flex justify-content-lg-between mt-2">
-  <div class="search">
-    <input
-  class="form-control mt-2 mb-2 input-sm"
-  type="text"
-  placeholder="Search farmer..."
-  [(ngModel)]="searchText"
-  (ngModelChange)="onSearchChange()"
-/>
-  </div>
+      <div class="d-flex justify-content-lg-between mt-2">
+        <div class="search">
+          <input
+            class="form-control mt-2 mb-2 input-sm"
+            type="text"
+            placeholder="Search farmer..."
+            [(ngModel)]="searchText"
+            (ngModelChange)="onSearchChange()"
+          />
+        </div>
 
-  <button class="btn btn-success btn-lg" type="button">
-    Export
-  </button>
-</div>
+        <button class="btn btn-success btn-lg" type="button">
+          Export
+        </button>
+      </div>
 
-<!-- TABLE -->
-<div class="table-responsive">
-  <table class="table table-bordered table-striped table-hover mt-3 w-100">
-    <thead>
-      <tr>
-        <th>Organisation ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Phone Number</th>
-        <th>Email Address</th>
-        <th>ID Number</th>
-        <th>Physical Address</th>
-        <th>Farmer Category</th>
-        <th>Date of Registration</th>
-        <th>Farm Name</th>
-        <th>Farm Size</th>
-        <th>UPI No.</th>
-        <th>Bank Name</th>
-        <th>Account Number</th>
-        <th>Relationship</th>
-        <th>Action</th>
-      </tr>
-    </thead>
+      <!-- LOADING INDICATOR -->
+      <div *ngIf="isLoading" class="text-center mt-3">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
 
-    <tbody>
-      <!-- Add this debug line temporarily -->
-      <tr *ngIf="filteredFarmers.length === 0">
-        <td colspan="16" class="text-center">
-          No farmers found. Total farmers: {{ farmerData.length }}
-        </td>
-      </tr>
+      <!-- TABLE -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover mt-3 w-100">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Phone Number</th>
+              <th>Email</th>
+              <th>ID Number</th>
+              <th>Gender</th>
+              <th>Category</th>
+              <th>Date of Birth</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-      <tr *ngFor="let column of filteredFarmers; let i = index">
-        <td>{{ column.id }}</td>
-        <td>{{ column.firstName }}</td>
-        <td>{{ column.lastName }}</td>
-        <td>{{ column.phoneNumber }}</td>
-        <td>{{ column.emailAddress }}</td>
-        <td>{{ column.idNumber }}</td>
-        <td>{{ column.physicalAddress }}</td>
-        <td>{{ column.category }}</td>
-        <td>{{ column.date }}</td>
-        <td>{{ column.farmName }}</td>
-        <td>{{ column.farmSize }}</td>
-        <td>{{ column.upi }}</td>
-        <td>{{ column.bankName }}</td>
-        <td>{{ column.accountNumber }}</td>
-        <td>{{ column.relationship }}</td>
+          <tbody>
+            <tr *ngIf="filteredFarmers.length === 0 && !isLoading">
+              <td colspan="11" class="text-center">
+                No farmers found. Total farmers: {{ farmerData.length }}
+              </td>
+            </tr>
 
-        <td>
-          <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal"
-            data-bs-target="#exampleModal" (click)="onEdit(column)">Edit</button>
-          <button class="btn btn-danger btn-sm">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+            <tr *ngFor="let farmer of filteredFarmers; let i = index">
+              <td>{{ farmer.farmer_id }}</td>
+              <td>{{ farmer.first_name }}</td>
+              <td>{{ farmer.last_name }}</td>
+              <td>{{ farmer.phone_number }}</td>
+              <td>{{ farmer.email || 'N/A' }}</td>
+              <td>{{ farmer.id_number }}</td>
+              <td>{{ farmer.gender || 'N/A' }}</td>
+              <td>{{ farmer.farmer_category || 'N/A' }}</td>
+              <td>{{ farmer.date_of_birth || 'N/A' }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': farmer.status === 'ACTIVE',
+                  'bg-danger': farmer.status === 'INACTIVE'
+                }">
+                  {{ farmer.status }}
+                </span>
+              </td>
 
+              <td>
+                <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal"
+                  data-bs-target="#exampleModal" (click)="onEdit(farmer)">Edit</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteFarmer(farmer.farmer_id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-<!-- PAGINATION -->
-<div class="d-flex justify-content-between align-items-center mt-3">
-  <div>
-    <button
-      class="btn btn-secondary btn-sm"
-      [disabled]="page === 1"
-      (click)="page = page - 1"
-    >
-      Previous
-    </button>
+      <!-- PAGINATION -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+          <button
+            class="btn btn-secondary btn-sm"
+            [disabled]="page === 1"
+            (click)="prevPage()"
+          >
+            Previous
+          </button>
 
-    <button
-      class="btn btn-secondary btn-sm ms-2"
-      [disabled]="page === totalPages"
-      (click)="page = page + 1"
-    >
-      Next
-    </button>
-  </div>
+          <button
+            class="btn btn-secondary btn-sm ms-2"
+            [disabled]="page === totalPages"
+            (click)="nextPage()"
+          >
+            Next
+          </button>
+        </div>
 
-  <div>
-    Page {{ page }} of {{ totalPages }}
-  </div>
-</div>
-
-
+        <div>
+          Page {{ page }} of {{ totalPages }}
+        </div>
+      </div>
 
      <!-- Modal -->
      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
        <div class="modal-dialog modal-lg">
          <div class="modal-content">
            <div class="modal-header">
-             <h5 class="modal-title" id="exampleModalLabel">Manage Farmer</h5>
+             <h5 class="modal-title" id="exampleModalLabel">
+               {{ showAdd ? 'Add New Farmer' : 'Edit Farmer' }}
+             </h5>
              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
            </div>
            <div class="modal-body">
              <form [formGroup]="formValue">
+
+              <!-- Personal Information -->
+              <h5 class="text-primary mb-3">Personal Information</h5>
               <div class="row">
-               <div class="col mb-3">
-                 <label  class="form-label">First Name</label>
-                 <input type="text" formControlName="firstName" class="form-control"
-                   aria-describedby="emailHelp">
-               </div>
-               <div class="col mb-3">
-                <label  class="form-label">Last Name</label>
-                <input type="text" formControlName="lastName" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col mb-3">
-                <label  class="form-label">Phone Number</label>
-                <input type="number" formControlName="phoneNumber" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-              <div class="col mb-3">
-                <label  class="form-label">Enter Email Address</label>
-                <input type="email" formControlName="emailAddress" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col mb-3">
-                <label  class="form-label">ID NUMBER</label>
-                <input type="number" formControlName="idNumber" class="form-control"
-                  aria-describedby="emailHelp">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">First Name <span class="text-danger">*</span></label>
+                  <input type="text" formControlName="first_name" class="form-control"
+                    [class.is-invalid]="formValue.get('first_name')?.invalid && formValue.get('first_name')?.touched">
+                  <div class="invalid-feedback">
+                    First name is required
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                  <input type="text" formControlName="last_name" class="form-control"
+                    [class.is-invalid]="formValue.get('last_name')?.invalid && formValue.get('last_name')?.touched">
+                  <div class="invalid-feedback">
+                    Last name is required
+                  </div>
+                </div>
               </div>
 
-              <div class="col mb-3">
-                <label  class="form-label">Enter Physical Address</label>
-                <input type="email" formControlName="physicalAddress" class="form-control"
-                  aria-describedby="emailHelp">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                  <input type="text" formControlName="phone_number" class="form-control"
+                    placeholder="e.g., 0712345678"
+                    [class.is-invalid]="formValue.get('phone_number')?.invalid && formValue.get('phone_number')?.touched">
+                  <div class="invalid-feedback">
+                    Phone number is required
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" formControlName="email" class="form-control"
+                    placeholder="farmer@example.com"
+                    [class.is-invalid]="formValue.get('email')?.invalid && formValue.get('email')?.touched">
+                  <div class="invalid-feedback">
+                    Please enter a valid email
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col mb-3">
-                <label  class="form-label">Enter Farmer Catagory</label>
-                <input type="text" formControlName="category" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-              <div class="col mb-3">
-                <label  class="form-label">Enter Date of Registration</label>
-                <input type="date" formControlName="date" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-             </div>
-              <h2 class="text-center">Farm Section</h2>
-               <div class="row">
-              <div class="col mb-3">
-                <label  class="form-label">Select Location Province</label>
-                <select class="form-control" formControlName="location">
-                    <option>District</option>
-                    <option>Sector</option>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">ID Number <span class="text-danger">*</span></label>
+                  <input type="text" formControlName="id_number" class="form-control"
+                    [class.is-invalid]="formValue.get('id_number')?.invalid && formValue.get('id_number')?.touched">
+                  <div class="invalid-feedback">
+                    ID number is required
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Gender</label>
+                  <select class="form-control" formControlName="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                   </select>
-             </div>
-
-
-
-              <div class="col mb-3">
-                <label  class="form-label">Enter Farm Name</label>
-                <input type="text" formControlName="farmName" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-            </div>
-            <div class="row">
-              <div class="col mb-3">
-                <label  class="form-label">Enter Farm Size</label>
-                <input type="number" formControlName="farmSize" class="form-control"
-                  aria-describedby="emailHelp">
+                </div>
               </div>
 
-
-              <div class="col mb-3">
-                <label  class="form-label">Enter UPI NO.</label>
-                <input type="number" formControlName="upi" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-            </div>
-
-              <h1 class="text-center">Bank Details</h1>
               <div class="row">
-              <div class="col mb-3">
-                <label  class="form-label">Enter Bank Name</label>
-                <input type="text" formControlName="bankName" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-              <div class="col mb-3">
-                <label  class="form-label">Enter Account Number</label>
-                <input type="number" formControlName="accountNumber" class="form-control"
-                  aria-describedby="emailHelp">
-              </div>
-              </div>
-
-
-              <div class="mb-3">
-                <label  class="form-label">Enter Account Address</label>
-                <input type="email" formControlName="accountAddress" class="form-control"
-                  aria-describedby="emailHelp">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Date of Birth</label>
+                  <input type="date" formControlName="date_of_birth" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Farmer Category</label>
+                  <select class="form-control" formControlName="farmer_category">
+                    <option value="">Select Category</option>
+                    <option value="Dairy Farmer">Dairy Farmer</option>
+                    <option value="Crop Farmer">Crop Farmer</option>
+                    <option value="Mixed Farmer">Mixed Farmer</option>
+                    <option value="Poultry Farmer">Poultry Farmer</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
               </div>
 
-              <h4 class="text-center">Next of Kin</h4>
-                   <div class="row">
-              <div class="col mb-3">
-                <label  class="form-label">First Name</label>
-                <input type="text" formControlName="firstName" class="form-control"
-                  aria-describedby="emailHelp">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Status</label>
+                  <select class="form-control" formControlName="status">
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </select>
+                </div>
               </div>
-              <div class="col mb-3">
-               <label  class="form-label">Last Name</label>
-               <input type="text" formControlName="lastName" class="form-control"
-                 aria-describedby="emailHelp">
-             </div>
-            </div>
-            <div class="row">
-             <div class="col mb-3">
-               <label  class="form-label">Phone Number</label>
-               <input type="number" formControlName="phoneNumber" class="form-control"
-                 aria-describedby="emailHelp">
-             </div>
-             <div class="col mb-3">
-               <label  class="form-label">Enter Email Address</label>
-               <input type="email" formControlName="emailAddress" class="form-control"
-                 aria-describedby="emailHelp">
-             </div>
-            </div>
-            <div class="row">
-             <div class="col mb-3">
-               <label  class="form-label">ID NUMBER</label>
-               <input type="number" formControlName="id" class="form-control"
-                 aria-describedby="emailHelp">
-             </div>
-             <div class="col mb-3">
-              <label  class="form-label">Enter Relationship</label>
-              <input type="text" formControlName="relationship" class="form-control"
-                aria-describedby="emailHelp">
-            </div>
-          </div>
+
+              <!-- Hidden fields for organisation and country -->
+              <input type="hidden" formControlName="organisation">
+              <input type="hidden" formControlName="country">
 
              </form>
            </div>
            <div class="modal-footer">
              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-             <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button>
+             <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"
+               class="btn btn-primary" [disabled]="isLoading || formValue.invalid">
+               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+               Add Farmer
+             </button>
              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-               class="btn btn-primary">Update</button>
+               class="btn btn-primary" [disabled]="isLoading || formValue.invalid">
+               <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+               Update Farmer
+             </button>
            </div>
          </div>
        </div>

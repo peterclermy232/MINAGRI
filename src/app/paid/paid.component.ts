@@ -36,32 +36,32 @@ export class PaidComponent implements OnInit {
       this.showUpdate = false;
     }
 
-    postEmployeeDetails(){
-    this.paidModelObj.idNumber = this.formValue.value.idNumber;
-    this.paidModelObj.idNumber = this.formValue.value.idNumber;
-    this.paidModelObj.farm = this.formValue.value.farm;
-    this.paidModelObj.insurance= this.formValue.value.insurance;
-    this.paidModelObj.planting = this.formValue.value.planting;
-    this.paidModelObj.landSize = this.formValue.value.landSize;
-    this.paidModelObj.measure = this.formValue.value.measure;
+    // postEmployeeDetails(){
+    // this.paidModelObj.idNumber = this.formValue.value.idNumber;
+    // this.paidModelObj.idNumber = this.formValue.value.idNumber;
+    // this.paidModelObj.farm = this.formValue.value.farm;
+    // this.paidModelObj.insurance= this.formValue.value.insurance;
+    // this.paidModelObj.planting = this.formValue.value.planting;
+    // this.paidModelObj.landSize = this.formValue.value.landSize;
+    // this.paidModelObj.measure = this.formValue.value.measure;
 
 
 
-      this.api.postPaid(this.  paidModelObj)
-      .subscribe(res=>{
-        console.log(res);
-        alert("Organization Added Successfully");
-        let ref = document.getElementById('cancel')
-        ref?.click();
-        this.formValue.reset();
-        this.getAllEmployee();
-      },
-      error=>{
-        alert("something went wrong");
-      })
-    }
+    //   this.api.postPaid(this.paidModelObj)
+    //   .subscribe(res=>{
+    //     console.log(res);
+    //     alert("Organization Added Successfully");
+    //     let ref = document.getElementById('cancel')
+    //     ref?.click();
+    //     this.formValue.reset();
+    //     this.getAllEmployee();
+    //   },
+    //   error=>{
+    //     alert("something went wrong");
+    //   })
+    // }
     getAllEmployee(){
-      this.api.getPaid()
+      this.api.getPaidQuotations()
       .subscribe(res=>{
         this.policyData = res;
       })
@@ -95,7 +95,7 @@ export class PaidComponent implements OnInit {
 
 
 
-       this.api.updatePaid(this.  paidModelObj,this.  paidModelObj.id)
+       this.api.updatePaidQuotation(this.paidModelObj,this.  paidModelObj.id)
       .subscribe(res=>{
         alert("Updated Successfully")
         let ref = document.getElementById('cancel')

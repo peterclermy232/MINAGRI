@@ -1,139 +1,275 @@
 <main id="main" class="main">
-    <div class="pagetitle">
-       <h1>Policy Quotation</h1>
-       <nav>
-          <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Dashboard</li>
-             <ol class="breadcrumb-item active">Policy Quotation</ol>
-          </ol>
-       </nav>
+  <div class="pagetitle">
+    <h1>Policy Quotation</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <li class="breadcrumb-item active">Policy Quotation</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <!-- Action Bar -->
+    <nav class="navbar navbar-light">
+      <div class="container">
+        <div class="flex-centered">
+          <button class="btn btn-success" type="button" (click)="clickAddEmployee()"
+            data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Open Quotation
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Search and Export -->
+    <div class="d-flex justify-content-lg-between mt-2">
+      <div class="search">
+        <input
+          class="form-control mt-2 mb-2 input-sm"
+          type="text"
+          placeholder="Search by policy number or status..."
+          [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+      <button class="btn btn-success btn-lg" type="button">Export</button>
     </div>
-    <section class="section">
 
-       <!-- <nav class="navbar navbar-ligth ">
-         <div class="container">
-           <h1 style="color: aliceblue;">Open Quotation</h1>
-           <div class="flex-centered">
-             <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal">Open  Quotation</button>
-           </div>
-         </div>
-       </nav> -->
-       <nav class="navbar navbar-ligth ">
-        <div class="container">
-          <div class="flex-centered">
-            <button  class="btn btn-success" type="button" (click)="clickAddEmployee()" data-bs-toggle="modal"
-              data-bs-target="#exampleModal">Open  Quotation</button>
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="text-center mt-3">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Quotations Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover mt-3 w-100">
+        <thead>
+          <tr>
+            <th>Quotation ID</th>
+            <th>Policy Number</th>
+            <th>Farmer</th>
+            <th>Farm</th>
+            <th>Insurance Product</th>
+            <th>Premium Amount</th>
+            <th>Sum Insured</th>
+            <th>Status</th>
+            <th>Quotation Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredQuotations.length === 0 && !isLoading">
+            <td colspan="10" class="text-center">
+              No quotations found. Total quotations: {{ quotationData.length }}
+            </td>
+          </tr>
+
+          <tr *ngFor="let row of filteredQuotations">
+            <td>{{ row.quotation_id }}</td>
+            <td>{{ row.policy_number || 'N/A' }}</td>
+            <td>{{ row.farmer || 'N/A' }}</td>
+            <td>{{ row.farm || 'N/A' }}</td>
+            <td>{{ row.insurance_product || 'N/A' }}</td>
+            <td>{{ row.premium_amount | currency:'KES' }}</td>
+            <td>{{ row.sum_insured | currency:'KES' }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-warning': row.status === 'OPEN',
+                'bg-success': row.status === 'PAID',
+                'bg-primary': row.status === 'WRITTEN',
+                'bg-secondary': row.status === 'CANCELLED'
+              }">
+                {{ row.status }}
+              </span>
+            </td>
+            <td>{{ row.quotation_date | date:'short' }}</td>
+            <td>
+              <div class="btn-group" role="group">
+                <button
+                  class="btn btn-warning btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                  (click)="onEdit(row)"
+                  title="Edit">
+                  Edit
+                </button>
+                <button
+                  *ngIf="row.status === 'OPEN'"
+                  class="btn btn-success btn-sm"
+                  (click)="markAsPaid(row.quotation_id)"
+                  title="Mark as Paid">
+                  Pay
+                </button>
+                <button
+                  *ngIf="row.status === 'PAID'"
+                  class="btn btn-primary btn-sm"
+                  (click)="writePolicy(row.quotation_id)"
+                  title="Write Policy">
+                  Write
+                </button>
+                <button
+                  class="btn btn-danger btn-sm"
+                  (click)="deleteQuotation(row.quotation_id)"
+                  title="Delete">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>
+        <button
+          class="btn btn-secondary btn-sm"
+          [disabled]="page === 1"
+          (click)="prevPage()">
+          Previous
+        </button>
+        <button
+          class="btn btn-secondary btn-sm ms-2"
+          [disabled]="page === totalPages"
+          (click)="nextPage()">
+          Next
+        </button>
+      </div>
+      <div>Page {{ page }} of {{ totalPages }}</div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              {{ showAdd ? 'Create Policy Quotation' : 'Edit Policy Quotation' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-        </div>
-      </nav>
-      <!--search input-->
-      <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
-        </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
 
-       <table class="table table-bordered table-striped table-hover mt-3 w-100">
-         <thead>
-           <tr>
-            <th scope="col">Policy ID</th>
-             <th scope="col">Farmer ID Number</th>
-             <th scope="col">Farm</th>
-             <th scope="col">Insurance Product</th>
-             <th scope="col">Planting Window</th>
-             <th scope="col">Land Size</th>
-             <th scope="col"> Unit of Measure</th>
+          <div class="modal-body">
+            <form [formGroup]="formValue">
 
-           </tr>
-         </thead>
-         <tbody>
-           <tr *ngFor ="let row of policyData">
-            <td>{{row.id}}</td>
-             <td>{{row.idNumber}}</td>
-             <td>{{row.farm}}</td>
-             <td>{{row.insurance}}</td>
-             <td>{{row.planting}}</td>
-             <td>{{row.landSize}}</td>
-             <td>{{row.measure}}</td>
+              <!-- Farmer Selection -->
+              <div class="mb-3">
+                <label class="form-label">Select Farmer <span class="text-danger">*</span></label>
+                <select
+                  class="form-control"
+                  formControlName="farmer"
+                  (change)="onFarmerChange($event)"
+                  [class.is-invalid]="formValue.get('farmer')?.invalid && formValue.get('farmer')?.touched">
+                  <option value="">-- Select Farmer --</option>
+                  <option *ngFor="let farmer of farmers" [value]="farmer.farmer_id">
+                    {{ farmer.first_name }} {{ farmer.last_name }} ({{ farmer.id_number }})
+                  </option>
+                </select>
+                <div class="invalid-feedback">Farmer is required</div>
+              </div>
 
-             <td>
-               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                 data-bs-target="#exampleModal" (click)="onEdit( row)" class="btn btn-info">Edit</button>
+              <!-- Farm Selection -->
+              <div class="mb-3">
+                <label class="form-label">Select Farm <span class="text-danger">*</span></label>
+                <select
+                  class="form-control"
+                  formControlName="farm"
+                  [class.is-invalid]="formValue.get('farm')?.invalid && formValue.get('farm')?.touched"
+                  [disabled]="farms.length === 0">
+                  <option value="">-- Select Farm --</option>
+                  <option *ngFor="let farm of farms" [value]="farm.farm_id">
+                    {{ farm.farm_name }} ({{ farm.farm_size }} {{ farm.unit_of_measure }})
+                  </option>
+                </select>
+                <div class="invalid-feedback">Farm is required</div>
+                <small *ngIf="farms.length === 0" class="text-muted">
+                  Please select a farmer first
+                </small>
+              </div>
 
-             </td>
-           </tr>
-         </tbody>
+              <!-- Insurance Product Selection -->
+              <div class="mb-3">
+                <label class="form-label">Select Insurance Product <span class="text-danger">*</span></label>
+                <select
+                  class="form-control"
+                  formControlName="insurance_product"
+                  (change)="onProductChange($event)"
+                  [class.is-invalid]="formValue.get('insurance_product')?.invalid && formValue.get('insurance_product')?.touched">
+                  <option value="">-- Select Product --</option>
+                  <option *ngFor="let product of insuranceProducts" [value]="product.product_id">
+                    {{ product.product_name }} (Rate: {{ product.average_premium_rate }}%)
+                  </option>
+                </select>
+                <div class="invalid-feedback">Insurance Product is required</div>
+              </div>
 
-       </table>
+              <!-- Sum Insured -->
+              <div class="mb-3">
+                <label class="form-label">Sum Insured (KES) <span class="text-danger">*</span></label>
+                <input
+                  type="number"
+                  formControlName="sum_insured"
+                  class="form-control"
+                  placeholder="0.00"
+                  [class.is-invalid]="formValue.get('sum_insured')?.invalid && formValue.get('sum_insured')?.touched">
+                <div class="invalid-feedback">Sum Insured is required and must be positive</div>
+              </div>
 
-        <!--Modal-->
-       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-         <div class="modal-dialog">
-           <div class="modal-content">
-             <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel"> Create Policy Quotation</h5>
-               <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-             </div>
-             <div class="modal-body">
-               <form [formGroup]="formValue">
+              <!-- Premium Amount -->
+              <div class="mb-3">
+                <label class="form-label">Premium Amount (KES) <span class="text-danger">*</span></label>
+                <input
+                  type="number"
+                  formControlName="premium_amount"
+                  class="form-control"
+                  placeholder="0.00"
+                  [class.is-invalid]="formValue.get('premium_amount')?.invalid && formValue.get('premium_amount')?.touched">
+                <div class="invalid-feedback">Premium Amount is required and must be positive</div>
+              </div>
 
-
-                 <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Enter Farmer ID Number</label>
-                   <input type="number" formControlName="idNumber" class="form-control" id="exampleInputPassword1">
-                 </div>
-
-                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label"> Select Farm</label>
-                  <select class="form-control" formControlName="assessor">
-                    <option>Accredit</option>
-                    <!-- <option>Blacklisted</option>
-                    <option>Disable</option> -->
-                    </select>
-               </div>
-               <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Select Insurance Product</label>
-                <select class="form-control" formControlName="insurance">
-                  <option>Accredit</option>
-                  <!-- <option>Blacklisted</option>
-                  <option>Disable</option> -->
-                  </select>
-             </div>
-             <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Select Planting Window </label>
-              <select class="form-control" formControlName="planting">
-                <option>Accredit</option>
-                <!-- <option>Blacklisted</option>
-                <option>Disable</option> -->
+              <!-- Status -->
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select class="form-control" formControlName="status">
+                  <option value="OPEN">Open</option>
+                  <option value="PAID">Paid</option>
+                  <option value="WRITTEN">Written</option>
+                  <option value="CANCELLED">Cancelled</option>
                 </select>
               </div>
-              <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Enter Land Size</label>
-                <input type="number" formControlName="landSize" class="form-control" id="exampleInputPassword1">
-              </div>
-              <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Select the Unit of Measure </label>
-                <select class="form-control" formControlName="measure">
-                  <option>Acre</option>
-                   <option>Hectare</option>
 
-                  </select>
-                </div>
-               </form>
-             </div>
-             <div class="modal-footer">
-               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button>
-               <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-                 class="btn btn-primary">Update</button>
-             </div>
-           </div>
-         </div>
-       </div>
+            </form>
+          </div>
 
-      </section>
-  </main>
+          <div class="modal-footer">
+            <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button
+              type="button"
+              *ngIf="showAdd"
+              (click)="postEmployeeDetails()"
+              class="btn btn-primary"
+              [disabled]="isLoading || formValue.invalid">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+              Create Quotation
+            </button>
+            <button
+              type="button"
+              *ngIf="showUpdate"
+              (click)="updateEmployeeDetails()"
+              class="btn btn-primary"
+              [disabled]="isLoading || formValue.invalid">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+              Update Quotation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
+  </section>
+</main>

@@ -1,203 +1,123 @@
-// src/app/shared/advisory.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, delay } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface Advisory {
-  id: number;
-  dateTimeAdded: Date;
-  province: string;
-  district: string;
-  sector: string;
-  gender: string;
-  policyStatus: string;
+  policyStatus: any;
+  advisory_id?: number;
+  id?: number;
+  date_time_added?: Date;
+  province?: string;
+  district?: string;
+  sector?: string;
+  gender?: string;
   message: string;
-  sendNow: boolean;
-  scheduledDateTime?: Date;
-  status: 'Sent' | 'Scheduled' | 'Draft';
-  recipientsCount: number;
+  send_now: boolean;
+  scheduled_date_time?: Date;
+  status: string;
+  recipients_count: number;
+  sent_date_time?: Date;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdvisoryService {
-  // Dummy data storage - replace with actual API calls
-  private advisories: Advisory[] = [
-    {
-      id: 1,
-      dateTimeAdded: new Date('2024-01-15 10:30:00'),
-      province: 'Eastern',
-      district: 'Bugesera',
-      sector: 'Agriculture',
-      gender: 'All',
-      policyStatus: 'Active',
-      message: 'Reminder: Please ensure your crops are properly insured before the rainy season begins.',
-      sendNow: true,
-      status: 'Sent',
-      recipientsCount: 245
-    },
-    {
-      id: 2,
-      dateTimeAdded: new Date('2024-01-20 14:15:00'),
-      province: 'Northern',
-      district: 'Musanze',
-      sector: 'Livestock',
-      gender: 'Male',
-      policyStatus: 'Pending',
-      message: 'New livestock insurance packages available. Contact your nearest agent for details.',
-      sendNow: false,
-      scheduledDateTime: new Date('2024-02-01 09:00:00'),
-      status: 'Scheduled',
-      recipientsCount: 156
-    },
-    {
-      id: 3,
-      dateTimeAdded: new Date('2024-01-25 16:45:00'),
-      province: 'Western',
-      district: 'Rubavu',
-      sector: 'Fisheries',
-      gender: 'Female',
-      policyStatus: 'Active',
-      message: 'Weather alert: Heavy rains expected. Please take necessary precautions for your fish farms.',
-      sendNow: true,
-      status: 'Sent',
-      recipientsCount: 89
-    }
-  ];
 
-  constructor(private http: HttpClient) { }
+  private baseUrl = `${environment.apiUrl}/advisories`;
 
-  // Get all advisories
+  constructor(private http: HttpClient) {}
+
   getAdvisories(): Observable<Advisory[]> {
-    // Simulate API call with delay
-    return of([...this.advisories]).pipe(delay(300));
-
-    // When backend is ready, use:
-    // return this.http.get<Advisory[]>('/api/advisories');
+    return this.http.get<any>(`${this.baseUrl}/`).pipe(
+      map((res) => Array.isArray(res) ? res : res.results ?? []),
+      catchError(this.handleError)
+    );
   }
 
-  // Get single advisory by ID
-  getAdvisory(id: number): Observable<Advisory | undefined> {
-    const advisory = this.advisories.find(a => a.id === id);
-    return of(advisory).pipe(delay(200));
-
-    // When backend is ready, use:
-    // return this.http.get<Advisory>(`/api/advisories/${id}`);
+  getAdvisory(id: number): Observable<Advisory> {
+    return this.http.get<Advisory>(`${this.baseUrl}/${id}/`)
+      .pipe(catchError(this.handleError));
   }
 
-  // Create new advisory
-  createAdvisory(advisory: Omit<Advisory, 'id' | 'dateTimeAdded'>): Observable<Advisory> {
-    const newAdvisory: Advisory = {
-      ...advisory,
-      id: Math.max(...this.advisories.map(a => a.id), 0) + 1,
-      dateTimeAdded: new Date()
-    };
-
-    this.advisories.unshift(newAdvisory);
-    return of(newAdvisory).pipe(delay(500));
-
-    // When backend is ready, use:
-    // return this.http.post<Advisory>('/api/advisories', advisory);
+  createAdvisory(advisory: Partial<Advisory>): Observable<Advisory> {
+    return this.http.post<Advisory>(`${this.baseUrl}/`, advisory)
+      .pipe(catchError(this.handleError));
   }
 
-  // Update existing advisory
+  sendAdvisory(payload: any): Observable<Advisory> {
+    return this.http.post<Advisory>(`${this.baseUrl}/send_advisory/`, payload)
+      .pipe(catchError(this.handleError));
+  }
+
   updateAdvisory(id: number, advisory: Partial<Advisory>): Observable<Advisory> {
-    const index = this.advisories.findIndex(a => a.id === id);
-    if (index !== -1) {
-      this.advisories[index] = { ...this.advisories[index], ...advisory };
-      return of(this.advisories[index]).pipe(delay(500));
-    }
-    throw new Error('Advisory not found');
-
-    // When backend is ready, use:
-    // return this.http.put<Advisory>(`/api/advisories/${id}`, advisory);
+    return this.http.put<Advisory>(`${this.baseUrl}/${id}/`, advisory)
+      .pipe(catchError(this.handleError));
   }
 
-  // Delete advisory
-  deleteAdvisory(id: number): Observable<boolean> {
-    const index = this.advisories.findIndex(a => a.id === id);
-    if (index !== -1) {
-      this.advisories.splice(index, 1);
-      return of(true).pipe(delay(300));
-    }
-    return of(false);
-
-    // When backend is ready, use:
-    // return this.http.delete<boolean>(`/api/advisories/${id}`);
+  deleteAdvisory(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}/`)
+      .pipe(catchError(this.handleError));
   }
 
-  // Get provinces (dummy data)
+  estimateRecipients(filters: any): Observable<number> {
+    return this.http.post<{ count: number }>(`${this.baseUrl}/estimate_recipients/`, filters).pipe(
+      map(res => res.count),
+      catchError(this.handleError)
+    );
+  }
+
   getProvinces(): Observable<string[]> {
-    return of(['Eastern', 'Northern', 'Southern', 'Western', 'Kigali City']).pipe(delay(100));
+    return new Observable(observer => {
+      observer.next(['Eastern', 'Northern', 'Southern', 'Western', 'Kigali City']);
+      observer.complete();
+    });
   }
 
-  // Get districts by province (dummy data)
   getDistricts(province: string): Observable<string[]> {
-    const districts: { [key: string]: string[] } = {
-      'Eastern': ['Bugesera', 'Gatsibo', 'Kayonza', 'Kirehe', 'Ngoma', 'Nyagatare', 'Rwamagana'],
-      'Northern': ['Burera', 'Gakenke', 'Gicumbi', 'Musanze', 'Rulindo'],
-      'Southern': ['Gisagara', 'Huye', 'Kamonyi', 'Muhanga', 'Nyamagabe', 'Nyanza', 'Nyaruguru', 'Ruhango'],
-      'Western': ['Karongi', 'Ngororero', 'Nyabihu', 'Nyamasheke', 'Rubavu', 'Rusizi', 'Rutsiro'],
+    const districts: any = {
+      Eastern: ['Bugesera', 'Gatsibo', 'Kayonza', 'Kirehe', 'Ngoma', 'Nyagatare', 'Rwamagana'],
+      Northern: ['Burera', 'Gakenke', 'Gicumbi', 'Musanze', 'Rulindo'],
+      Southern: ['Gisagara', 'Huye', 'Kamonyi', 'Muhanga', 'Nyamagabe', 'Nyanza', 'Nyaruguru', 'Ruhango'],
+      Western: ['Karongi', 'Ngororero', 'Nyabihu', 'Nyamasheke', 'Rubavu', 'Rusizi', 'Rutsiro'],
       'Kigali City': ['Gasabo', 'Kicukiro', 'Nyarugenge']
     };
-    return of(districts[province] || []).pipe(delay(100));
+
+    return new Observable(observer => {
+      observer.next(districts[province] || []);
+      observer.complete();
+    });
   }
 
-  // Get sectors (dummy data)
   getSectors(): Observable<string[]> {
-    return of(['Agriculture', 'Livestock', 'Fisheries', 'Forestry', 'Mixed Farming']).pipe(delay(100));
+    return new Observable(observer => {
+      observer.next(['Agriculture', 'Livestock', 'Fisheries', 'Forestry', 'Mixed Farming']);
+      observer.complete();
+    });
   }
 
-  // Get policy statuses (dummy data)
   getPolicyStatuses(): Observable<string[]> {
-    return of(['All', 'Active', 'Pending', 'Expired', 'Cancelled']).pipe(delay(100));
+    return new Observable(observer => {
+      observer.next(['All', 'OPEN', 'PAID', 'WRITTEN', 'CANCELLED']);
+      observer.complete();
+    });
   }
 
-  // Get recipient count estimate
-  getRecipientCount(filters: {
-    province?: string;
-    district?: string;
-    sector?: string;
-    gender?: string;
-    policyStatus?: string;
-  }): Observable<number> {
-    // Simulate backend calculation
-    let count = Math.floor(Math.random() * 500) + 50;
-    return of(count).pipe(delay(200));
-
-    // When backend is ready, use:
-    // return this.http.post<number>('/api/advisories/recipient-count', filters);
-  }
-
-  // Send advisory immediately
-  sendAdvisory(id: number): Observable<boolean> {
-    const advisory = this.advisories.find(a => a.id === id);
-    if (advisory) {
-      advisory.status = 'Sent';
-      return of(true).pipe(delay(1000));
-    }
-    return of(false);
-
-    // When backend is ready, use:
-    // return this.http.post<boolean>(`/api/advisories/${id}/send`, {});
-  }
-
-  // Export advisories to CSV
   exportAdvisories(advisories: Advisory[]): void {
-    const headers = ['ID', 'Date Added', 'Province', 'District', 'Sector', 'Gender', 'Policy Status', 'Message', 'Status', 'Recipients'];
+    const headers = ['ID', 'Date Added', 'Province', 'District', 'Sector', 'Gender', 'Message', 'Status', 'Recipients'];
+
     const rows = advisories.map(a => [
-      a.id,
-      a.dateTimeAdded.toLocaleString(),
-      a.province,
-      a.district,
-      a.sector,
-      a.gender,
-      a.policyStatus,
+      a.id ?? a.advisory_id,
+      new Date(a.date_time_added!).toLocaleString(),
+      a.province ?? '',
+      a.district ?? '',
+      a.sector ?? '',
+      a.gender ?? '',
       `"${a.message}"`,
       a.status,
-      a.recipientsCount
+      a.recipients_count
     ]);
 
     const csv = [
@@ -206,11 +126,14 @@ export class AdvisoryService {
     ].join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = url;
+    link.href = URL.createObjectURL(blob);
     link.download = `advisories_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
-    window.URL.revokeObjectURL(url);
+  }
+
+  private handleError(error: any) {
+    console.error('Advisory Service Error:', error);
+    return throwError(() => error);
   }
 }

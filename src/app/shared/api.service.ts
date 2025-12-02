@@ -1,36 +1,43 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http' ;
-import { map } from "rxjs/operators"
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+export interface Organization {
+  organisation_id?: number;
+  organisation_name: string;
+  organisation_email?: string;
+  organisation_msisdn?: string;
+  organisation_type?: number;
+  country?: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
+  private baseUrl = `${environment.apiUrl}/organisations`; // use environment consistently
 
-  constructor(private http : HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  postOrganization(data:any){
-    return this.http.post<any>("http://localhost:3000/posts",data)
-    .pipe(map((res:any)=>{
-      return res;
-    }))
+  getOrganizations(): Observable<Organization[]> {
+    return this.http.get<{ results: Organization[] }>(`${this.baseUrl}/`)
+      .pipe(map(res => res.results || []));
   }
-  getOrganization(){
-    return this.http.get<any>("http://localhost:3000/posts")
-    .pipe(map((res:any)=>{
-      return res;
-    }))
+
+  getOrganizationById(id: number): Observable<Organization> {
+    return this.http.get<Organization>(`${this.baseUrl}/${id}/`);
   }
-  updateOrganization(data:any,id:number){
-    return this.http.put<any>("http://localhost:3000/posts/"+id,data)
-    .pipe(map((res:any)=>{
-      return res;
-    }))
+
+  postOrganization(data: Organization): Observable<Organization> {
+    return this.http.post<Organization>(`${this.baseUrl}/`, data);
   }
-  // deleteOrganization(id:number){
-  //   return this.http.delete<any>("http://localhost:3000/posts/"+id)
-  //   .pipe(map((res:any)=>{
-  //     return res;
-  //   }))
-  // }
+
+  updateOrganization(id: number, data: Organization): Observable<Organization> {
+    return this.http.put<Organization>(`${this.baseUrl}/${id}/`, data);
+  }
+
+  deleteOrganization(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}/`);
+  }
 }

@@ -15,7 +15,7 @@
          <div class="container-fluid">
 
            <div class="d-flex">
-             <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
+             <button  class="btn btn-success" (click)="clickAddPolicy()" type="button" data-bs-toggle="modal"
                data-bs-target="#exampleModal">Add New Written Policy</button>
            </div>
          </div>
@@ -119,8 +119,8 @@
              </div>
              <div class="modal-footer">
                <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button>
-               <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
+               <!-- <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button> -->
+               <button type="button" *ngIf="showUpdate" (click)="updatePolicyDetails()"
                  class="btn btn-primary">Update</button>
              </div>
            </div>

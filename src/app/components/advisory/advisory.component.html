@@ -36,7 +36,7 @@
           </button>
         </div>
       </div>
-      <button class="btn btn-success" type="button" (click)="exportData()">
+      <button class="btn btn-success" type="button" (click)="exportToCSV()">
         <i class="bi bi-download"></i> Export
       </button>
     </div>
@@ -141,7 +141,7 @@
               </tr>
               <tr *ngFor="let item of filteredAdvisories | paginate: { itemsPerPage: pageSize, currentPage: page }">
                 <td>{{ item.id }}</td>
-                <td>{{ item.dateTimeAdded | date:'short' }}</td>
+                <td>{{ item.date_time_added | date:'short' }}</td>
                 <td>{{ item.province }}</td>
                 <td>{{ item.district }}</td>
                 <td>{{ item.sector }}</td>
@@ -165,7 +165,7 @@
                   </span>
                 </td>
                 <td>
-                  <strong>{{ item.recipientsCount }}</strong>
+                  <strong>{{ item.recipients_count }}</strong>
                 </td>
                 <td>
                   <span [ngClass]="getStatusBadgeClass(item.status)">

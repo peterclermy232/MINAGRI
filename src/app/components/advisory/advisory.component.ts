@@ -30,13 +30,18 @@ export class AdvisoryComponent implements OnInit {
 
   showAdd = false;
   showUpdate = false;
+
   minDateTime!: string;
   estimatedRecipients: number = 0;
+
   advisoryData: Advisory[] = [];
+
+  editAdvisoryId: number | null = null;
+
   constructor(
     private fb: FormBuilder,
     private advisoryService: AdvisoryService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -45,6 +50,9 @@ export class AdvisoryComponent implements OnInit {
     this.minDateTime = this.formatDateTimeLocal(new Date());
   }
 
+  // ---------------------------------------------------
+  // FORM INITIALIZATION
+  // ---------------------------------------------------
   initializeForm(): void {
     this.formValue = this.fb.group({
       province: ['', Validators.required],
@@ -57,12 +65,15 @@ export class AdvisoryComponent implements OnInit {
       scheduledDateTime: ['']
     });
 
-    // Update estimated recipients whenever a relevant field changes
+    // Update estimated recipients whenever form changes
     this.formValue.valueChanges.subscribe(() => {
       this.updateRecipientCount();
     });
   }
 
+  // ---------------------------------------------------
+  // LOAD STATIC LISTS
+  // ---------------------------------------------------
   loadLists(): void {
     this.advisoryService.getProvinces().subscribe(res => this.provinces = res);
     this.advisoryService.getSectors().subscribe(res => this.sectors = res);
@@ -77,30 +88,42 @@ export class AdvisoryComponent implements OnInit {
     });
   }
 
+  // ---------------------------------------------------
+  // LOAD ADVISORIES
+  // ---------------------------------------------------
   loadAdvisories(): void {
     this.isLoading = true;
+
     this.advisoryService.getAdvisories().subscribe(data => {
+      this.advisories = data;
       this.advisoryData = data;
-      this.advisories = data;               // keep full list for search
-      this.filteredAdvisories = [...data];   // initialize filtered list
+      this.filteredAdvisories = [...data];
       this.isLoading = false;
     });
   }
 
+  // ---------------------------------------------------
+  // SEARCH
+  // ---------------------------------------------------
   searchAdvisories(): void {
     const term = this.searchTerm.toLowerCase();
+
     this.filteredAdvisories = this.advisories.filter(a =>
-      a.province.toLowerCase().includes(term) ||
-      a.district.toLowerCase().includes(term) ||
-      a.sector.toLowerCase().includes(term) ||
-      a.message.toLowerCase().includes(term)
+      (a.province ?? '').toLowerCase().includes(term) ||
+      (a.district ?? '').toLowerCase().includes(term) ||
+      (a.sector ?? '').toLowerCase().includes(term) ||
+      (a.message ?? '').toLowerCase().includes(term)
     );
   }
 
+  // ---------------------------------------------------
+  // ADD ADVISORY
+  // ---------------------------------------------------
   clickAddAdvisory(): void {
     this.showAdd = true;
     this.showUpdate = false;
     this.formSubmitted = false;
+    this.editAdvisoryId = null;
 
     this.formValue.reset({
       sendNow: true,
@@ -111,27 +134,26 @@ export class AdvisoryComponent implements OnInit {
 
   async sendAdvisory(): Promise<void> {
     this.formSubmitted = true;
-
     if (this.formValue.invalid) return;
 
     this.isSending = true;
 
     const formData = this.formValue.value;
 
-    const newAdvisoryPayload = {
+    const payload = {
       province: formData.province,
       district: formData.district,
       sector: formData.sector,
       gender: formData.gender,
       policyStatus: formData.policyStatus,
       message: formData.message,
-      sendNow: formData.sendNow,
-      scheduledDateTime: formData.sendNow ? null : formData.scheduledDateTime,
-      status: (formData.sendNow ? 'Sent' : 'Scheduled') as 'Sent' | 'Scheduled' | 'Draft',
-      recipientsCount: this.estimatedRecipients
+      send_now: formData.sendNow,
+      scheduled_date_time: formData.sendNow ? null : formData.scheduledDateTime,
+      status: formData.sendNow ? 'Sent' : 'Scheduled',
+      recipients_count: this.estimatedRecipients
     };
 
-    this.advisoryService.createAdvisory(newAdvisoryPayload).subscribe(res => {
+    this.advisoryService.createAdvisory(payload).subscribe(() => {
       this.isSending = false;
       this.showAdd = false;
       this.loadAdvisories();
@@ -140,6 +162,9 @@ export class AdvisoryComponent implements OnInit {
     });
   }
 
+  // ---------------------------------------------------
+  // ESTIMATE RECIPIENT COUNT
+  // ---------------------------------------------------
   updateRecipientCount(): void {
     const filters = {
       province: this.formValue.get('province')?.value,
@@ -149,77 +174,96 @@ export class AdvisoryComponent implements OnInit {
       policyStatus: this.formValue.get('policyStatus')?.value
     };
 
-    this.advisoryService.getRecipientCount(filters).subscribe(count => {
+    this.advisoryService.estimateRecipients(filters).subscribe(count => {
       this.estimatedRecipients = count;
     });
   }
 
-  exportData(): void {
-    this.advisoryService.exportAdvisories(this.filteredAdvisories);
-  }
-
-  formatDateTimeLocal(date: Date): string {
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1);
-    const day = pad(date.getDate());
-    const hour = pad(date.getHours());
-    const minute = pad(date.getMinutes());
-    return `${year}-${month}-${day}T${hour}:${minute}`;
-  }
-
+  // ---------------------------------------------------
+  // DELETE ADVISORY
+  // ---------------------------------------------------
   deleteAdvisory(advisory: Advisory): void {
     if (!confirm(`Are you sure you want to delete this advisory?`)) return;
 
-    this.advisoryService.deleteAdvisory(advisory.id).subscribe(success => {
-      if (success) {
-        this.advisories = this.advisories.filter(a => a.id !== advisory.id);
-        this.filteredAdvisories = this.filteredAdvisories.filter(a => a.id !== advisory.id);
-        alert('Advisory deleted successfully!');
-      } else {
-        alert('Failed to delete advisory.');
-      }
+    this.advisoryService.deleteAdvisory(advisory.id!).subscribe(() => {
+      this.advisories = this.advisories.filter(a => a.id !== advisory.id);
+      this.filteredAdvisories = this.filteredAdvisories.filter(a => a.id !== advisory.id);
+      alert('Advisory deleted successfully!');
     });
   }
 
-  // ---------------------- EDIT ADVISORY -------------------------
-onEdit(advisory: Advisory): void {
-  this.showAdd = false;
-  this.showUpdate = true;
-  this.formSubmitted = false;
+  // ---------------------------------------------------
+  // EDIT ADVISORY
+  // ---------------------------------------------------
+  onEdit(advisory: Advisory): void {
+    this.showAdd = false;
+    this.showUpdate = true;
+    this.formSubmitted = false;
 
-  this.formValue.patchValue({
-    province: advisory.province,
-    district: advisory.district,
-    sector: advisory.sector,
-    gender: advisory.gender,
-    policyStatus: advisory.policyStatus,
-    message: advisory.message,
-    sendNow: advisory.sendNow,
-    scheduledDateTime: advisory.scheduledDateTime ? this.formatDateTimeLocal(new Date(advisory.scheduledDateTime)) : ''
-  });
+    this.editAdvisoryId = advisory.id!;
 
-  // Optionally open modal if not using data-bs-toggle
-  const modal = document.getElementById('advisoryModal');
-  modal?.classList.add('show');
-  modal?.setAttribute('style', 'display: block;');
-}
+    this.formValue.patchValue({
+      province: advisory.province,
+      district: advisory.district,
+      sector: advisory.sector,
+      gender: advisory.gender,
+      policyStatus: advisory.policyStatus,
+      message: advisory.message,
+      sendNow: advisory.send_now,
+      scheduledDateTime: advisory.scheduled_date_time
+        ? this.formatDateTimeLocal(new Date(advisory.scheduled_date_time))
+        : ''
+    });
 
-// ---------------------- RESEND ADVISORY -------------------------
-resendAdvisory(advisory: Advisory): void {
-  if (!confirm('Are you sure you want to resend this advisory?')) return;
+    const modal = document.getElementById('advisoryModal');
+    modal?.classList.add('show');
+    modal?.setAttribute('style', 'display: block;');
+  }
 
-  this.advisoryService.sendAdvisory(advisory.id).subscribe(success => {
-    if (success) {
+  // ---------------------------------------------------
+  // UPDATE ADVISORY
+  // ---------------------------------------------------
+  updateAdvisory(): void {
+    if (!this.editAdvisoryId) return;
+    this.formSubmitted = true;
+    if (this.formValue.invalid) return;
+
+    const formData = this.formValue.value;
+
+    const payload = {
+      province: formData.province,
+      district: formData.district,
+      sector: formData.sector,
+      gender: formData.gender,
+      policyStatus: formData.policyStatus,
+      message: formData.message,
+      send_now: formData.sendNow,
+      scheduled_date_time: formData.sendNow ? null : formData.scheduledDateTime,
+      recipients_count: this.estimatedRecipients
+    };
+
+    this.advisoryService.updateAdvisory(this.editAdvisoryId, payload).subscribe(() => {
+      this.showUpdate = false;
+      this.loadAdvisories();
+      alert('Advisory updated successfully!');
+    });
+  }
+
+  // ---------------------------------------------------
+  // RESEND ADVISORY
+  // ---------------------------------------------------
+  resendAdvisory(advisory: Advisory): void {
+    if (!confirm('Are you sure you want to resend this advisory?')) return;
+
+    this.advisoryService.sendAdvisory({ id: advisory.id }).subscribe(() => {
       alert('Advisory resent successfully!');
       this.loadAdvisories();
-    } else {
-      alert('Failed to resend advisory.');
-    }
-  });
-}
+    });
+  }
 
-
+  // ---------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------
   getStatusBadgeClass(status: string): string {
     switch (status) {
       case 'Sent': return 'badge bg-success';
@@ -228,7 +272,45 @@ resendAdvisory(advisory: Advisory): void {
       default: return 'badge bg-info';
     }
   }
+
   getTotalRecipients(): number {
-  return this.advisoryData.reduce((sum, a) => sum + a.recipientsCount, 0);
-}
+    return this.advisoryData.reduce((sum, a) => sum + (a.recipients_count ?? 0), 0);
+  }
+
+  formatDateTimeLocal(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  exportToCSV(): void {
+    const headers = ['ID', 'Date Time Added', 'Province', 'District', 'Sector', 'Gender', 'Policy Status', 'Message', 'Status', 'Recipients Count', 'Sent Date Time'];
+    const rows = this.advisoryData.map(a => [
+      a.id,
+      a.date_time_added ? new Date(a.date_time_added).toLocaleString() : '',
+      a.province,
+      a.district,
+      a.sector,
+      a.gender,
+      a.policyStatus,
+      a.message,
+      a.status,
+      a.recipients_count,
+      a.sent_date_time ? new Date(a.sent_date_time).toLocaleString() : ''
+    ]);
+
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += headers.join(',') + '\n';
+    rows.forEach(rowArray => {
+      const row = rowArray.join(',');
+      csvContent += row + '\n';
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'advisory_data.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 }
