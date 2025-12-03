@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -10,15 +10,33 @@ import { environment } from 'src/environments/environment';
 export class UserService {
   private baseUrl = `${environment.apiUrl}/users`;
   private authUrl = `${environment.apiUrl}/auth`;
+  private orgsUrl = `${environment.apiUrl}/organisations`;
+  private countriesUrl = `${environment.apiUrl}/countries`;
 
   constructor(private http: HttpClient) { }
 
   getUsers(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/`)
-      .pipe(
-        map((res: any) => Array.isArray(res) ? res : res?.results || []),
+    // Fetch all required data in parallel
+    return forkJoin({
+      usersResponse: this.http.get<any>(`${this.baseUrl}/`).pipe(
+        map((res: any) => {
+          // Handle both array response and object with results property
+          if (Array.isArray(res)) return res;
+          if (res?.results && Array.isArray(res.results)) return res.results;
+          if (res?.result && Array.isArray(res.result)) return res.result;
+          return [];
+        }),
         catchError(this.handleError)
-      );
+      ),
+      orgsResponse: this.http.get<any>(`${this.orgsUrl}/`).pipe(
+        map((res: any) => Array.isArray(res) ? res : res?.results || res?.result || []),
+        catchError(() => []) // Return empty array on error
+      ),
+      countriesResponse: this.http.get<any>(`${this.countriesUrl}/`).pipe(
+        map((res: any) => Array.isArray(res) ? res : res?.results || res?.result || []),
+        catchError(() => []) // Return empty array on error
+      )
+    });
   }
 
   getUsersWithDetails(): Observable<any> {

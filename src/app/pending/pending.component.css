@@ -1,0 +1,58 @@
+.container-fluid {
+  padding: 20px;
+}
+
+.card {
+  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+  margin-bottom: 1rem;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0.75rem 1.25rem;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.modal {
+  display: block;
+  overflow-y: auto;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.alert {
+  border-radius: 0.25rem;
+  padding: 0.75rem 1.25rem;
+}

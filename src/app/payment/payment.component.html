@@ -1,1 +1,207 @@
+<!-- payment.component.html -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Claims Pending Payment</h3>
+          <div class="card-tools">
+            <button class="btn btn-sm btn-success mr-2" (click)="exportToExcel()">
+              <i class="fas fa-file-excel"></i> Export
+            </button>
+            <button class="btn btn-sm btn-primary" (click)="loadPaymentPendingClaims()">
+              <i class="fas fa-sync"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Alert Messages -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" (click)="error = ''">&times;</button>
+            {{ error }}
+          </div>
+
+          <div *ngIf="success" class="alert alert-success alert-dismissible">
+            <button type="button" class="close" (click)="success = ''">&times;</button>
+            {{ success }}
+          </div>
+
+          <!-- Summary Card -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="info-box bg-warning">
+                <span class="info-box-icon"><i class="fas fa-clock"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Pending Payment</span>
+                  <span class="info-box-number">{{ paymentPendingClaims.length }} Claims</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="info-box bg-info">
+                <span class="info-box-icon"><i class="fas fa-dollar-sign"></i></span>
+                <div class="info-box-content">
+                  <span class="info-box-text">Total Amount</span>
+                  <span class="info-box-number">{{ formatCurrency(getTotalPaymentAmount()) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading Spinner -->
+          <div *ngIf="loading" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+
+          <!-- Claims Table -->
+          <div *ngIf="!loading" class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="thead-light">
+                <tr>
+                  <th>#</th>
+                  <th>Claim Number</th>
+                  <th>Farmer Name</th>
+                  <th>Policy Number</th>
+                  <th>Approved Amount</th>
+                  <th>Approval Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let claim of paymentPendingClaims; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ claim.claim_number }}</td>
+                  <td>{{ claim.farmer_name }}</td>
+                  <td>{{ claim.policy_number }}</td>
+                  <td class="text-right">{{ formatCurrency(claim.approved_amount) }}</td>
+                  <td>{{ formatDate(claim.approval_date) }}</td>
+                  <td>
+                    <span class="badge badge-warning">{{ claim.status }}</span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-info mr-1"
+                            (click)="viewClaimDetails(claim)"
+                            title="View Details">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-success"
+                            (click)="openPaymentModal(claim)"
+                            title="Process Payment">
+                      <i class="fas fa-money-bill-wave"></i> Pay
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="paymentPendingClaims.length === 0">
+                  <td colspan="8" class="text-center">No claims pending payment</td>
+                </tr>
+              </tbody>
+              <tfoot *ngIf="paymentPendingClaims.length > 0">
+                <tr class="font-weight-bold">
+                  <td colspan="4" class="text-right">Total:</td>
+                  <td class="text-right">{{ formatCurrency(getTotalPaymentAmount()) }}</td>
+                  <td colspan="3"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Process Payment Modal -->
+<div class="modal" [style.display]="showPaymentModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Process Payment</h5>
+        <button type="button" class="close text-white" (click)="closePaymentModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Claim Number:</label>
+              <p class="font-weight-bold">{{ selectedClaim?.claim_number }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Farmer Name:</label>
+              <p class="font-weight-bold">{{ selectedClaim?.farmer_name }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Policy Number:</label>
+              <p class="font-weight-bold">{{ selectedClaim?.policy_number }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Approved Amount:</label>
+              <p class="font-weight-bold text-success">
+                {{ formatCurrency(selectedClaim?.approved_amount || 0) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="form-group">
+          <label for="paymentReference">Payment Reference Number *</label>
+          <input type="text"
+                 id="paymentReference"
+                 class="form-control"
+                 [(ngModel)]="paymentReference"
+                 placeholder="Enter payment reference number">
+          <small class="form-text text-muted">
+            Enter the transaction reference from your payment system
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="paymentDate">Payment Date *</label>
+          <input type="date"
+                 id="paymentDate"
+                 class="form-control"
+                 [(ngModel)]="paymentDate">
+        </div>
+
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i>
+          <strong>Note:</strong> Once payment is processed, the claim status will be updated to "PAID"
+          and cannot be reversed. Please ensure all payment details are correct.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closePaymentModal()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success"
+                [disabled]="!paymentReference || loading"
+                (click)="processPayment()">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+          <i class="fas fa-check" *ngIf="!loading"></i>
+          Process Payment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showPaymentModal"></div>
 

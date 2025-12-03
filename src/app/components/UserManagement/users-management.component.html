@@ -86,7 +86,7 @@
                     <th scope="col">Phone</th>
                     <th scope="col">Organization</th>
                     <th scope="col">Country</th>
-                    <th scope="col">User Type</th>
+                    <th scope="col">User Role</th>
                     <th scope="col" class="text-center">Status</th>
                     <th scope="col" class="text-center">Actions</th>
                   </tr>
@@ -108,18 +108,18 @@
                     </td>
                     <td>
                       <i class="bi bi-phone me-1 text-muted"></i>
-                      {{ user.user_msisdn }}
+                      {{ user.user_phone_number || 'N/A' }}
                     </td>
                     <td>
                       <i class="bi bi-building me-1 text-muted"></i>
-                      {{ user.organisation }}
+                      {{ user.organisation_name }}
                     </td>
                     <td>
                       <i class="bi bi-geo-alt me-1 text-muted"></i>
-                      {{ user.country }}
+                      {{ user.country_name }}
                     </td>
                     <td>
-                      <span class="badge bg-info">{{ user.user_type }}</span>
+                      <span class="badge bg-info">{{ user.user_role }}</span>
                     </td>
                     <td class="text-center">
                       <span
@@ -141,12 +141,6 @@
                           (click)="showModal(user)"
                           title="Edit User">
                           <i class="bi bi-pencil-square"></i>
-                        </button>
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-outline-info"
-                          title="View Details">
-                          <i class="bi bi-eye"></i>
                         </button>
                         <button
                           type="button"
@@ -217,42 +211,38 @@
             <div class="row g-3">
               <!-- Organization Selection -->
               <div class="col-md-6">
-                <label for="organisation_id" class="form-label">
+                <label for="organisation" class="form-label">
                   Organization <span class="text-danger">*</span>
                 </label>
                 <select
                   class="form-select"
-                  id="organisation_id"
-                  formControlName="organisation_id"
-                  [class.is-invalid]="formSubmitted && userForm.get('organisation_id')?.invalid">
+                  id="organisation"
+                  formControlName="organisation"
+                  [class.is-invalid]="formSubmitted && userForm.get('organisation')?.invalid">
                   <option value="">Select Organization</option>
                   <option *ngFor="let org of organizations" [value]="org.organisation_id">
                     {{ org.organisation_name }}
                   </option>
                 </select>
-                <div class="invalid-feedback" *ngIf="formSubmitted && userForm.get('organisation_id')?.invalid">
+                <div class="invalid-feedback" *ngIf="formSubmitted && userForm.get('organisation')?.invalid">
                   Organization is required
                 </div>
               </div>
 
               <!-- Country Selection -->
               <div class="col-md-6">
-                <label for="country_id" class="form-label">
-                  Country <span class="text-danger">*</span>
+                <label for="country" class="form-label">
+                  Country
                 </label>
                 <select
                   class="form-select"
-                  id="country_id"
-                  formControlName="country_id"
-                  [class.is-invalid]="formSubmitted && userForm.get('country_id')?.invalid">
+                  id="country"
+                  formControlName="country">
                   <option value="">Select Country</option>
                   <option *ngFor="let country of countries" [value]="country.country_id">
                     {{ country.country }}
                   </option>
                 </select>
-                <div class="invalid-feedback" *ngIf="formSubmitted && userForm.get('country_id')?.invalid">
-                  Country is required
-                </div>
               </div>
 
               <!-- Full Name -->
@@ -297,27 +287,23 @@
 
               <!-- Phone Number -->
               <div class="col-md-6">
-                <label for="user_msisdn" class="form-label">
-                  Phone Number <span class="text-danger">*</span>
+                <label for="user_phone_number" class="form-label">
+                  Phone Number
                 </label>
                 <div class="input-group">
                   <span class="input-group-text"><i class="bi bi-phone"></i></span>
                   <input
                     type="tel"
                     class="form-control"
-                    id="user_msisdn"
-                    formControlName="user_msisdn"
-                    placeholder="+254712345678"
-                    [class.is-invalid]="formSubmitted && userForm.get('user_msisdn')?.invalid">
-                  <div class="invalid-feedback" *ngIf="formSubmitted && userForm.get('user_msisdn')?.invalid">
-                    Phone number is required
-                  </div>
+                    id="user_phone_number"
+                    formControlName="user_phone_number"
+                    placeholder="+254712345678">
                 </div>
               </div>
 
               <!-- Password -->
               <div class="col-md-6">
-                <label for="new_password" class="form-label">
+                <label for="password" class="form-label">
                   Password <span class="text-danger" *ngIf="modalMode.typ === 'create'">*</span>
                 </label>
                 <div class="input-group">
@@ -325,11 +311,11 @@
                   <input
                     type="password"
                     class="form-control"
-                    id="new_password"
-                    formControlName="new_password"
+                    id="password"
+                    formControlName="password"
                     [placeholder]="modalMode.typ === 'edit' ? 'Leave blank to keep current password' : 'Enter password'"
-                    [class.is-invalid]="formSubmitted && userForm.get('new_password')?.invalid">
-                  <div class="invalid-feedback" *ngIf="formSubmitted && userForm.get('new_password')?.invalid">
+                    [class.is-invalid]="formSubmitted && userForm.get('password')?.invalid">
+                  <div class="invalid-feedback" *ngIf="formSubmitted && userForm.get('password')?.invalid">
                     Password is required
                   </div>
                 </div>

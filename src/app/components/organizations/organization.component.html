@@ -26,35 +26,71 @@
             (click)="getOrganizations()"
             class="justify-content-end btn btn-primary"
             type="button">
+            <i class="fas fa-sync" [class.fa-spin]="organizations.loading"></i>
             Refresh Organizations
           </button>
         </div>
       </div>
     </nav>
 
-    <!-- Add your table here if needed -->
-    <div>
-      <div >
+    <!-- Loading Spinner -->
+    <div *ngIf="organizations.loading" class="text-center mt-4">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <p class="mt-2">Loading organizations...</p>
+    </div>
+
+    <!-- Organizations Table -->
+    <div *ngIf="!organizations.loading">
+      <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover mt-3 w-100">
-          <thead>
+          <thead class="thead-dark">
             <tr>
               <th>Organization Code</th>
               <th>Organization Name</th>
+              <th>Organization Type</th>
+              <th>Country</th>
               <th>Email</th>
               <th>Phone</th>
+              <th>Contact Person</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>organisation_code</td>
-              <td>organisation_name</td>
-              <td>organisation_email</td>
-              <td>organisation_msisdn </td>
-              <td>organisation_status</td>
+            <tr *ngFor="let org of organizations.data">
+              <td>{{ org.organisation_code }}</td>
+              <td>{{ org.organisation_name }}</td>
+              <td>{{ org.organisation_type }}</td>
+              <td>{{ org.country }}</td>
+              <td>{{ org.organisation_email }}</td>
+              <td>{{ org.organisation_msisdn }}</td>
+              <td>{{ org.organisation_contact }}</td>
               <td>
-                <button (click)="showModal()" class="btn btn-sm btn-warning">Edit</button>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'badge-success': org.organisation_status === 'ACTIVE',
+                    'badge-danger': org.organisation_status === 'INACTIVE',
+                    'badge-warning': org.organisation_status === 'PENDING'
+                  }">
+                  {{ org.organisation_status }}
+                </span>
+              </td>
+              <td>
+                <button
+                  (click)="showModal(org)"
+                  class="btn btn-sm btn-warning"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="organizations.data.length === 0">
+              <td colspan="9" class="text-center">
+                <p class="text-muted mb-0">No organizations found</p>
               </td>
             </tr>
           </tbody>
@@ -65,7 +101,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">{{modalMode.label}}</h5>
@@ -73,44 +109,58 @@
           </div>
           <form (ngSubmit)="handleSubmit()" [formGroup]="organizationForm">
             <div class="modal-body">
-              <div class="mb-3">
-                <label class="form-label">Organization Code</label>
-                <input type="text" formControlName="organisation_code" class="form-control">
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="organisation_code"
-                  [inputObject]="this.organizationForm.get('organisation_code')"
-                ></app-error-section>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Organization Code <span class="text-danger">*</span></label>
+                    <input type="text" formControlName="organisation_code" class="form-control">
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="organisation_code"
+                      [inputObject]="this.organizationForm.get('organisation_code')"
+                    ></app-error-section>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Organization Name <span class="text-danger">*</span></label>
+                    <input type="text" formControlName="organisation_name" class="form-control">
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="organisation_name"
+                      [inputObject]="this.organizationForm.get('organisation_name')"
+                    ></app-error-section>
+                  </div>
+                </div>
               </div>
-              <div class="mb-3">
-                <label class="form-label">Organization Name</label>
-                <input type="text" formControlName="organisation_name" class="form-control">
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="organisation_name"
-                  [inputObject]="this.organizationForm.get('organisation_name')"
-                ></app-error-section>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Organization Email <span class="text-danger">*</span></label>
+                    <input type="email" formControlName="organisation_email" class="form-control">
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="organisation_email"
+                      [inputObject]="this.organizationForm.get('organisation_email')"
+                    ></app-error-section>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Organization Phone <span class="text-danger">*</span></label>
+                    <input type="text" formControlName="organisation_msisdn" class="form-control">
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="organisation_phone"
+                      [inputObject]="this.organizationForm.get('organisation_msisdn')"
+                    ></app-error-section>
+                  </div>
+                </div>
               </div>
+
               <div class="mb-3">
-                <label class="form-label">Organization Email</label>
-                <input type="email" formControlName="organisation_email" class="form-control">
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="organisation_email"
-                  [inputObject]="this.organizationForm.get('organisation_email')"
-                ></app-error-section>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Organization Phone</label>
-                <input type="number" formControlName="organisation_msisdn" class="form-control">
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="organisation_phone"
-                  [inputObject]="this.organizationForm.get('organisation_msisdn')"
-                ></app-error-section>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Organization Contact Person</label>
+                <label class="form-label">Organization Contact Person <span class="text-danger">*</span></label>
                 <input type="text" formControlName="organisation_contact" class="form-control" placeholder="name - phone number">
                 <app-error-section
                   [formSubmitted]="formSubmitted"
@@ -118,32 +168,48 @@
                   [inputObject]="this.organizationForm.get('organisation_contact')"
                 ></app-error-section>
               </div>
-              <div class="mb-3">
-                <label class="form-label">Organization Type</label>
-                <select class="form-control" formControlName="organisation_type_id">
-                  <option *ngFor="let orgType of organizationTypes" [value]="orgType.organisation_type_id">{{orgType.organisation_type}}</option>
-                </select>
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="organisation_type"
-                  [inputObject]="this.organizationForm.get('organisation_type_id')"
-                ></app-error-section>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Organization Type <span class="text-danger">*</span></label>
+                    <select class="form-control" formControlName="organisation_type_id">
+                      <option value="">Select Organization Type</option>
+                      <option *ngFor="let orgType of organizationTypes" [value]="orgType.organisation_type_id">
+                        {{orgType.organisation_type}}
+                      </option>
+                    </select>
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="organisation_type"
+                      [inputObject]="this.organizationForm.get('organisation_type_id')"
+                    ></app-error-section>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">Country <span class="text-danger">*</span></label>
+                    <select class="form-control" formControlName="country_id">
+                      <option value="">Select Country</option>
+                      <option *ngFor="let cty of countries" [value]="cty.country_id">
+                        {{cty.country}}
+                      </option>
+                    </select>
+                    <app-error-section
+                      [formSubmitted]="formSubmitted"
+                      inputProperty="country"
+                      [inputObject]="this.organizationForm.get('country_id')"
+                    ></app-error-section>
+                  </div>
+                </div>
               </div>
+
               <div class="mb-3">
-                <label class="form-label">Country</label>
-                <select class="form-control" formControlName="country_id">
-                  <option *ngFor="let cty of countries" [value]="cty.country_id">{{cty.country}}</option>
-                </select>
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="country"
-                  [inputObject]="this.organizationForm.get('country_id')"
-                ></app-error-section>
-              </div>
-              <div class="mb-3">
-                <label class="form-label">Status</label>
+                <label class="form-label">Status <span class="text-danger">*</span></label>
                 <select class="form-control" formControlName="organisation_status">
                   <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                  <option value="PENDING">Pending</option>
                 </select>
                 <app-error-section
                   [formSubmitted]="formSubmitted"
@@ -154,7 +220,10 @@
             </div>
             <div class="modal-footer">
               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button [disabled]="modalBtn.loading" type="submit" [class]="modalBtn.classes">{{modalBtn.text}}</button>
+              <button [disabled]="modalBtn.loading" type="submit" [class]="modalBtn.classes">
+                <span *ngIf="modalBtn.loading" class="spinner-border spinner-border-sm mr-1"></span>
+                {{modalBtn.text}}
+              </button>
             </div>
           </form>
         </div>

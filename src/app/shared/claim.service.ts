@@ -1,68 +1,257 @@
+// claims.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+
+export interface Claim {
+  claim_id: number;
+  farmer_name: string;
+  policy_number: string;
+  claim_number: string;
+  estimated_loss_amount: number;
+  approved_amount?: number;
+  status: string;
+  claim_date: string;
+  approval_date?: string;
+  payment_date?: string;
+  payment_reference?: string;
+  farmer?: number;
+  quotation?: number;
+  loss_assessor?: number;
+}
+
+export interface Invoice {
+  invoice_id: number;
+  organisation_name: string;
+  subsidy_name: string;
+  invoice_number: string;
+  amount: number;
+  status: string;
+  approved_date?: string;
+  settlement_date?: string;
+  payment_reference?: string;
+  date_time_added: string;
+  organisation?: number;
+  subsidy?: number;
+}
+
+export interface LossAssessor {
+  assessor_id: number;
+  user_name: string;
+  organisation_name: string;
+  status: string;
+  user?: number;
+  organisation?: number;
+}
+
+export interface Subsidy {
+  subsidy_id: number;
+  subsidy_name: string;
+  subsidy_rate: number;
+  organisation_name: string;
+  insurance_product_name?: string;
+  status: string;
+}
+
+export interface ClaimStatistics {
+  total_claims: number;
+  by_status: Array<{status: string, count: number}>;
+  total_claimed: number;
+  total_approved: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class ClaimService {
-  private baseUrl = `${environment.apiUrl}/claims`;
+export class ClaimsService {
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
-  getClaims(status?: string, farmerId?: number): Observable<any> {
-    let params = new HttpParams();
-    if (status) params = params.set('status', status);
-    if (farmerId) params = params.set('farmer_id', farmerId.toString());
-
-    return this.http.get<any>(`${this.baseUrl}/`, { params })
-      .pipe(
-        map((res: any) => Array.isArray(res) ? res : res?.results || []),
-        catchError(this.handleError)
-      );
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('access_token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
   }
 
-  getClaim(id: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${id}/`)
-      .pipe(catchError(this.handleError));
+  // ============== CLAIMS ENDPOINTS ==============
+
+  getClaims(params?: any): Observable<Claim[]> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.get<Claim[]>(`${this.apiUrl}/claims/`, {
+      headers: this.getHeaders(),
+      params: httpParams
+    });
   }
 
-  createClaim(data: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/`, data)
-      .pipe(catchError(this.handleError));
+  getClaim(id: number): Observable<Claim> {
+    return this.http.get<Claim>(`${this.apiUrl}/claims/${id}/`, {
+      headers: this.getHeaders()
+    });
   }
 
-  updateClaim(data: any, id: number): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${id}/`, data)
-      .pipe(catchError(this.handleError));
+  createClaim(claim: Partial<Claim>): Observable<Claim> {
+    return this.http.post<Claim>(`${this.apiUrl}/claims/`, claim, {
+      headers: this.getHeaders()
+    });
   }
 
-  deleteClaim(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/${id}/`)
-      .pipe(catchError(this.handleError));
+  updateClaim(id: number, claim: Partial<Claim>): Observable<Claim> {
+    return this.http.patch<Claim>(`${this.apiUrl}/claims/${id}/`, claim, {
+      headers: this.getHeaders()
+    });
   }
 
-  assignAssessor(claimId: number, assessorId: number): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/${claimId}/assign_assessor/`, {
-      assessor_id: assessorId
-    }).pipe(catchError(this.handleError));
+  assignAssessor(claimId: number, assessorId: number): Observable<Claim> {
+    return this.http.post<Claim>(
+      `${this.apiUrl}/claims/${claimId}/assign_assessor/`,
+      { assessor_id: assessorId },
+      { headers: this.getHeaders() }
+    );
   }
 
-  approveClaim(claimId: number, approvedAmount: number): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/${claimId}/approve/`, {
-      approved_amount: approvedAmount
-    }).pipe(catchError(this.handleError));
+  approveClaim(claimId: number, approvedAmount: number): Observable<Claim> {
+    return this.http.post<Claim>(
+      `${this.apiUrl}/claims/${claimId}/approve/`,
+      { approved_amount: approvedAmount },
+      { headers: this.getHeaders() }
+    );
   }
 
-  getClaimStatistics(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/statistics/`)
-      .pipe(catchError(this.handleError));
+  getClaimStatistics(): Observable<ClaimStatistics> {
+    return this.http.get<ClaimStatistics>(`${this.apiUrl}/claims/statistics/`, {
+      headers: this.getHeaders()
+    });
   }
 
-  private handleError(error: any) {
-    console.error('An error occurred:', error);
-    return throwError(() => error);
+  // ============== LOSS ASSESSORS ENDPOINTS ==============
+
+  getLossAssessors(params?: any): Observable<LossAssessor[]> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.get<LossAssessor[]>(`${this.apiUrl}/loss-assessors/`, {
+      headers: this.getHeaders(),
+      params: httpParams
+    });
+  }
+
+  // ============== INVOICES ENDPOINTS ==============
+
+  getInvoices(params?: any): Observable<Invoice[]> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.get<Invoice[]>(`${this.apiUrl}/invoices/`, {
+      headers: this.getHeaders(),
+      params: httpParams
+    });
+  }
+
+  getInvoice(id: number): Observable<Invoice> {
+    return this.http.get<Invoice>(`${this.apiUrl}/invoices/${id}/`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  createInvoice(invoice: Partial<Invoice>): Observable<Invoice> {
+    return this.http.post<Invoice>(`${this.apiUrl}/invoices/`, invoice, {
+      headers: this.getHeaders()
+    });
+  }
+
+  approveInvoice(invoiceId: number): Observable<Invoice> {
+    return this.http.post<Invoice>(
+      `${this.apiUrl}/invoices/${invoiceId}/approve/`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  settleInvoice(invoiceId: number, paymentReference: string): Observable<Invoice> {
+    return this.http.post<Invoice>(
+      `${this.apiUrl}/invoices/${invoiceId}/settle/`,
+      { payment_reference: paymentReference },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  // ============== SUBSIDIES ENDPOINTS ==============
+
+  getSubsidies(params?: any): Observable<Subsidy[]> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.get<Subsidy[]>(`${this.apiUrl}/subsidies/`, {
+      headers: this.getHeaders(),
+      params: httpParams
+    });
+  }
+
+  // ============== UTILITY METHODS ==============
+
+  formatCurrency(amount: number, currency: string = 'USD'): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency
+    }).format(amount);
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString();
+  }
+
+  exportToCSV(data: any[], filename: string, headers: string[]): void {
+    const rows = data.map(item =>
+      headers.map(header => {
+        const value = this.getNestedValue(item, header);
+        return typeof value === 'string' && value.includes(',')
+          ? `"${value}"`
+          : value;
+      })
+    );
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  private getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((current, prop) => current?.[prop], obj);
   }
 }

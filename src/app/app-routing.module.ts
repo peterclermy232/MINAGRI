@@ -7,7 +7,7 @@ import { RoleComponent } from './components/role/role.component';
 
 
 import { LossAssesor } from './components/manage-loss-assesor/loss-assesor.component';
-import { AddOrganizationComponent } from './components/AddOrganization/add-organization.component';
+import { UsersManagementComponent } from './components/UserManagement/users-management.component';
 
 import { ManageCrops } from './components/manage-crops/manage-crops.component';
 import { CropVarietiesComponent } from './components/crop-varieties/crop-varieties.component';
@@ -64,7 +64,7 @@ const routes: Routes = [
   {path: 'manage-product', component: ManageProductComponent},
   {path: 'manage-insurance', component: ManageInsuranceComponent},
   {path: 'manage-subsidy', component: ManageSubsidyComponent},
-  { path: 'add-organization', component: AddOrganizationComponent },
+  { path: 'add-organization', component: UsersManagementComponent },
   {path: 'farmer', component: FarmerComponent},
   {path: 'quotation', component: QuotationComponent},
   {path: 'insurance', component: InsuranceComponent},

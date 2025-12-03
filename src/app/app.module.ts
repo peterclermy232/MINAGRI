@@ -11,7 +11,7 @@ import { OrganizationComponent } from './components/organizations/organization.c
 import { OrganizationTypeComponent } from './components/Organization/organization-type.component';
 import {  RoleComponent } from './components/role/role.component';
 
-import { AddOrganizationComponent } from './components/AddOrganization/add-organization.component';
+import { UsersManagementComponent } from './components/UserManagement/users-management.component';
 import { ManageFarmerComponent } from './components/manage-farmer/manage-farmer.component';
 
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
@@ -73,7 +73,7 @@ import { InMemoryDataService } from './shared/in-memory-data.service';
     RoleComponent,
     ErrorSectionComponent,
 
-    AddOrganizationComponent,
+    UsersManagementComponent,
     ManageFarmerComponent,
 
     LossAssesor,

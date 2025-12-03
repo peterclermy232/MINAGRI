@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from 'src/app/shared/user.service';
 import { UserModel } from './users';
-import { Organization, OrganizationType, User } from '../../types';
+import { Organization, User } from '../../types';
 import { AuthService } from '../../shared/auth.service';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -10,11 +10,11 @@ import { NotifierService } from '../../services/notifier.service';
 import { OrganizationService } from 'src/app/shared/organization.service';
 
 @Component({
-  selector: 'app-add-organization',
-  templateUrl: './add-organization.component.html',
-  styleUrls: ['./add-organization.component.css'],
+  selector: 'app-users-management',
+  templateUrl: './users-management.component.html',
+  styleUrls: ['./users-management.component.css'],
 })
-export class AddOrganizationComponent implements OnInit {
+export class UsersManagementComponent implements OnInit {
   userForm: FormGroup;
   formSubmitted = false;
   currentUser: null | User = null;
@@ -63,13 +63,13 @@ export class AddOrganizationComponent implements OnInit {
       },
       {
         label: 'Phone',
-        data: 'user_msisdn',
+        data: 'user_phone_number',
         dynamic: true,
         classes: '',
       },
       {
-        label: 'User Type',
-        data: 'user_type',
+        label: 'User Role',
+        data: 'user_role',
         dynamic: true,
         classes: '',
       },
@@ -81,7 +81,7 @@ export class AddOrganizationComponent implements OnInit {
       },
       {
         label: 'Organisation',
-        data: 'organisation',
+        data: 'organisation_name',
         dynamic: true,
         classes: '',
       },
@@ -102,12 +102,12 @@ export class AddOrganizationComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.userForm = this.fb.group({
-      organisation_id: ['', [Validators.required]],
-      country_id: ['', [Validators.required]],
+      organisation: ['', [Validators.required]],
+      country: [''],
       user_name: ['', [Validators.required]],
       user_email: ['', [Validators.required, Validators.email]],
-      user_msisdn: ['', [Validators.required]],
-      new_password: ['', [Validators.required]],
+      user_phone_number: [''],
+      password: ['', [Validators.required]],
       user_status: ['ACTIVE', Validators.required],
       userId: [null],
     });
@@ -115,30 +115,28 @@ export class AddOrganizationComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('Component initialized');
-    console.log('Initial state - users.data:', this.users.data);
-    console.log('Initial state - filteredUsers:', this.filteredUsers);
     this.getUsers();
   }
 
-  setUser(user: User) {
-    console.log('user', user);
-    this.userForm.get('organisation_id')!.setValue(user.organisation_id);
-    this.userForm.get('userId')!.setValue(user.user_id);
-    this.userForm.get('user_name')!.setValue(user.user_name);
-    this.userForm.get('user_email')!.setValue(user.user_email);
-    this.userForm.get('user_msisdn')!.setValue(user.user_msisdn);
-    this.userForm.get('new_password')!.setValue('');
-    this.userForm.get('user_status')!.setValue(user.user_status);
-    this.userForm.get('country_id')!.setValue(user.country_id);
+  setUser(user: any) {
+    console.log('Setting user:', user);
+    this.userForm.patchValue({
+      organisation: user.organisation,
+      userId: user.user_id,
+      user_name: user.user_name,
+      user_email: user.user_email,
+      user_phone_number: user.user_phone_number || '',
+      password: '',
+      user_status: user.user_status,
+      country: user.country || ''
+    });
 
     // Clear password requirement for edit mode
-    this.userForm.get('new_password')!.clearValidators();
-    this.userForm.get('new_password')!.updateValueAndValidity();
-
-    console.log('userform', this.userForm);
+    this.userForm.get('password')!.clearValidators();
+    this.userForm.get('password')!.updateValueAndValidity();
   }
 
-  showModal(user?: User) {
+  showModal(user?: any) {
     this.formSubmitted = false;
 
     if (user) {
@@ -162,8 +160,8 @@ export class AddOrganizationComponent implements OnInit {
       this.resetForm();
 
       // Set password as required for new users
-      this.userForm.get('new_password')!.setValidators([Validators.required]);
-      this.userForm.get('new_password')!.updateValueAndValidity();
+      this.userForm.get('password')!.setValidators([Validators.required]);
+      this.userForm.get('password')!.updateValueAndValidity();
     }
   }
 
@@ -182,29 +180,10 @@ export class AddOrganizationComponent implements OnInit {
       .subscribe(
         (resp: any) => {
           console.log('Full response:', resp);
-          console.log('Response type:', typeof resp);
-          console.log('Response keys:', Object.keys(resp));
 
-          // Check if response has the expected structure
-          if (!resp.orgsResponse || !resp.countriesResponse || !resp.usersResponse) {
-            console.error('Response structure is incorrect!', resp);
-            console.log('Expected: { orgsResponse: {...}, countriesResponse: {...}, usersResponse: {...} }');
-            console.log('Got:', resp);
-
-            this.notifierService.showSweetAlert({
-              typ: 'error',
-              message: 'Invalid response structure from API',
-            });
-            return;
-          }
-
-          console.log('orgsResponseyyy:', resp.orgsResponse);
-          console.log('countriesResponseyyy:', resp.countriesResponse);
-          console.log('usersResponseyyyy:', resp.usersResponse);
-
-          const orgs = resp.orgsResponse;
-          const countriesResponse = resp.countriesResponse;
-          const usersResponse = resp.usersResponse;
+          const orgs = resp.orgsResponse || [];
+          const countriesResponse = resp.countriesResponse || [];
+          const usersResponse = resp.usersResponse || [];
 
           console.log('Organizations:', orgs);
           console.log('Countries:', countriesResponse);
@@ -213,22 +192,20 @@ export class AddOrganizationComponent implements OnInit {
           this.countries = countriesResponse;
           this.organizations = orgs;
 
-          this.users.data = usersResponse.map(
-            (user: any) => {
-              const org = orgs.find(
-                (typ: any) =>
-                  typ.organisation_id === user.organisation_id
-              );
-              const country = countriesResponse.find(
-                (cty: any) => cty.country_id === user.country_id
-              );
-              return {
-                ...user,
-                organisation: org ? org.organisation_name : 'none',
-                country: country ? country.country : 'none',
-              };
-            }
-          );
+          // Map users with organization and country names
+          this.users.data = usersResponse.map((user: any) => {
+            const org = orgs.find(
+              (o: any) => o.organisation_id === user.organisation
+            );
+            const country = countriesResponse.find(
+              (c: any) => c.country_id === user.country
+            );
+            return {
+              ...user,
+              organisation_name: org ? org.organisation_name : user.organisation_name || 'N/A',
+              country_name: country ? country.country : 'N/A',
+            };
+          });
 
           console.log('Processed users:', this.users.data);
 
@@ -253,7 +230,7 @@ export class AddOrganizationComponent implements OnInit {
         !this.searchTerm ||
         user.user_name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         user.user_email?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.user_msisdn?.includes(this.searchTerm);
+        user.user_phone_number?.includes(this.searchTerm);
 
       const matchesStatus =
         !this.selectedStatus ||
@@ -261,7 +238,7 @@ export class AddOrganizationComponent implements OnInit {
 
       const matchesOrganization =
         !this.selectedOrganization ||
-        user.organisation_id === parseInt(this.selectedOrganization);
+        user.organisation === parseInt(this.selectedOrganization);
 
       return matchesSearch && matchesStatus && matchesOrganization;
     });
@@ -275,14 +252,14 @@ export class AddOrganizationComponent implements OnInit {
     };
 
     const userData = {
-      organisation_id: parseInt(this.userForm.get('organisation_id')!.value),
-      country_id: parseInt(this.userForm.get('country_id')!.value),
-      user_type: 'API USER',
+      organisation: parseInt(this.userForm.get('organisation')!.value),
+      country: this.userForm.get('country')!.value ? parseInt(this.userForm.get('country')!.value) : null,
+      user_role: 'SUPERUSER',
       user_name: this.userForm.get('user_name')!.value,
       user_email: this.userForm.get('user_email')!.value,
-      user_msisdn: this.userForm.get('user_msisdn')!.value,
+      user_phone_number: this.userForm.get('user_phone_number')!.value || null,
       user_status: this.userForm.get('user_status')!.value,
-      new_password: this.userForm.get('new_password')!.value,
+      password: this.userForm.get('password')!.value,
     };
 
     this.userService
@@ -305,9 +282,7 @@ export class AddOrganizationComponent implements OnInit {
             timer: true,
           });
 
-          // Close modal
           this.closeModal();
-
           this.resetForm();
           this.getUsers();
         },
@@ -334,20 +309,19 @@ export class AddOrganizationComponent implements OnInit {
 
     const updateData: any = {
       user_id: this.currentUser?.user_id,
-      record_version: this.currentUser?.record_version,
-      organisation_id: parseInt(this.userForm.get('organisation_id')!.value),
-      country_id: parseInt(this.userForm.get('country_id')!.value),
-      user_type: 'API USER',
+      organisation: parseInt(this.userForm.get('organisation')!.value),
+      country: this.userForm.get('country')!.value ? parseInt(this.userForm.get('country')!.value) : null,
+      //user_role: this.currentUser?.user_role || 'SUPERUSER',
       user_name: this.userForm.get('user_name')!.value,
       user_email: this.userForm.get('user_email')!.value,
-      user_msisdn: this.userForm.get('user_msisdn')!.value,
+      user_phone_number: this.userForm.get('user_phone_number')!.value || null,
       user_status: this.userForm.get('user_status')!.value,
     };
 
     // Only include password if it was changed
-    const newPassword = this.userForm.get('new_password')!.value;
+    const newPassword = this.userForm.get('password')!.value;
     if (newPassword && newPassword.trim() !== '') {
-      updateData.new_password = newPassword;
+      updateData.password = newPassword;
     }
 
     this.userService
@@ -369,9 +343,7 @@ export class AddOrganizationComponent implements OnInit {
             timer: true,
           });
 
-          // Close modal
           this.closeModal();
-
           this.resetForm();
           this.getUsers();
         },
@@ -401,7 +373,6 @@ export class AddOrganizationComponent implements OnInit {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Since in-memory-web-api supports DELETE
         this.userService.deleteUser(user.user_id).subscribe(
           (resp) => {
             this.notifierService.showSweetAlert({
@@ -439,8 +410,8 @@ export class AddOrganizationComponent implements OnInit {
     };
 
     // Reset password validation
-    this.userForm.get('new_password')!.setValidators([Validators.required]);
-    this.userForm.get('new_password')!.updateValueAndValidity();
+    this.userForm.get('password')!.setValidators([Validators.required]);
+    this.userForm.get('password')!.updateValueAndValidity();
   }
 
   handleSubmit() {
@@ -483,27 +454,5 @@ export class AddOrganizationComponent implements OnInit {
         backdrop.remove();
       }
     }
-  }
-
-  // Debug method - REMOVE AFTER TESTING
-  debugData() {
-    console.log('=== DEBUG DATA ===');
-    console.log('users.loading:', this.users.loading);
-    console.log('users.data:', this.users.data);
-    console.log('users.data.length:', this.users.data?.length);
-    console.log('filteredUsers:', this.filteredUsers);
-    console.log('filteredUsers.length:', this.filteredUsers?.length);
-    console.log('organizations:', this.organizations);
-    console.log('countries:', this.countries);
-    console.log('searchTerm:', this.searchTerm);
-    console.log('selectedStatus:', this.selectedStatus);
-    console.log('selectedOrganization:', this.selectedOrganization);
-
-    alert(`
-      Users Data: ${this.users.data?.length || 0}
-      Filtered Users: ${this.filteredUsers?.length || 0}
-      Organizations: ${this.organizations?.length || 0}
-      Countries: ${this.countries?.length || 0}
-    `);
   }
 }

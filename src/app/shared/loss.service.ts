@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class LossAssessorService {
-  private baseUrl = `${environment.apiUrl}/loss-assessors`;
+  private baseUrl = `${environment.apiUrl}/loss_assessors`;
 
   constructor(private http: HttpClient) { }
 

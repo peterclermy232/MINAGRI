@@ -104,5 +104,7 @@ export class PaidComponent implements OnInit {
         this.getAllEmployee();
       })
   }
-
+postEmployeeDetails(){
+  
+}
 }

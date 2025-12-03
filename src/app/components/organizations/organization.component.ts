@@ -35,64 +35,7 @@ export class OrganizationComponent implements OnInit {
   };
   countries: { country: string; country_id: string }[] = [];
   organizationTypes: OrganizationType[] = [];
-  dataTable = {
-    columns: [
-      {
-        label: 'Organisation Code',
-        data: 'organisation_code',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Organisation',
-        data: 'organisation_name',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Organisation Type',
-        data: 'organisation_type',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Country',
-        data: 'country',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Email',
-        data: 'organisation_email',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Phone',
-        data: 'organisation_msisdn',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Contact Person',
-        data: 'organisation_contact',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Status',
-        data: 'organisation_status',
-        dynamic: false,
-        classes: 'text-center',
-      },
-      {
-        label: 'Actions',
-        data: 'actions',
-        dynamic: false,
-        classes: 'text-center',
-      },
-    ],
-  };
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -105,53 +48,38 @@ export class OrganizationComponent implements OnInit {
       country_id: ['', [Validators.required]],
       organisation_code: ['', [Validators.required]],
       organisation_name: ['', [Validators.required]],
-      organisation_email: ['', [Validators.required]],
+      organisation_email: ['', [Validators.required, Validators.email]],
       organisation_msisdn: ['', [Validators.required]],
       organisation_contact: ['', [Validators.required]],
       organisation_status: ['ACTIVE', Validators.required],
       organisationId: [null],
     });
   }
+
   ngOnInit(): void {
     this.getOrganizations();
   }
+
   setOrganization(organization: Organization) {
-    this.organizationForm
-      .get('organisation_type_id')!
-      .setValue(organization.organisation_type_id);
-    this.organizationForm
-      .get('organisation_code')!
-      .setValue(organization.organisation_code);
-    this.organizationForm
-      .get('organisation_name')!
-      .setValue(organization.organisation_name);
-    this.organizationForm
-      .get('organisation_email')!
-      .setValue(organization.organisation_email);
-    this.organizationForm
-      .get('organisation_msisdn')!
-      .setValue(organization.organisation_msisdn);
-    this.organizationForm
-      .get('organisation_contact')!
-      .setValue(organization.organisation_contact);
-    this.organizationForm.get('country_id')!.setValue(organization.country_id);
-    this.organizationForm
-      .get('organisation_status')!
-      .setValue(organization.organisation_status);
-    this.organizationForm
-      .get('organisationId')!
-      .setValue(organization.organisation_id);
-    console.log(this.organizationForm);
-    console.log(this.countries);
-    console.log(this.organizationTypes);
+    this.organizationForm.patchValue({
+      organisation_type_id: organization.organisation_type_id,
+      organisation_code: organization.organisation_code,
+      organisation_name: organization.organisation_name,
+      organisation_email: organization.organisation_email,
+      organisation_msisdn: organization.organisation_msisdn,
+      organisation_contact: organization.organisation_contact,
+      country_id: organization.country_id,
+      organisation_status: organization.organisation_status,
+      organisationId: organization.organisation_id,
+    });
   }
+
   showModal(organization?: Organization) {
-    console.log('organization', organization);
     if (organization) {
       this.modalMode.typ = 'edit';
       this.modalMode.label = 'Edit Organization';
       this.modalBtn = {
-        text: 'Edit Organization',
+        text: 'Update Organization',
         classes: 'btn btn-warning',
         loading: false,
       };
@@ -167,6 +95,7 @@ export class OrganizationComponent implements OnInit {
       };
       this.resetForm();
     }
+    this.formSubmitted = false;
   }
 
   getOrganizations() {
@@ -180,14 +109,15 @@ export class OrganizationComponent implements OnInit {
       )
       .subscribe(
         (resp: any) => {
-          // this.organizationTypes.data = resp;
           const orgTypes = resp.orgTypesResponse.results;
           const countriesResponse = resp.countriesResponse.results;
           this.organizationTypes = orgTypes;
           this.countries = countriesResponse;
+
+          // Map organizations with their type and country names
           this.organizations.data = resp.orgsResponse.results.map(
             (organization: any) => {
-              const type = orgTypes.find(
+              const orgType = orgTypes.find(
                 (typ: any) =>
                   typ.organisation_type_id === organization.organisation_type_id
               );
@@ -196,14 +126,20 @@ export class OrganizationComponent implements OnInit {
               );
               return {
                 ...organization,
-                organisation_type: type ? type.organisation_type : 'none',
-                country: country ? country.country : 'none',
+                organisation_type: orgType ? orgType.organisation_type : 'N/A',
+                country: country ? country.country : 'N/A',
               };
             }
           );
+
+          console.log('Organizations loaded:', this.organizations.data);
         },
         (err) => {
-          console.log('crop err', err);
+          console.error('Error loading organizations:', err);
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: 'Failed to load organizations',
+          });
         }
       );
   }
@@ -211,29 +147,46 @@ export class OrganizationComponent implements OnInit {
   createOrganization() {
     this.modalBtn = {
       loading: true,
-      text: 'Processing...',
+      text: 'Creating...',
       classes: 'btn btn-primary',
     };
+
+    const countryId = this.organizationForm.get('country_id')?.value;
+    const orgTypeId = this.organizationForm.get('organisation_type_id')?.value;
+
+    console.log('Country ID:', countryId);
+    console.log('Org Type ID:', orgTypeId);
+
+    // Prepare payload - Django expects only the _id fields for ForeignKeys
+    const payload: any = {
+      organisation_code:
+        this.organizationForm.get('organisation_code')?.value,
+      organisation_name:
+        this.organizationForm.get('organisation_name')?.value,
+      organisation_email:
+        this.organizationForm.get('organisation_email')?.value,
+      organisation_msisdn: this.getString(
+        this.organizationForm.get('organisation_msisdn')?.value
+      ),
+      organisation_contact: this.organizationForm.get('organisation_contact')
+        ?.value,
+      organisation_status: this.organizationForm.get('organisation_status')
+        ?.value,
+    };
+
+    // Add ForeignKey fields - Django expects integer IDs only
+    if (countryId && countryId !== '') {
+      payload.country = parseInt(countryId);  // Just the ID, not in array
+    }
+
+    if (orgTypeId && orgTypeId !== '') {
+      payload.organisation_type = parseInt(orgTypeId);  // Just the ID, not in array
+    }
+
+    console.log('Final Payload:', payload);
+
     this.organizationService
-      .postOrganization({
-        country_id: parseInt(this.organizationForm.get('country_id')?.value),
-        organisation_type_id: parseInt(
-          this.organizationForm.get('organisation_type_id')?.value
-        ),
-        organisation_code:
-          this.organizationForm.get('organisation_code')?.value,
-        organisation_name:
-          this.organizationForm.get('organisation_name')?.value,
-        organisation_email:
-          this.organizationForm.get('organisation_email')?.value,
-        organisation_msisdn: this.getString(
-          this.organizationForm.get('organisation_msisdn')?.value
-        ),
-        organisation_contact: this.organizationForm.get('organisation_contact')
-          ?.value,
-        organisation_status: this.organizationForm.get('organisation_status')
-          ?.value,
-      })
+      .postOrganization(payload)
       .pipe(
         finalize(() => {
           this.modalBtn = {
@@ -245,20 +198,19 @@ export class OrganizationComponent implements OnInit {
       )
       .subscribe(
         (resp) => {
-          console.log('create resp', resp);
-          this.resetForm();
-          this.getOrganizations();
-          // Swal.fire('Success!', 'Organization created successfully', 'success');
+          console.log('Organization created:', resp);
           this.notifierService.showSweetAlert({
             typ: 'success',
             message: 'Organization created successfully',
             timer: true,
           });
+          this.closeModal();
+          this.resetForm();
+          this.getOrganizations();
         },
         (err) => {
-          console.log('er', err.error);
-          const errorMessage =
-            err.error.errors[0].message || 'Invalid data submitted';
+          console.error('Create organization error:', err);
+          const errorMessage = this.extractErrorMessage(err);
           this.notifierService.showSweetAlert({
             typ: 'error',
             message: errorMessage,
@@ -266,59 +218,82 @@ export class OrganizationComponent implements OnInit {
         }
       );
   }
+
   updateOrganization() {
     this.modalBtn = {
       loading: true,
-      text: 'Processing...',
-      classes: 'btn btn-primary',
+      text: 'Updating...',
+      classes: 'btn btn-warning',
     };
+
+    const countryId = this.organizationForm.get('country_id')?.value;
+    const orgTypeId = this.organizationForm.get('organisation_type_id')?.value;
+
+    // Find the selected country and organization type names
+    const selectedCountry = this.countries.find(c => c.country_id === countryId);
+    const selectedOrgType = this.organizationTypes.find(o => o.organisation_type_id === orgTypeId);
+
+    // Prepare payload with both ID and value fields
+    const payload: any = {
+      organisation_id: this.currentOrg?.organisation_id,
+      organisation_code:
+        this.organizationForm.get('organisation_code')?.value,
+      organisation_name:
+        this.organizationForm.get('organisation_name')?.value,
+      organisation_email:
+        this.organizationForm.get('organisation_email')?.value,
+      organisation_msisdn: this.getString(
+        this.organizationForm.get('organisation_msisdn')?.value
+      ),
+      organisation_contact: this.organizationForm.get(
+        'organisation_contact'
+      )?.value,
+      organisation_status: this.organizationForm.get('organisation_status')
+        ?.value,
+      record_version: this.currentOrg?.record_version,
+    };
+
+    // Add country fields (ID as integer, country as array of string)
+    if (countryId && countryId !== '' && selectedCountry) {
+      payload.country_id = parseInt(countryId);
+      payload.country = [selectedCountry.country]; // Array with country name
+    }
+
+    // Add organisation_type fields (ID as integer, organisation_type as array of string)
+    if (orgTypeId && orgTypeId !== '' && selectedOrgType) {
+      payload.organisation_type_id = parseInt(orgTypeId);
+      payload.organisation_type = [selectedOrgType.organisation_type]; // Array with org type name
+    }
+
     this.organizationService
       .updateOrganization(
-        {
-          organisation_id: this.currentOrg?.organisation_id,
-          country_id: this.organizationForm.get('organisation_type')?.value,
-          organisation_type_id: this.organizationForm.get(
-            'organisation_type_id'
-          )?.value,
-          organisation_code:
-            this.organizationForm.get('organisation_code')?.value,
-          organisation_name:
-            this.organizationForm.get('organisation_name')?.value,
-          organisation_email:
-            this.organizationForm.get('organisation_email')?.value,
-          organisation_msisdn: this.organizationForm.get('organisation_msisdn')
-            ?.value,
-          organisation_contact: this.organizationForm.get(
-            'organisation_contact'
-          )?.value,
-          organisation_status: this.organizationForm.get('organisation_status')
-            ?.value,
-          record_version: this.currentOrg?.record_version,
-        },
-        1
+        payload,
+        this.currentOrg?.organisation_id || 0
       )
       .pipe(
         finalize(() => {
           this.modalBtn = {
             loading: false,
-            text: 'Create Crop',
-            classes: 'btn btn-primary',
+            text: 'Update Organization',
+            classes: 'btn btn-warning',
           };
         })
       )
       .subscribe(
         (resp) => {
+          console.log('Organization updated:', resp);
           this.notifierService.showSweetAlert({
             typ: 'success',
             message: 'Organization updated successfully',
             timer: true,
           });
+          this.closeModal();
           this.resetForm();
           this.getOrganizations();
         },
         (err) => {
-          console.log('org err', err);
-          const errorMessage = err.error.errors[0] || 'Invalid data submitted';
+          console.error('Update organization error:', err);
+          const errorMessage = this.extractErrorMessage(err);
           this.notifierService.showSweetAlert({
             typ: 'error',
             message: errorMessage,
@@ -328,24 +303,44 @@ export class OrganizationComponent implements OnInit {
   }
 
   resetForm() {
-    this.organizationForm.reset();
+    this.organizationForm.reset({
+      organisation_status: 'ACTIVE',
+      organisationId: null,
+    });
     this.organizationForm.markAsPristine();
-    this.modalBtn = {
-      loading: false,
-      text: 'Create Organization',
-      classes: 'btn btn-primary',
-    };
+    this.organizationForm.markAsUntouched();
+    this.formSubmitted = false;
+    this.currentOrg = null;
+  }
+
+  closeModal() {
+    // Close the Bootstrap modal programmatically
+    const modalElement = document.getElementById('exampleModal');
+    const modal = (window as any).bootstrap?.Modal?.getInstance(modalElement);
+    if (modal) {
+      modal.hide();
+    } else {
+      // Fallback: click the close button
+      document.getElementById('cancel')?.click();
+    }
   }
 
   handleSubmit() {
-    console.log('organizationForm', this.organizationForm);
+    console.log('Form values:', this.organizationForm.value);
+    console.log('Form valid:', this.organizationForm.valid);
+    console.log('Form errors:', this.getFormValidationErrors());
+
     if (this.organizationForm.invalid) {
-      console.log('invalid');
       this.formSubmitted = true;
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'Please fill all required fields correctly',
+      });
       return;
     }
 
     this.formSubmitted = false;
+
     if (this.organizationForm.get('organisationId')?.value) {
       this.updateOrganization();
     } else {
@@ -353,11 +348,70 @@ export class OrganizationComponent implements OnInit {
     }
   }
 
+  // Helper method to log form validation errors
+  getFormValidationErrors() {
+    const errors: any = {};
+    Object.keys(this.organizationForm.controls).forEach(key => {
+      const controlErrors = this.organizationForm.get(key)?.errors;
+      if (controlErrors != null) {
+        errors[key] = controlErrors;
+      }
+    });
+    return errors;
+  }
+
   alertWithError() {
     Swal.fire('Error Occurred!', 'Try again later!', 'error');
   }
 
-  getString(text: number) {
+  getString(text: any): string {
+    if (text === null || text === undefined) return '';
     return text.toString();
+  }
+
+  // Extract error messages from backend response
+  extractErrorMessage(err: any): string {
+    if (!err.error) {
+      return 'An unexpected error occurred';
+    }
+
+    // Handle field-specific errors like { "country": ["This field is required."] }
+    if (typeof err.error === 'object' && !err.error.errors) {
+      const errorFields: string[] = [];
+
+      // Map of backend field names to user-friendly names
+      const fieldMap: { [key: string]: string } = {
+        'country': 'Country',
+        'organisation_type': 'Organization Type',
+        'organisation_code': 'Organization Code',
+        'organisation_name': 'Organization Name',
+        'organisation_email': 'Organization Email',
+        'organisation_msisdn': 'Organization Phone',
+        'organisation_contact': 'Contact Person',
+        'organisation_status': 'Status'
+      };
+
+      for (const field in err.error) {
+        if (err.error.hasOwnProperty(field)) {
+          const fieldName = fieldMap[field] || field;
+          const fieldErrors = err.error[field];
+          if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+            errorFields.push(`${fieldName}: ${fieldErrors[0]}`);
+          }
+        }
+      }
+
+      if (errorFields.length > 0) {
+        return errorFields.join('\n');
+      }
+    }
+
+    // Handle errors array format like { "errors": [{ "message": "..." }] }
+    if (err.error.errors && Array.isArray(err.error.errors) && err.error.errors.length > 0) {
+      return err.error.errors[0].message || 'Invalid data submitted';
+    }
+
+    // Fallback to generic message
+    return err.error.message || 'Invalid data submitted';
   }
 }

@@ -1,113 +1,248 @@
+<!-- forcast.component.html -->
 <main id="main" class="main">
-    <div class="pagetitle">
-       <h1>Forecast Data</h1>
-       <nav>
-          <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Dashboard</li>
-             <ol class="breadcrumb-item active">Forecast Data</ol>
-          </ol>
-       </nav>
+  <div class="pagetitle">
+    <h1>Forecast Data</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <li class="breadcrumb-item active">Forecast Data</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <!-- Alert Messages -->
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+      <i class="bi bi-exclamation-triangle"></i> {{ error }}
     </div>
-    <section class="section">
 
-       <nav class="navbar navbar-ligth">
-         <div class="container-fluid">
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show">
+      <button type="button" class="btn-close" (click)="success = ''"></button>
+      <i class="bi bi-check-circle"></i> {{ success }}
+    </div>
 
-           <div class="flex-centered">
-             <!-- <button  class="btn btn-success"  type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal">Add forecast Data</button> -->
-           </div>
-         </div>
-       </nav>
-       <!--search input-->
-       <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
+    <nav class="navbar navbar-light bg-light mb-3">
+      <div class="container-fluid">
+        <div class="flex-centered">
+          <button class="btn btn-success" type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal"
+                  (click)="openAddModal()">
+            <i class="bi bi-plus-circle"></i> Add Forecast Data
+          </button>
         </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
+      </div>
+    </nav>
 
-       <table class="table table-bordered table-striped table-hover mt-3 w-100">
-         <thead>
-           <tr>
-            <!-- <th scope="col">Organization ID</th> -->
-             <th scope="col">Date Time Added</th>
-             <th scope="col">Start Date</th>
-             <th scope="col">End Date</th>
-             <th scope="col">Forecast</th>
-             <!-- <th scope="col">Action</th> -->
+    <!-- Search and Export -->
+    <div class="d-flex justify-content-between mt-2 mb-3">
+      <div class="search flex-grow-1 me-3">
+        <input class="form-control"
+               type="text"
+               [(ngModel)]="searchTerm"
+               (ngModelChange)="applySearch()"
+               placeholder="Search by location, type, or value" />
+      </div>
+      <button class="btn btn-success btn-lg"
+              type="button"
+              (click)="exportData()">
+        <i class="bi bi-download"></i> Export
+      </button>
+    </div>
 
-           </tr>
-         </thead>
-         <tbody>
-           <tr >
-            <td>Time</td>
-             <td>Start</td>
-             <td>End</td>
-             <td>forecast</td>
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
 
-             <!-- <td>
-               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                 data-bs-target="#exampleModal"   class="btn btn-warning btn-sm">Edit</button>
+    <!-- Data Table -->
+    <div *ngIf="!loading" class="table-responsive">
+      <table class="table table-bordered table-striped table-hover mt-3">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Date Time Added</th>
+            <th scope="col">Location</th>
+            <th scope="col">Value</th>
+            <th scope="col">Start Date</th>
+            <th scope="col">End Date</th>
+            <th scope="col">Status</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of paginatedData; let i = index">
+            <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td>{{ formatDateTime(item.date_time_added) }}</td>
+            <td>{{ item.location }}</td>
+            <td>{{ item.value }}</td>
+            <td>{{ formatDate(item.start_date || '') }}</td>
+            <td>{{ formatDate(item.end_date || '') }}</td>
+            <td>
+              <span class="badge bg-primary">{{ item.status || 'FORECAST' }}</span>
+            </td>
+            <td>
+              <button style="color: white;"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                      (click)="openEditModal(item)"
+                      class="btn btn-warning btn-sm me-1">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button type="button"
+                      (click)="deleteData(item)"
+                      class="btn btn-danger btn-sm">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="paginatedData.length === 0">
+            <td colspan="8" class="text-center">No forecast data found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-             </td> -->
-           </tr>
-         </tbody>
+    <!-- Pagination -->
+    <nav *ngIf="filteredData.length > pageSize">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="previousPage()">Previous</a>
+        </li>
+        <li class="page-item"
+            *ngFor="let page of [].constructor(totalPages); let i = index"
+            [class.active]="currentPage === i + 1">
+          <a class="page-link" (click)="currentPage = i + 1">{{ i + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="nextPage()">Next</a>
+        </li>
+      </ul>
+    </nav>
 
-       </table>
-
-       <!-- Modal -->
-       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-         <div class="modal-dialog">
-           <div class="modal-content">
-             <div class="modal-header">
-               <h5>Add forecast Data</h5>
-               <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-             </div>
-             <div class="modal-body">
-               <form [formGroup]="formValue">
-
-                  <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Date Time Added</label>
-                   <input type="datetime" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div>
-
-                  <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Start Date</label>
-                   <input type="date" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div>
-
-                  <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">End Date</label>
-                   <input type="date" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div>
-
-
-                 <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Forecast Status</label>
-                   <select class="form-select" formControlName="assessor">
-                     <option>Forecast</option>
-                     <!-- <option>Blacklisted</option>
-                     <option>Disable</option> -->
-                     </select>
-                     <app-error-section></app-error-section>
+    <!-- Modal -->
+    <div class="modal fade"
+         id="exampleModal"
+         tabindex="-1"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              {{ showAdd ? 'Add Forecast Data' : 'Edit Forecast Data' }}
+            </h5>
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                    (click)="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="formValue">
+              <div class="mb-3">
+                <label for="location" class="form-label">
+                  Location <span class="text-danger">*</span>
+                </label>
+                <input type="text"
+                       formControlName="location"
+                       class="form-control"
+                       id="location"
+                       placeholder="Enter location">
+                <div *ngIf="formValue.get('location')?.invalid && formValue.get('location')?.touched"
+                     class="text-danger small">
+                  Location is required
                 </div>
-                 <!-- <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Status</label>
-                   <input type="text" formControlName="email" class="form-control" id="exampleInputPassword1">
-                 </div> -->
-               </form>
-             </div>
-             <div class="modal-footer">
-               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button"  class="btn btn-primary">Save</button>
-               <!-- <button type="button" class="btn btn-primary">Update</button> -->
-             </div>
-           </div>
-         </div>
-       </div>
+              </div>
 
-      </section>
-  </main>
+              <div class="mb-3">
+                <label for="value" class="form-label">
+                  Value <span class="text-danger">*</span>
+                </label>
+                <input type="number"
+                       formControlName="value"
+                       class="form-control"
+                       id="value"
+                       step="0.01"
+                       placeholder="Enter forecast value">
+                <div *ngIf="formValue.get('value')?.invalid && formValue.get('value')?.touched"
+                     class="text-danger small">
+                  Value is required
+                </div>
+              </div>
 
+              <div class="mb-3">
+                <label for="recorded_at" class="form-label">
+                  Forecast Date <span class="text-danger">*</span>
+                </label>
+                <input type="datetime-local"
+                       formControlName="recorded_at"
+                       class="form-control"
+                       id="recorded_at">
+                <div *ngIf="formValue.get('recorded_at')?.invalid && formValue.get('recorded_at')?.touched"
+                     class="text-danger small">
+                  Forecast date/time is required
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date"
+                       formControlName="start_date"
+                       class="form-control"
+                       id="start_date">
+              </div>
+
+              <div class="mb-3">
+                <label for="end_date" class="form-label">End Date</label>
+                <input type="date"
+                       formControlName="end_date"
+                       class="form-control"
+                       id="end_date">
+              </div>
+
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" formControlName="status" id="status">
+                  <option value="FORECAST">Forecast</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="ARCHIVED">Archived</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button"
+                    id="cancel"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    (click)="closeModal()">
+              Close
+            </button>
+            <button type="button"
+                    *ngIf="showAdd"
+                    class="btn btn-primary"
+                    [disabled]="formValue.invalid || loading"
+                    (click)="saveData()">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+              <i class="bi bi-save" *ngIf="!loading"></i> Save
+            </button>
+            <button type="button"
+                    *ngIf="showUpdate"
+                    class="btn btn-primary"
+                    [disabled]="formValue.invalid || loading"
+                    (click)="updateData()">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+              <i class="bi bi-arrow-repeat" *ngIf="!loading"></i> Update
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
