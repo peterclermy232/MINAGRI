@@ -23,13 +23,25 @@
       </div>
     </nav>
 
+    <!-- Debug Info - Remove in production -->
+    <div class="alert alert-info mt-2" *ngIf="farmers.length === 0 || insuranceProducts.length === 0">
+      <strong>Debug Info:</strong>
+      <ul class="mb-0">
+        <li>Farmers loaded: {{ farmers.length }}</li>
+        <li>Insurance Products loaded: {{ insuranceProducts.length }}</li>
+        <li>All Farms loaded: {{ allFarms.length }}</li>
+        <li>Quotations loaded: {{ quotationData.length }}</li>
+      </ul>
+      <small class="text-muted">If any value is 0, check your API endpoints and Django server.</small>
+    </div>
+
     <!-- Search and Export -->
     <div class="d-flex justify-content-lg-between mt-2">
       <div class="search">
         <input
           class="form-control mt-2 mb-2 input-sm"
           type="text"
-          placeholder="Search by policy number or status..."
+          placeholder="Search by policy number, status, or farmer name..."
           [(ngModel)]="searchText"
           (ngModelChange)="onSearchChange()"
         />
@@ -64,18 +76,22 @@
         <tbody>
           <tr *ngIf="filteredQuotations.length === 0 && !isLoading">
             <td colspan="10" class="text-center">
-              No quotations found. Total quotations: {{ quotationData.length }}
+              <div class="py-3">
+                <p class="mb-1">No quotations found.</p>
+                <small class="text-muted">Total quotations in database: {{ quotationData.length }}</small>
+              </div>
             </td>
           </tr>
 
           <tr *ngFor="let row of filteredQuotations">
             <td>{{ row.quotation_id }}</td>
             <td>{{ row.policy_number || 'N/A' }}</td>
-            <td>{{ row.farmer || 'N/A' }}</td>
-            <td>{{ row.farm || 'N/A' }}</td>
-            <td>{{ row.insurance_product || 'N/A' }}</td>
-            <td>{{ row.premium_amount | currency:'KES' }}</td>
-            <td>{{ row.sum_insured | currency:'KES' }}</td>
+            <!-- Use helper functions to display names instead of IDs -->
+            <td>{{ row.farmer_name || getFarmerName(row.farmer) }}</td>
+            <td>{{ row.farm_name || getFarmName(row.farm) }}</td>
+            <td>{{ row.product_name || getProductName(row.insurance_product) }}</td>
+            <td>{{ row.premium_amount | currency:'KES ' }}</td>
+            <td>{{ row.sum_insured | currency:'KES ' }}</td>
             <td>
               <span class="badge" [ngClass]="{
                 'bg-warning': row.status === 'OPEN',
@@ -140,7 +156,7 @@
           Next
         </button>
       </div>
-      <div>Page {{ page }} of {{ totalPages }}</div>
+      <div>Page {{ page }} of {{ totalPages }} ({{ filteredQuotations.length }} items)</div>
     </div>
 
     <!-- Modal -->
@@ -155,6 +171,14 @@
           </div>
 
           <div class="modal-body">
+            <!-- Debug info in modal -->
+            <div class="alert alert-warning" *ngIf="farmers.length === 0 || insuranceProducts.length === 0">
+              <small>
+                <strong>Warning:</strong> Some dropdown data is missing.
+                <br>Farmers: {{ farmers.length }}, Products: {{ insuranceProducts.length }}
+              </small>
+            </div>
+
             <form [formGroup]="formValue">
 
               <!-- Farmer Selection -->
@@ -165,7 +189,7 @@
                   formControlName="farmer"
                   (change)="onFarmerChange($event)"
                   [class.is-invalid]="formValue.get('farmer')?.invalid && formValue.get('farmer')?.touched">
-                  <option value="">-- Select Farmer --</option>
+                  <option value="">-- Select Farmer ({{ farmers.length }} available) --</option>
                   <option *ngFor="let farmer of farmers" [value]="farmer.farmer_id">
                     {{ farmer.first_name }} {{ farmer.last_name }} ({{ farmer.id_number }})
                   </option>
@@ -180,15 +204,17 @@
                   class="form-control"
                   formControlName="farm"
                   [class.is-invalid]="formValue.get('farm')?.invalid && formValue.get('farm')?.touched"
-                  [disabled]="farms.length === 0">
-                  <option value="">-- Select Farm --</option>
+                  [disabled]="!formValue.get('farmer')?.value || farms.length === 0">
+                  <option value="">
+                    {{ formValue.get('farmer')?.value ? '-- Select Farm (' + farms.length + ' available) --' : '-- Select a farmer first --' }}
+                  </option>
                   <option *ngFor="let farm of farms" [value]="farm.farm_id">
                     {{ farm.farm_name }} ({{ farm.farm_size }} {{ farm.unit_of_measure }})
                   </option>
                 </select>
                 <div class="invalid-feedback">Farm is required</div>
-                <small *ngIf="farms.length === 0" class="text-muted">
-                  Please select a farmer first
+                <small class="text-muted" *ngIf="formValue.get('farmer')?.value && farms.length === 0">
+                  Loading farms or no farms available for this farmer...
                 </small>
               </div>
 
@@ -200,7 +226,7 @@
                   formControlName="insurance_product"
                   (change)="onProductChange($event)"
                   [class.is-invalid]="formValue.get('insurance_product')?.invalid && formValue.get('insurance_product')?.touched">
-                  <option value="">-- Select Product --</option>
+                  <option value="">-- Select Product ({{ insuranceProducts.length }} available) --</option>
                   <option *ngFor="let product of insuranceProducts" [value]="product.product_id">
                     {{ product.product_name }} (Rate: {{ product.average_premium_rate }}%)
                   </option>
@@ -216,8 +242,10 @@
                   formControlName="sum_insured"
                   class="form-control"
                   placeholder="0.00"
+                  min="0.01"
+                  step="0.01"
                   [class.is-invalid]="formValue.get('sum_insured')?.invalid && formValue.get('sum_insured')?.touched">
-                <div class="invalid-feedback">Sum Insured is required and must be positive</div>
+                <div class="invalid-feedback">Sum Insured is required and must be greater than 0</div>
               </div>
 
               <!-- Premium Amount -->
@@ -228,8 +256,10 @@
                   formControlName="premium_amount"
                   class="form-control"
                   placeholder="0.00"
+                  min="0.01"
+                  step="0.01"
                   [class.is-invalid]="formValue.get('premium_amount')?.invalid && formValue.get('premium_amount')?.touched">
-                <div class="invalid-feedback">Premium Amount is required and must be positive</div>
+                <div class="invalid-feedback">Premium Amount is required and must be greater than 0</div>
               </div>
 
               <!-- Status -->

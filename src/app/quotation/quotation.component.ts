@@ -22,6 +22,7 @@ export class QuotationComponent implements OnInit {
   // Dropdown data
   farmers: any[] = [];
   farms: any[] = [];
+  allFarms: any[] = []; // Store all farms for filtering
   insuranceProducts: any[] = [];
   selectedFarmerId: number = 0;
 
@@ -41,17 +42,22 @@ export class QuotationComponent implements OnInit {
       farmer: ['', Validators.required],
       farm: ['', Validators.required],
       insurance_product: ['', Validators.required],
-      premium_amount: [0, [Validators.required, Validators.min(0)]],
-      sum_insured: [0, [Validators.required, Validators.min(0)]],
+      premium_amount: [0, [Validators.required, Validators.min(0.01)]],
+      sum_insured: [0, [Validators.required, Validators.min(0.01)]],
       status: ['OPEN']
     });
 
     // Initialize arrays
     this.quotationData = [];
     this.filteredQuotations = [];
+    this.farmers = [];
+    this.farms = [];
+    this.allFarms = [];
+    this.insuranceProducts = [];
 
     // Load data
     this.loadFarmers();
+    this.loadAllFarms(); // Load all farms for reference
     this.loadInsuranceProducts();
     this.getAllQuotations();
   }
@@ -74,6 +80,8 @@ export class QuotationComponent implements OnInit {
   loadFarmers() {
     this.api.getFarmers().subscribe({
       next: (res) => {
+        console.log('Farmers API response:', res);
+
         if (Array.isArray(res)) {
           this.farmers = res;
         } else if (res && Array.isArray(res.results)) {
@@ -81,10 +89,38 @@ export class QuotationComponent implements OnInit {
         } else {
           this.farmers = [];
         }
+
+        console.log('Farmers loaded:', this.farmers.length);
       },
       error: (error) => {
         console.error('Error loading farmers:', error);
         this.farmers = [];
+        alert('Failed to load farmers. Please refresh the page.');
+      }
+    });
+  }
+
+  /**
+   * Load all farms (for display purposes)
+   */
+  loadAllFarms() {
+    this.api.getAllFarms().subscribe({
+      next: (res) => {
+        console.log('All Farms API response:', res);
+
+        if (Array.isArray(res)) {
+          this.allFarms = res;
+        } else if (res && Array.isArray(res.results)) {
+          this.allFarms = res.results;
+        } else {
+          this.allFarms = [];
+        }
+
+        console.log('All farms loaded:', this.allFarms.length);
+      },
+      error: (error) => {
+        console.error('Error loading all farms:', error);
+        this.allFarms = [];
       }
     });
   }
@@ -94,11 +130,14 @@ export class QuotationComponent implements OnInit {
    */
   onFarmerChange(event: any) {
     const farmerId = event.target.value;
+    console.log('Farmer selected:', farmerId);
+
     if (farmerId) {
       this.selectedFarmerId = Number(farmerId);
       this.loadFarmsByFarmer(this.selectedFarmerId);
     } else {
       this.farms = [];
+      this.formValue.patchValue({ farm: '' });
     }
   }
 
@@ -106,8 +145,12 @@ export class QuotationComponent implements OnInit {
    * Load farms by farmer ID
    */
   loadFarmsByFarmer(farmerId: number) {
+    console.log('Loading farms for farmer ID:', farmerId);
+
     this.api.getFarmsByFarmer(farmerId).subscribe({
       next: (res) => {
+        console.log('Farms API response:', res);
+
         if (Array.isArray(res)) {
           this.farms = res;
         } else if (res && Array.isArray(res.results)) {
@@ -115,10 +158,17 @@ export class QuotationComponent implements OnInit {
         } else {
           this.farms = [];
         }
+
+        console.log('Farms loaded for farmer:', this.farms.length);
+
+        if (this.farms.length === 0) {
+          alert('No farms found for this farmer. Please add a farm first.');
+        }
       },
       error: (error) => {
         console.error('Error loading farms:', error);
         this.farms = [];
+        alert('Failed to load farms for this farmer.');
       }
     });
   }
@@ -129,6 +179,8 @@ export class QuotationComponent implements OnInit {
   loadInsuranceProducts() {
     this.api.getInsuranceProducts('ACTIVE').subscribe({
       next: (res) => {
+        console.log('Insurance Products API response:', res);
+
         if (Array.isArray(res)) {
           this.insuranceProducts = res;
         } else if (res && Array.isArray(res.results)) {
@@ -136,10 +188,13 @@ export class QuotationComponent implements OnInit {
         } else {
           this.insuranceProducts = [];
         }
+
+        console.log('Insurance products loaded:', this.insuranceProducts.length);
       },
       error: (error) => {
         console.error('Error loading insurance products:', error);
         this.insuranceProducts = [];
+        alert('Failed to load insurance products. Please refresh the page.');
       }
     });
   }
@@ -149,16 +204,49 @@ export class QuotationComponent implements OnInit {
    */
   onProductChange(event: any) {
     const productId = Number(event.target.value);
+    console.log('Product selected:', productId);
+
     if (productId) {
       const product = this.insuranceProducts.find(p => p.product_id === productId);
-      if (product) {
-        // Auto-fill sum_insured from product
+      if (product && product.average_premium_rate) {
+        const sumInsured = this.formValue.get('sum_insured')?.value || 0;
+        const calculatedPremium = sumInsured * (product.average_premium_rate / 100);
+
+        console.log('Auto-calculating premium:', {
+          sumInsured,
+          rate: product.average_premium_rate,
+          premium: calculatedPremium
+        });
+
         this.formValue.patchValue({
-          sum_insured: product.sum_insured,
-          premium_amount: product.sum_insured * (product.average_premium_rate / 100)
+          premium_amount: calculatedPremium
         });
       }
     }
+  }
+
+  /**
+   * Helper function to get farmer name by ID
+   */
+  getFarmerName(farmerId: number): string {
+    const farmer = this.farmers.find(f => f.farmer_id === farmerId);
+    return farmer ? `${farmer.first_name} ${farmer.last_name}` : 'N/A';
+  }
+
+  /**
+   * Helper function to get farm name by ID
+   */
+  getFarmName(farmId: number): string {
+    const farm = this.allFarms.find(f => f.farm_id === farmId);
+    return farm ? farm.farm_name : 'N/A';
+  }
+
+  /**
+   * Helper function to get product name by ID
+   */
+  getProductName(productId: number): string {
+    const product = this.insuranceProducts.find(p => p.product_id === productId);
+    return product ? product.product_name : 'N/A';
   }
 
   /**
@@ -168,16 +256,20 @@ export class QuotationComponent implements OnInit {
     this.isLoading = true;
     this.api.getQuotations().subscribe({
       next: (res) => {
-        console.log('Quotations loaded from API:', res);
+        console.log('Quotations API response:', res);
 
         if (Array.isArray(res)) {
           this.quotationData = res;
         } else if (res && Array.isArray(res.results)) {
           this.quotationData = res.results;
+        } else if (res && Array.isArray(res.quotations)) {
+          // Handle the case where backend returns {quotations: [...]}
+          this.quotationData = res.quotations;
         } else {
           this.quotationData = [];
         }
 
+        console.log('Quotations loaded:', this.quotationData.length);
         this.applyFilters();
         this.isLoading = false;
       },
@@ -201,27 +293,51 @@ export class QuotationComponent implements OnInit {
     });
 
     if (this.formValue.invalid) {
+      console.log('Form validation errors:', this.formValue.errors);
       alert('Please fill in all required fields correctly');
       return;
     }
 
     this.isLoading = true;
-    const quotationData = this.formValue.value;
+    const quotationData = {
+      farmer: Number(this.formValue.value.farmer),
+      farm: Number(this.formValue.value.farm),
+      insurance_product: Number(this.formValue.value.insurance_product),
+      premium_amount: Number(this.formValue.value.premium_amount),
+      sum_insured: Number(this.formValue.value.sum_insured),
+      status: this.formValue.value.status
+    };
+
+    console.log('Creating quotation with data:', quotationData);
 
     this.api.postQuotation(quotationData).subscribe({
       next: (res) => {
-        console.log('Quotation created:', res);
-        alert('Quotation Created Successfully');
+        console.log('Quotation created successfully:', res);
+        alert('Quotation Created Successfully!');
         let ref = document.getElementById('cancel');
         ref?.click();
         this.formValue.reset();
+        this.farms = [];
         this.getAllQuotations();
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error creating quotation:', error);
         this.isLoading = false;
-        const errorMsg = error.error?.detail || error.error?.message || 'Something went wrong';
+
+        let errorMsg = 'Something went wrong';
+        if (error.error) {
+          if (typeof error.error === 'string') {
+            errorMsg = error.error;
+          } else if (error.error.detail) {
+            errorMsg = error.error.detail;
+          } else if (error.error.message) {
+            errorMsg = error.error.message;
+          } else if (error.error.errors) {
+            errorMsg = JSON.stringify(error.error.errors);
+          }
+        }
+
         alert(`Failed to create quotation: ${errorMsg}`);
       }
     });
@@ -271,22 +387,43 @@ export class QuotationComponent implements OnInit {
     }
 
     this.isLoading = true;
-    const quotationData = this.formValue.value;
+    const quotationData = {
+      farmer: Number(this.formValue.value.farmer),
+      farm: Number(this.formValue.value.farm),
+      insurance_product: Number(this.formValue.value.insurance_product),
+      premium_amount: Number(this.formValue.value.premium_amount),
+      sum_insured: Number(this.formValue.value.sum_insured),
+      status: this.formValue.value.status
+    };
+
+    console.log('Updating quotation:', this.quotationModelObj.id, quotationData);
 
     this.api.updateQuotation(quotationData, this.quotationModelObj.id).subscribe({
       next: (res) => {
-        console.log('Quotation updated:', res);
-        alert('Updated Successfully');
+        console.log('Quotation updated successfully:', res);
+        alert('Updated Successfully!');
         let ref = document.getElementById('cancel');
         ref?.click();
         this.formValue.reset();
+        this.farms = [];
         this.getAllQuotations();
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error updating quotation:', error);
         this.isLoading = false;
-        const errorMsg = error.error?.detail || error.error?.message || 'Something went wrong';
+
+        let errorMsg = 'Something went wrong';
+        if (error.error) {
+          if (typeof error.error === 'string') {
+            errorMsg = error.error;
+          } else if (error.error.detail) {
+            errorMsg = error.error.detail;
+          } else if (error.error.errors) {
+            errorMsg = JSON.stringify(error.error.errors);
+          }
+        }
+
         alert(`Failed to update quotation: ${errorMsg}`);
       }
     });
@@ -300,7 +437,7 @@ export class QuotationComponent implements OnInit {
       this.isLoading = true;
       this.api.deleteQuotation(id).subscribe({
         next: (res) => {
-          console.log('Quotation deleted:', res);
+          console.log('Quotation deleted successfully:', res);
           alert('Quotation deleted successfully');
           this.getAllQuotations();
           this.isLoading = false;
@@ -319,18 +456,25 @@ export class QuotationComponent implements OnInit {
    */
   markAsPaid(id: number) {
     const paymentRef = prompt('Enter payment reference:');
-    if (paymentRef) {
+    if (paymentRef && paymentRef.trim()) {
       this.isLoading = true;
       this.api.markAsPaid(id, paymentRef).subscribe({
         next: (res) => {
-          alert('Quotation marked as paid successfully');
+          console.log('Marked as paid:', res);
+          alert('Quotation marked as paid successfully!');
           this.getAllQuotations();
           this.isLoading = false;
         },
         error: (error) => {
           console.error('Error marking as paid:', error);
           this.isLoading = false;
-          alert('Failed to mark as paid');
+
+          let errorMsg = 'Failed to mark as paid';
+          if (error.error?.error) {
+            errorMsg = error.error.error;
+          }
+
+          alert(errorMsg);
         }
       });
     }
@@ -344,6 +488,7 @@ export class QuotationComponent implements OnInit {
       this.isLoading = true;
       this.api.writePolicy(id).subscribe({
         next: (res) => {
+          console.log('Policy written:', res);
           alert(`Policy written successfully! Policy Number: ${res.policy_number}`);
           this.getAllQuotations();
           this.isLoading = false;
@@ -351,7 +496,12 @@ export class QuotationComponent implements OnInit {
         error: (error) => {
           console.error('Error writing policy:', error);
           this.isLoading = false;
-          const errorMsg = error.error?.error || 'Failed to write policy';
+
+          let errorMsg = 'Failed to write policy';
+          if (error.error?.error) {
+            errorMsg = error.error.error;
+          }
+
           alert(errorMsg);
         }
       });
@@ -378,7 +528,11 @@ export class QuotationComponent implements OnInit {
       data = data.filter(item => {
         const policyNumber = (item.policy_number || '').toLowerCase();
         const status = (item.status || '').toLowerCase();
-        return policyNumber.includes(searchLower) || status.includes(searchLower);
+        const farmerName = this.getFarmerName(item.farmer).toLowerCase();
+
+        return policyNumber.includes(searchLower) ||
+               status.includes(searchLower) ||
+               farmerName.includes(searchLower);
       });
     }
 
@@ -396,6 +550,14 @@ export class QuotationComponent implements OnInit {
     const end = start + this.pageSize;
 
     this.filteredQuotations = data.slice(start, end);
+
+    console.log('Filters applied:', {
+      total: this.quotationData.length,
+      filtered: data.length,
+      displayed: this.filteredQuotations.length,
+      page: this.page,
+      totalPages: this.totalPages
+    });
   }
 
   /**

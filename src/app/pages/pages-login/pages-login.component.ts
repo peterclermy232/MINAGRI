@@ -53,10 +53,10 @@ export class PagesLoginComponent implements OnInit {
       loading: true,
     };
 
-    const username = this.loginForm.get('username')!.value;
+    const user_name = this.loginForm.get('username')!.value;
     const password = this.loginForm.get('password')!.value;
     this.authService
-      .appUserLogin(username, password)
+      .appUserLogin(user_name, password)
       .pipe(
         finalize(() => {
           this.loginBtn = {

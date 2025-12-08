@@ -29,7 +29,10 @@ export class QuotationService {
 
     return this.http.get<any>(`${this.baseUrl}/`, { params })
       .pipe(
-        map((res: any) => res),
+        map((res: any) => {
+          console.log('Quotations API raw response:', res);
+          return res;
+        }),
         catchError(this.handleError)
       );
   }
@@ -38,9 +41,13 @@ export class QuotationService {
    * Create a new quotation
    */
   postQuotation(data: any): Observable<any> {
+    console.log('Creating quotation with data:', data);
     return this.http.post<any>(`${this.baseUrl}/`, data)
       .pipe(
-        map((res: any) => res),
+        map((res: any) => {
+          console.log('Quotation created response:', res);
+          return res;
+        }),
         catchError(this.handleError)
       );
   }
@@ -49,9 +56,13 @@ export class QuotationService {
    * Update an existing quotation
    */
   updateQuotation(data: any, id: number): Observable<any> {
+    console.log('Updating quotation:', id, data);
     return this.http.put<any>(`${this.baseUrl}/${id}/`, data)
       .pipe(
-        map((res: any) => res),
+        map((res: any) => {
+          console.log('Quotation updated response:', res);
+          return res;
+        }),
         catchError(this.handleError)
       );
   }
@@ -93,6 +104,7 @@ export class QuotationService {
    * Mark quotation as paid
    */
   markAsPaid(id: number, paymentReference: string): Observable<any> {
+    console.log('Marking quotation as paid:', id, paymentReference);
     return this.http.post<any>(`${this.baseUrl}/${id}/mark_paid/`, {
       payment_reference: paymentReference
     })
@@ -106,6 +118,7 @@ export class QuotationService {
    * Write policy from quotation
    */
   writePolicy(id: number): Observable<any> {
+    console.log('Writing policy for quotation:', id);
     return this.http.post<any>(`${this.baseUrl}/${id}/write_policy/`, {})
       .pipe(
         map((res: any) => res),
@@ -124,7 +137,24 @@ export class QuotationService {
 
     return this.http.get<any>(`${this.farmerUrl}/`, { params })
       .pipe(
-        map((res: any) => res),
+        map((res: any) => {
+          console.log('Farmers API raw response:', res);
+          return res;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Get all farms (for display purposes)
+   */
+  getAllFarms(): Observable<any> {
+    return this.http.get<any>(`${this.farmUrl}/`)
+      .pipe(
+        map((res: any) => {
+          console.log('All Farms API raw response:', res);
+          return res;
+        }),
         catchError(this.handleError)
       );
   }
@@ -137,7 +167,10 @@ export class QuotationService {
 
     return this.http.get<any>(`${this.farmUrl}/`, { params })
       .pipe(
-        map((res: any) => res),
+        map((res: any) => {
+          console.log('Farms by farmer API raw response:', res);
+          return res;
+        }),
         catchError(this.handleError)
       );
   }
@@ -153,7 +186,10 @@ export class QuotationService {
 
     return this.http.get<any>(`${this.productUrl}/`, { params })
       .pipe(
-        map((res: any) => res),
+        map((res: any) => {
+          console.log('Insurance Products API raw response:', res);
+          return res;
+        }),
         catchError(this.handleError)
       );
   }
@@ -162,7 +198,19 @@ export class QuotationService {
    * Error handling
    */
   private handleError(error: any) {
-    console.error('An error occurred:', error);
+    console.error('API Error occurred:', error);
+
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      console.error('Client-side error:', error.error.message);
+    } else {
+      // Server-side error
+      console.error(
+        `Backend returned code ${error.status}, ` +
+        `body was: ${JSON.stringify(error.error)}`
+      );
+    }
+
     return throwError(() => error);
   }
 }

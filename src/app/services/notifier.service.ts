@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
+
 @Injectable({
   providedIn: 'root',
 })
 export class NotifierService {
   constructor() {}
+
+  // ------------------- TOAST NOTIFICATION -------------------
   showToast(data: { typ: 'success' | 'error'; message: string }) {
     const Toast = Swal.mixin({
       toast: true,
@@ -18,34 +21,56 @@ export class NotifierService {
       },
     });
 
-    Toast.fire({
+    return Toast.fire({
       icon: data.typ,
       title: data.message,
     });
   }
 
+  // ------------------- SWEET ALERT (INFO, WARN, ERROR, SUCCESS) -------------------
   showSweetAlert(data: {
-    typ: 'success' | 'error';
+    typ: 'success' | 'error' | 'warning';
     message: string;
     timer?: boolean;
-  }) {
-    const title = data.typ === 'success' ? 'Success!' : 'Error Occurred!';
+  }): Promise<any> {
+    const title =
+      data.typ === 'success'
+        ? 'Success!'
+        : data.typ === 'warning'
+        ? 'Warning!'
+        : 'Error!';
+
     if (data.timer) {
-      console.log('has timer');
-      Swal.fire({
-        icon: data.typ,
+      return Swal.fire({
+        icon: data.typ as SweetAlertIcon,
         title,
         text: data.message,
         timer: 2000,
         showCancelButton: false,
         showConfirmButton: false,
       });
-    } else {
-      Swal.fire({
-        icon: data.typ,
-        title,
-        text: data.message,
-      });
     }
+
+    return Swal.fire({
+      icon: data.typ as SweetAlertIcon,
+      title,
+      text: data.message,
+    });
+  }
+
+  // ------------------- CONFIRMATION DIALOG -------------------
+  confirm(
+    message: string,
+    confirmText: string = 'Yes',
+    cancelText: string = 'Cancel'
+  ): Promise<any> {
+    return Swal.fire({
+      icon: 'warning',
+      title: 'Are you sure?',
+      html: `<div style="font-size:16px">${message}</div>`,
+      showCancelButton: true,
+      confirmButtonText: confirmText,
+      cancelButtonText: cancelText,
+    });
   }
 }

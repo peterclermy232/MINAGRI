@@ -45,7 +45,7 @@ export class PagesRegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOrganizations();
-    this.loadCountries();
+    //this.loadCountries();
   }
 
   // Custom validator to check if passwords match

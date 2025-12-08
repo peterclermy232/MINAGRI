@@ -1,6 +1,5 @@
-// weather.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -16,139 +15,144 @@ export interface WeatherData {
   status?: string;
 }
 
-export interface HistoricalData extends WeatherData {
-  data_type: 'HISTORICAL';
-}
-
 export interface ForecastData extends WeatherData {
   data_type: 'FORECAST';
+}
+
+export interface HistoricalData extends WeatherData {
+  data_type: 'HISTORICAL';
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class WeatherService {
-  private apiUrl = `${environment.apiUrl}/weather_data`;
+  private baseUrl = `${environment.apiUrl}/weather_data`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token');
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': token ? `Bearer ${token}` : ''
     });
   }
 
-  // ============== WEATHER DATA ENDPOINTS ==============
+  // Get all weather data
+  getAllWeatherData(): Observable<WeatherData[]> {
+    return this.http.get<WeatherData[]>(`${this.baseUrl}/`, {
+      headers: this.getHeaders()
+    });
+  }
 
-  getWeatherData(params?: any): Observable<WeatherData[]> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key]);
-        }
-      });
-    }
-    return this.http.get<WeatherData[]>(`${this.apiUrl}/`, {
+  // Get forecast data
+  getForecastData(): Observable<ForecastData[]> {
+    return this.http.get<ForecastData[]>(`${this.baseUrl}/`, {
       headers: this.getHeaders(),
-      params: httpParams
+      params: { type: 'FORECAST' }
     });
   }
 
+  // Get historical data
+  getHistoricalData(): Observable<HistoricalData[]> {
+    return this.http.get<HistoricalData[]>(`${this.baseUrl}/`, {
+      headers: this.getHeaders(),
+      params: { type: 'HISTORICAL' }
+    });
+  }
+
+  // Get single weather data
   getWeatherDataById(id: number): Observable<WeatherData> {
-    return this.http.get<WeatherData>(`${this.apiUrl}/${id}/`, {
+    return this.http.get<WeatherData>(`${this.baseUrl}/${id}/`, {
       headers: this.getHeaders()
     });
   }
 
-  createWeatherData(data: Partial<WeatherData>): Observable<WeatherData> {
-    return this.http.post<WeatherData>(`${this.apiUrl}/`, data, {
+  // Create forecast data
+  createForecastData(data: any): Observable<ForecastData> {
+    return this.http.post<ForecastData>(`${this.baseUrl}/`, data, {
       headers: this.getHeaders()
     });
   }
 
-  updateWeatherData(id: number, data: Partial<WeatherData>): Observable<WeatherData> {
-    return this.http.patch<WeatherData>(`${this.apiUrl}/${id}/`, data, {
+  // Create historical data
+  createHistoricalData(data: any): Observable<HistoricalData> {
+    return this.http.post<HistoricalData>(`${this.baseUrl}/`, data, {
       headers: this.getHeaders()
     });
   }
 
+  // Update weather data
+  updateWeatherData(id: number, data: any): Observable<WeatherData> {
+    return this.http.put<WeatherData>(`${this.baseUrl}/${id}/`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // Delete weather data
   deleteWeatherData(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}/`, {
+    return this.http.delete(`${this.baseUrl}/${id}/`, {
       headers: this.getHeaders()
     });
   }
 
-  // ============== HISTORICAL DATA METHODS ==============
-
-  getHistoricalData(params?: any): Observable<HistoricalData[]> {
-    return this.getWeatherData({ ...params, type: 'HISTORICAL' }) as Observable<HistoricalData[]>;
-  }
-
-  createHistoricalData(data: Partial<HistoricalData>): Observable<HistoricalData> {
-    return this.createWeatherData({ ...data, data_type: 'HISTORICAL' }) as Observable<HistoricalData>;
-  }
-
-  // ============== FORECAST DATA METHODS ==============
-
-  getForecastData(params?: any): Observable<ForecastData[]> {
-    return this.getWeatherData({ ...params, type: 'FORECAST' }) as Observable<ForecastData[]>;
-  }
-
-  createForecastData(data: Partial<ForecastData>): Observable<ForecastData> {
-    return this.createWeatherData({ ...data, data_type: 'FORECAST' }) as Observable<ForecastData>;
-  }
-
-  // ============== UTILITY METHODS ==============
-
-  exportToCSV(data: WeatherData[], filename: string): void {
+  // Export to CSV
+  exportToCSV(data: any[], filename: string): void {
     const headers = [
-      'Date Time Added',
-      'Location',
-      'Data Type',
-      'Value',
-      'Recorded At',
-      'Start Date',
-      'End Date',
-      'Status'
+      'ID', 'Location', 'Data Type', 'Value',
+      'Recorded At', 'Start Date', 'End Date',
+      'Status', 'Date Added'
     ];
 
     const rows = data.map(item => [
-      this.formatDateTime(item.date_time_added),
-      item.location,
-      item.data_type,
-      item.value.toString(),
+      item.weather_id || '',
+      item.location || '',
+      item.data_type || '',
+      item.value || '',
       this.formatDateTime(item.recorded_at),
-      item.start_date || 'N/A',
-      item.end_date || 'N/A',
-      item.status || 'N/A'
+      this.formatDate(item.start_date || ''),
+      this.formatDate(item.end_date || ''),
+      item.status || '',
+      this.formatDateTime(item.date_time_added)
     ]);
 
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.map(cell =>
-        typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell
-      ).join(','))
-    ].join('\n');
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += headers.join(',') + '\n';
+    rows.forEach(rowArray => {
+      csvContent += rowArray.map(field => `"${field}"`).join(',') + '\n';
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
+    const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
-    link.href = url;
-    link.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`;
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `${filename}_${new Date().getTime()}.csv`);
+    document.body.appendChild(link);
     link.click();
-    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
   }
 
+  // Format datetime for display
   formatDateTime(dateString: string): string {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
+  // Format date for display
   formatDate(dateString: string): string {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   }
 }

@@ -38,7 +38,7 @@ export class PendingComponent implements OnInit {
   approvedAmount: number = 0;
 
   private apiUrl = `${environment.apiUrl}/claims/`;
-  private assessorUrl = `${environment.apiUrl}/loss-assessors/`;
+  private assessorUrl = `${environment.apiUrl}/loss_assessors/`;
 
   constructor(private http: HttpClient) { }
 

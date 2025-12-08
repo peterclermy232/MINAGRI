@@ -61,7 +61,7 @@ export class ApiInterceptor implements HttpInterceptor {
       catchError((error) => {
         // Refresh failed, logout user
         this.authService.logout().subscribe();
-        this.router.navigate(['/pages-login']);
+        this.router.navigate(['/login']);
         return throwError(() => error);
       })
     );

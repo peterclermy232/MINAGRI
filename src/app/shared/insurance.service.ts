@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class InsuranceService {
-  private baseUrl = `${environment.apiUrl}/insurance-products`;
+  private baseUrl = `${environment.apiUrl}/insurance_products`;
 
   constructor(private http: HttpClient) { }
 
