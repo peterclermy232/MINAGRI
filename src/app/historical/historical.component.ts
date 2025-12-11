@@ -55,8 +55,8 @@ export class HistoricalComponent implements OnInit {
 
     this.weatherService.getHistoricalData().subscribe({
       next: (data) => {
-        this.historicalDataList = data;
-        this.filteredData = data;
+        this.historicalDataList = data.results;
+        this.filteredData = data.results;
         this.updatePagination();
         this.loading = false;
       },

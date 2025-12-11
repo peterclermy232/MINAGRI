@@ -21,8 +21,8 @@ export class PaidService {
   }
 
   // Get paid quotations
-  getPaidQuotations(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/`, {
+  getPaidQuotations(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/`, {
       headers: this.getHeaders(),
       params: { status: 'PAID' }
     });

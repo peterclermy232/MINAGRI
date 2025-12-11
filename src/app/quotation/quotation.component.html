@@ -204,11 +204,11 @@
                   class="form-control"
                   formControlName="farm"
                   [class.is-invalid]="formValue.get('farm')?.invalid && formValue.get('farm')?.touched"
-                  [disabled]="!formValue.get('farmer')?.value || farms.length === 0">
+                  [disabled]="!formValue.get('farmer')?.value || allFarms.length === 0">
                   <option value="">
-                    {{ formValue.get('farmer')?.value ? '-- Select Farm (' + farms.length + ' available) --' : '-- Select a farmer first --' }}
+                    {{ formValue.get('farmer')?.value ? '-- Select Farm (' + allFarms.length + ' available) --' : '-- Select a farmer first --' }}
                   </option>
-                  <option *ngFor="let farm of farms" [value]="farm.farm_id">
+                  <option *ngFor="let farm of allFarms" [value]="farm.farm_id">
                     {{ farm.farm_name }} ({{ farm.farm_size }} {{ farm.unit_of_measure }})
                   </option>
                 </select>

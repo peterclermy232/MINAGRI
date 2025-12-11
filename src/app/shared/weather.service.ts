@@ -13,14 +13,22 @@ export interface WeatherData {
   start_date?: string;
   end_date?: string;
   status?: string;
+  results: any[];
 }
 
 export interface ForecastData extends WeatherData {
   data_type: 'FORECAST';
+  results: any[];
 }
 
 export interface HistoricalData extends WeatherData {
   data_type: 'HISTORICAL';
+}
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }
 
 @Injectable({
@@ -47,16 +55,16 @@ export class WeatherService {
   }
 
   // Get forecast data
-  getForecastData(): Observable<ForecastData[]> {
-    return this.http.get<ForecastData[]>(`${this.baseUrl}/`, {
+  getForecastData(): Observable<PaginatedResponse<ForecastData>> {
+    return this.http.get<PaginatedResponse<ForecastData>>(`${this.baseUrl}/`, {
       headers: this.getHeaders(),
       params: { type: 'FORECAST' }
     });
   }
 
   // Get historical data
-  getHistoricalData(): Observable<HistoricalData[]> {
-    return this.http.get<HistoricalData[]>(`${this.baseUrl}/`, {
+  getHistoricalData(): Observable<PaginatedResponse<HistoricalData>> {
+    return this.http.get<PaginatedResponse<HistoricalData>>(`${this.baseUrl}/`, {
       headers: this.getHeaders(),
       params: { type: 'HISTORICAL' }
     });

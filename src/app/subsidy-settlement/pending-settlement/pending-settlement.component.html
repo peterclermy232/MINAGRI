@@ -1,0 +1,278 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Pending Settlement</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Subsidy Settlement</li>
+        <li class="breadcrumb-item active">Pending Settlement</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <!-- Alert Messages -->
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+      <button type="button" class="btn-close" (click)="error = ''"></button>
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show">
+      <button type="button" class="btn-close" (click)="success = ''"></button>
+      <i class="bi bi-check-circle me-2"></i>{{ success }}
+    </div>
+
+    <!-- Action Bar -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                   (ngModelChange)="applyFilters()"
+                   placeholder="Search invoices...">
+          </div>
+          <div class="col-md-8 text-end">
+            <button class="btn btn-primary me-2" (click)="openBulkSettleModal()"
+                    [disabled]="selectedInvoices.size === 0">
+              <i class="bi bi-check-circle"></i> Settle Selected ({{ selectedInvoices.size }})
+            </button>
+            <button class="btn btn-success me-2" (click)="exportToExcel()">
+              <i class="bi bi-file-earmark-excel"></i> Export
+            </button>
+            <button class="btn btn-info" (click)="loadPendingInvoices()">
+              <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <div class="card bg-warning text-white">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-clock-history"></i> Pending Settlement
+            </h5>
+            <h3>{{ filteredInvoices.length }}</h3>
+            <p class="mb-0">Total Invoices</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-currency-dollar"></i> Total Amount
+            </h5>
+            <h3>{{ formatCurrency(getTotalAmount()) }}</h3>
+            <p class="mb-0">Awaiting Settlement</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-success text-white">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-check-square"></i> Selected
+            </h5>
+            <h3>{{ formatCurrency(getSelectedAmount()) }}</h3>
+            <p class="mb-0">{{ selectedInvoices.size }} invoices selected</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div *ngIf="!loading" class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" [checked]="selectAll"
+                         (change)="toggleSelectAll()">
+                </th>
+                <th>#</th>
+                <th>Invoice Number</th>
+                <th>Organisation</th>
+                <th>Subsidy</th>
+                <th>Amount</th>
+                <th>Approved Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let invoice of paginatedInvoices; let i = index">
+                <td>
+                  <input type="checkbox"
+                         [checked]="isSelected(invoice.invoice_id)"
+                         (change)="toggleSelection(invoice.invoice_id)">
+                </td>
+                <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                <td><strong>{{ invoice.invoice_number }}</strong></td>
+                <td>{{ invoice.organisation_name }}</td>
+                <td>{{ invoice.subsidy_name }}</td>
+                <td class="text-end">
+                  <strong class="text-primary">{{ formatCurrency(invoice.amount) }}</strong>
+                </td>
+                <td>{{ formatDate(invoice.approved_date) }}</td>
+                <td>
+                  <button class="btn btn-sm btn-success"
+                          (click)="openSettleModal(invoice)">
+                    <i class="bi bi-cash-coin"></i> Settle
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="paginatedInvoices.length === 0">
+                <td colspan="8" class="text-center text-muted">
+                  <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                  <p class="mt-2">No invoices pending settlement</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav *ngIf="totalPages > 1">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="previousPage()">Previous</a>
+            </li>
+            <li class="page-item" *ngFor="let p of [].constructor(totalPages); let i = index"
+                [class.active]="currentPage === i + 1">
+              <a class="page-link" (click)="currentPage = i + 1">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="nextPage()">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Single Settlement Modal -->
+<div class="modal fade" [class.show]="showSettleModal" [style.display]="showSettleModal ? 'block' : 'none'"
+     tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-cash-coin"></i> Settle Invoice
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeSettleModal()"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedInvoice">
+        <div class="mb-3">
+          <label class="form-label"><strong>Invoice Number:</strong></label>
+          <p class="text-primary">{{ selectedInvoice.invoice_number }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><strong>Organisation:</strong></label>
+          <p>{{ selectedInvoice.organisation_name }}</p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><strong>Amount:</strong></label>
+          <p class="text-success fs-4">
+            <strong>{{ formatCurrency(selectedInvoice.amount) }}</strong>
+          </p>
+        </div>
+        <div class="mb-3">
+          <label for="settlementRef" class="form-label">
+            <strong>Payment Reference *</strong>
+          </label>
+          <input type="text" id="settlementRef" class="form-control"
+                 [(ngModel)]="settlementReference"
+                 placeholder="Enter payment/transaction reference">
+          <small class="text-muted">
+            Enter the reference from your payment system
+          </small>
+        </div>
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle"></i>
+          This invoice will be marked as settled and moved to the settled invoices list.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeSettleModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-success"
+                [disabled]="!settlementReference || loading"
+                (click)="settleInvoice()">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i class="bi bi-check-circle" *ngIf="!loading"></i>
+          Settle Invoice
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Settlement Modal -->
+<div class="modal fade" [class.show]="showBulkSettleModal"
+     [style.display]="showBulkSettleModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-cash-stack"></i> Bulk Settlement
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeBulkSettleModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-primary">
+          <h6><i class="bi bi-info-circle"></i> Settlement Summary</h6>
+          <p class="mb-1"><strong>Number of Invoices:</strong> {{ selectedInvoices.size }}</p>
+          <p class="mb-0"><strong>Total Amount:</strong> {{ formatCurrency(getSelectedAmount()) }}</p>
+        </div>
+
+        <div class="mb-3">
+          <label for="bulkPaymentRef" class="form-label">
+            <strong>Bulk Payment Reference *</strong>
+          </label>
+          <input type="text" id="bulkPaymentRef" class="form-control"
+                 [(ngModel)]="bulkPaymentReference"
+                 placeholder="Enter bulk payment reference">
+          <small class="text-muted">
+            This reference will be applied to all selected invoices
+          </small>
+        </div>
+
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle"></i>
+          <strong>Warning:</strong> This action will settle {{ selectedInvoices.size }} invoices.
+          Please ensure the payment has been processed before proceeding.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeBulkSettleModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary"
+                [disabled]="!bulkPaymentReference || loading"
+                (click)="bulkSettleInvoices()">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i class="bi bi-check-all" *ngIf="!loading"></i>
+          Settle {{ selectedInvoices.size }} Invoices
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade" [class.show]="showSettleModal || showBulkSettleModal"
+     *ngIf="showSettleModal || showBulkSettleModal"></div>

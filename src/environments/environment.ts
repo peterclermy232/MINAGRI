@@ -6,7 +6,7 @@ export const environment: ENV = {
   // Django API configuration
   apiUrl: 'http://127.0.0.1:8001/api/v1',
   authUrl: 'http://127.0.0.1:8001/api/v1/auth',
-
+// 8000
   // Legacy fields (keep for compatibility)
   consumer_key: 'hpHBZ6V_SxZUzeJX2VuwPnpLwb4a',
   consumer_secret: '6psbCCyfbTi3rrN0ybApNr4C2Wka',

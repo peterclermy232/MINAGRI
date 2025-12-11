@@ -33,12 +33,9 @@ import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.componen
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FarmerComponent } from './farmer/farmer.component';
 import { QuotationComponent } from './quotation/quotation.component';
-import { InsuranceComponent } from './insurance/insurance.component';
+import { SubsidyComponent } from './subsidy/subsidy.component';
 import { PaidComponent } from './paid/paid.component';
-import { InvoiceComponent } from './invoice/invoice.component';
-import { ApprovedComponent } from './components/approved/approved.component';
 import { PendingComponent } from './pending/pending.component';
-import { SettledComponent } from './settled/settled.component';
 import { ClaimComponent } from './components/claim/claim.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
@@ -60,6 +57,10 @@ import { FilterPipe } from './pipes/filter.pipe';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { MockBackendInterceptor } from './interceptors/mock-backend.interceptor';
 import { InMemoryDataService } from './shared/in-memory-data.service';
+import { PendingSettlementComponent } from './subsidy-settlement/pending-settlement/pending-settlement.component';
+import { InvoiceService } from './shared/invoice';
+import { SettledComponent } from './subsidy-settlement/settled/settled.component';
+import { ApprovedComponent } from './subsidy-settlement/approved/approved.component';
 
 @NgModule({
   declarations: [
@@ -94,12 +95,9 @@ import { InMemoryDataService } from './shared/in-memory-data.service';
     ManageSubsidyComponent,
     FarmerComponent,
     QuotationComponent,
-    InsuranceComponent,
+    SubsidyComponent,
     PaidComponent,
-    InvoiceComponent,
-    ApprovedComponent,
     PendingComponent,
-    SettledComponent,
     ClaimComponent,
     PaymentComponent,
     PaidClaimComponent,
@@ -107,8 +105,10 @@ import { InMemoryDataService } from './shared/in-memory-data.service';
     ForcastComponent,
     HistoricalComponent,
     AdvisoryComponent,
-    FilterPipe
-
+    FilterPipe,
+    PendingSettlementComponent,
+    ApprovedComponent,
+    SettledComponent
   ],
   imports: [
     BrowserModule,
@@ -138,6 +138,7 @@ import { InMemoryDataService } from './shared/in-memory-data.service';
     //   multi: true,
     // },
     AdvisoryService,
+    InvoiceService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptor,

@@ -1,0 +1,159 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Subsidy Management</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <li class="breadcrumb-item active">Subsidies</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <div class="d-flex">
+          <button class="btn btn-success" (click)="clickAddSubsidy()" type="button" data-bs-toggle="modal"
+            data-bs-target="#subsidyModal">Add New Subsidy</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="d-flex justify-content-lg-between mt-2">
+      <div class="search">
+        <input class="form-control mt-2 mb-2 input-sm" type="text" placeholder="Search by subsidy name or product" />
+      </div>
+      <button class="btn btn-success btn-lg" type="button">Export</button>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover mt-3 w-100">
+      <thead>
+        <tr>
+          <th scope="col">Subsidy ID</th>
+          <th scope="col">Subsidy Name</th>
+          <th scope="col">Organization</th>
+          <th scope="col">Insurance Product</th>
+          <th scope="col">Subsidy Rate (%)</th>
+          <th scope="col">Status</th>
+          <th scope="col">Date Added</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of subsidyData">
+          <td>{{ row.subsidy_id }}</td>
+          <td>{{ row.subsidy_name }}</td>
+          <td>{{ row.organisation_name || getOrganizationName(row.organisation) }}</td>
+          <td>{{ row.product_name || getProductName(row.insurance_product) }}</td>
+          <td>{{ row.subsidy_rate }}%</td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'bg-success': row.status === 'ACTIVE',
+              'bg-danger': row.status === 'INACTIVE'
+            }">{{ row.status }}</span>
+          </td>
+          <td>{{ row.date_time_added | date:'short' }}</td>
+          <td>
+            <button style="color: aliceblue;" type="button" data-bs-toggle="modal" data-bs-target="#subsidyModal"
+              (click)="onEdit(row)" class="btn btn-info btn-sm me-2">Edit</button>
+            <button type="button" (click)="deleteSubsidy(row)" class="btn btn-danger btn-sm">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="subsidyData.length === 0">
+          <td colspan="8" class="text-center">No subsidies found</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="subsidyModal" tabindex="-1" aria-labelledby="subsidyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="subsidyModalLabel">
+              {{ showAdd ? 'Create Subsidy' : 'Update Subsidy' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="formValue">
+              <div class="mb-3">
+                <label for="subsidy_name" class="form-label">Subsidy Name *</label>
+                <input type="text" formControlName="subsidy_name" class="form-control"
+                       id="subsidy_name" placeholder="e.g., Government Crop Subsidy 2024" required>
+                <div *ngIf="formValue.get('subsidy_name')?.invalid && formValue.get('subsidy_name')?.touched"
+                     class="text-danger small">
+                  Subsidy name is required
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="organisation" class="form-label">Select Organization *</label>
+                  <select class="form-select" formControlName="organisation" id="organisation" required>
+                    <option value="">Choose organization...</option>
+                    <option *ngFor="let org of organizations" [value]="org.organisation_id">
+                      {{ org.organisation_name }}
+                    </option>
+                  </select>
+                  <div *ngIf="formValue.get('organisation')?.invalid && formValue.get('organisation')?.touched"
+                       class="text-danger small">
+                    Organization is required
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="insurance_product" class="form-label">Select Insurance Product *</label>
+                  <select class="form-select" formControlName="insurance_product" id="insurance_product" required>
+                    <option value="">Choose insurance product...</option>
+                    <option *ngFor="let product of insuranceProducts" [value]="product.product_id">
+                      {{ product.product_name }}
+                    </option>
+                  </select>
+                  <div *ngIf="formValue.get('insurance_product')?.invalid && formValue.get('insurance_product')?.touched"
+                       class="text-danger small">
+                    Insurance product is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="subsidy_rate" class="form-label">Subsidy Rate (%) *</label>
+                  <input type="number" formControlName="subsidy_rate" class="form-control"
+                         id="subsidy_rate" min="0" max="100" step="0.01" placeholder="e.g., 30" required>
+                  <div *ngIf="formValue.get('subsidy_rate')?.invalid && formValue.get('subsidy_rate')?.touched"
+                       class="text-danger small">
+                    Valid subsidy rate (0-100) is required
+                  </div>
+                  <small class="text-muted">Enter percentage (e.g., 30 for 30%)</small>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="status" class="form-label">Status *</label>
+                  <select class="form-select" formControlName="status" id="status" required>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Note:</strong> The subsidy rate will be applied to the premium amount of policies under the selected insurance product.
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" *ngIf="showAdd" (click)="postSubsidyDetails()"
+                    class="btn btn-primary" [disabled]="formValue.invalid">Save Subsidy</button>
+            <button type="button" *ngIf="showUpdate" (click)="updateSubsidyDetails()"
+                    class="btn btn-primary" [disabled]="formValue.invalid">Update Subsidy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

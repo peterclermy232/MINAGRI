@@ -26,7 +26,7 @@ export class PagesLoginComponent implements OnInit {
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required]],
     });
   }
 
@@ -41,6 +41,7 @@ export class PagesLoginComponent implements OnInit {
     this.formSubmitted = true;
 
     if (this.loginForm.invalid) {
+      this.showToast('error', 'Please fill in all required fields.');
       return;
     }
 
@@ -53,10 +54,13 @@ export class PagesLoginComponent implements OnInit {
       loading: true,
     };
 
-    const user_name = this.loginForm.get('username')!.value;
+    const username = this.loginForm.get('username')!.value.trim();
     const password = this.loginForm.get('password')!.value;
+
+    console.log('Attempting login with:', { username, password: '***' });
+
     this.authService
-      .appUserLogin(user_name, password)
+      .appUserLogin(username, password)
       .pipe(
         finalize(() => {
           this.loginBtn = {
@@ -67,11 +71,10 @@ export class PagesLoginComponent implements OnInit {
       )
       .subscribe({
         next: (token: string) => {
-          console.log('Login successful, token:', token);
+          console.log('Login successful, token received');
           this.resetForm();
           this.showToast('success', 'Successfully logged in!');
-          // Navigation is handled by AuthService, but you can override here if needed
-           this.router.navigate(['/dashboard']);
+          // Navigation is handled by AuthService
         },
         error: (err: any) => {
           console.error('Login error:', err);
@@ -88,14 +91,18 @@ export class PagesLoginComponent implements OnInit {
         errorMessage = err.error.error;
       } else if (err?.error?.message) {
         errorMessage = err.error.message;
+      } else if (err?.error?.detail) {
+        errorMessage = err.error.detail;
       } else if (err?.message) {
         errorMessage = err.message;
       } else if (err?.status === 0) {
         errorMessage = 'Unable to connect to server. Please check your internet connection.';
       } else if (err?.status === 401) {
-        errorMessage = 'Invalid username or password.';
+        errorMessage = 'Invalid username or password. Please try again.';
       } else if (err?.status === 403) {
         errorMessage = 'Your account is inactive. Please contact support.';
+      } else if (err?.status === 404) {
+        errorMessage = 'Login service not found. Please contact support.';
       } else if (err?.status >= 500) {
         errorMessage = 'Server error. Please try again later.';
       }

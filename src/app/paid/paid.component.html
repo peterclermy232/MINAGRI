@@ -1,11 +1,11 @@
 <main id="main" class="main">
   <div class="pagetitle">
-    <h1>Subsidy Approved Quotation</h1>
+    <h1>Paid Quotation</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
         <li class="breadcrumb-item">Dashboard</li>
-        <li class="breadcrumb-item active">Subsidy Approved Quotation</li>
+        <li class="breadcrumb-item active">Paid Quotation</li>
       </ol>
     </nav>
   </div>
@@ -15,7 +15,7 @@
       <div class="container">
         <div class="flex-centered">
           <button class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
-            data-bs-target="#exampleModal">Subsidy Approved Quotation</button>
+            data-bs-target="#exampleModal">Paid Quotation</button>
         </div>
       </div>
     </nav>
@@ -31,7 +31,7 @@
     <table class="table table-bordered table-striped table-hover mt-3 w-100">
       <thead>
         <tr>
-          <th scope="col">Policy ID</th>
+          <th scope="col">Farm Name</th>
           <th scope="col">Farmer ID Number</th>
           <th scope="col">Farm</th>
           <th scope="col">Insurance Product</th>
@@ -43,11 +43,11 @@
       </thead>
       <tbody>
         <tr *ngFor="let row of policyData">
-          <td>{{row.id}}</td>
-          <td>{{row.idNumber}}</td>
-          <td>{{row.farm}}</td>
-          <td>{{row.insurance}}</td>
-          <td>{{row.planting}}</td>
+          <td>{{row.farmer_name}}</td>
+          <td>{{row.farmer_id_number}}</td>
+          <td>{{row.farm_name}}</td>
+          <td>{{row.product_name}}</td>
+          <td>{{row.quotation_date}}</td>
           <td>{{row.landSize}}</td>
           <td>{{row.measure}}</td>
           <td>

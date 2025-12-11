@@ -30,7 +30,7 @@
       <table class="table table-bordered table-striped table-hover mt-3 w-100">
         <thead>
           <tr>
-           <th scope="col">Organisation ID</th>
+           <th scope="col">Username</th>
 
             <th scope="col">Organisation</th>
             <th scope="col">User</th>
@@ -43,9 +43,9 @@
         </thead>
         <tbody>
           <tr *ngFor="let  users of lossData" >
-           <td>{{ users.id}}</td>
+           <td>{{ users.user_name}}</td>
 
-            <td>{{ users.organization}}</td>
+            <td>{{ users.organisation_name}}</td>
             <td>{{ users.user}}</td>
             <td>{{ users.practiceNumber}}</td>
             <td>

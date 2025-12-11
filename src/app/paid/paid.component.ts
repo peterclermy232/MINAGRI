@@ -12,7 +12,7 @@ export class PaidComponent implements OnInit {
 
   formValue !:FormGroup;
   paidModelObj : PaidModel = new PaidModel();
-  policyData !:any;
+  policyData : any[] = [];
   showAdd!: boolean;
   showUpdate!:boolean;
   constructor(private formbuilder:FormBuilder,
@@ -63,7 +63,16 @@ export class PaidComponent implements OnInit {
     getAllEmployee(){
       this.api.getPaidQuotations()
       .subscribe(res=>{
-        this.policyData = res;
+
+        if (Array.isArray(res)) {
+          this.policyData = res;
+        } else if (res && Array.isArray(res.results)) {
+          this.policyData = res.results;
+        } else {
+          this.policyData = [];
+        }
+        console.log('paid', this.policyData);
+
       })
     }
     // deleteEmployee( row:any){
@@ -105,6 +114,6 @@ export class PaidComponent implements OnInit {
       })
   }
 postEmployeeDetails(){
-  
+
 }
 }

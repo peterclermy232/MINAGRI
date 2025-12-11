@@ -110,8 +110,10 @@ export class QuotationComponent implements OnInit {
 
         if (Array.isArray(res)) {
           this.allFarms = res;
+          console.log('All Farms API responseS7:', this.allFarms);
         } else if (res && Array.isArray(res.results)) {
           this.allFarms = res.results;
+          console.log('All Farms API responseS:', this.allFarms);
         } else {
           this.allFarms = [];
         }

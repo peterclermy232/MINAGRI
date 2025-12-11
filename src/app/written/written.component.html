@@ -1,133 +1,171 @@
 <main id="main" class="main">
-    <div class="pagetitle">
-       <h1>Policy Quotation</h1>
-       <nav>
-          <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Dashboard</li>
-             <ol class="breadcrumb-item active">Policy Quotation</ol>
-          </ol>
-       </nav>
-    </div>
-    <section class="section">
+  <div class="pagetitle">
+    <h1>Written Policies</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <li class="breadcrumb-item active">Written Policies</li>
+      </ol>
+    </nav>
+  </div>
 
-       <nav class="navbar navbar-ligth">
-         <div class="container-fluid">
-
-           <div class="d-flex">
-             <button  class="btn btn-success" (click)="clickAddPolicy()" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal">Add New Written Policy</button>
-           </div>
-         </div>
-       </nav>
-
-
-       <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
+  <section class="section">
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <div class="d-flex">
+          <button class="btn btn-success" (click)="clickAddPolicy()" type="button" data-bs-toggle="modal"
+            data-bs-target="#policyModal">Add New Written Policy</button>
         </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
+      </div>
+    </nav>
 
-       <table class="table table-bordered table-striped table-hover mt-3 w-100">
-         <thead>
-           <tr>
-            <th scope="col">Policy ID</th>
-             <th scope="col">Farmer ID Number</th>
-             <th scope="col">Farm</th>
-             <th scope="col">Insurance Product</th>
-             <th scope="col">Planting Window</th>
-             <th scope="col">Land Size</th>
-             <th scope="col"> Unit of Measure</th>
+    <div class="d-flex justify-content-lg-between mt-2">
+      <div class="search">
+        <input class="form-control mt-2 mb-2 input-sm" type="text" placeholder="Search by policy number or farmer" />
+      </div>
+      <button class="btn btn-success btn-lg" type="button">Export</button>
+    </div>
 
-           </tr>
-         </thead>
-         <tbody>
-           <tr *ngFor ="let row of policyData">
-            <td>{{row.id}}</td>
-             <td>{{row.idNumber}}</td>
-             <td>{{row.farm}}</td>
-             <td>{{row.insurance}}</td>
-             <td>{{row.planting}}</td>
-             <td>{{row.landSize}}</td>
-             <td>{{row.measure}}</td>
+    <table class="table table-bordered table-striped table-hover mt-3 w-100">
+      <thead>
+        <tr>
+          <th scope="col">Policy Number</th>
+          <th scope="col">Farmer</th>
+          <th scope="col">Farm</th>
+          <th scope="col">Insurance Product</th>
+          <th scope="col">Premium Amount</th>
+          <th scope="col">Sum Insured</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of policyData">
+          <td>{{ row.policy_number || 'N/A' }}</td>
+          <td>{{ row.farmer_name || getFarmerName(row.farmer) }}</td>
+          <td>{{ row.farm_name || getFarmName(row.farm) }}</td>
+          <td>{{ row.product_name || getProductName(row.insurance_product) }}</td>
+          <td>{{ row.premium_amount | currency:'KES ' }}</td>
+          <td>{{ row.sum_insured | currency:'KES ' }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'bg-success': row.status === 'WRITTEN',
+              'bg-danger': row.status === 'CANCELLED',
+              'bg-warning': row.status === 'EXPIRED'
+            }">{{ row.status }}</span>
+          </td>
+          <td>
+            <button style="color: aliceblue;" type="button" data-bs-toggle="modal" data-bs-target="#policyModal"
+              (click)="onEdit(row)" class="btn btn-info btn-sm me-2">Edit</button>
+            <button type="button" (click)="cancelPolicy(row)" class="btn btn-danger btn-sm">Cancel</button>
+          </td>
+        </tr>
+        <tr *ngIf="policyData.length === 0">
+          <td colspan="8" class="text-center">No written policies found</td>
+        </tr>
+      </tbody>
+    </table>
 
-             <td>
-               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                 data-bs-target="#exampleModal" (click)="onEdit( row)" class="btn btn-info">Edit</button>
-
-             </td>
-           </tr>
-         </tbody>
-
-       </table>
-
-        <!--Modal-->
-       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-         <div class="modal-dialog">
-           <div class="modal-content">
-             <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel"> Create Policy Quotation</h5>
-               <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-             </div>
-             <div class="modal-body">
-               <form [formGroup]="formValue">
-
-
-                 <div class="mb-3">
-                   <label for="exampleInputPassword1" class="form-label">Enter Farmer ID Number</label>
-                   <input type="number" formControlName="idNumber" class="form-control" id="exampleInputPassword1">
-                 </div>
-
-                 <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label"> Select Farm</label>
-                  <select class="form-select" formControlName="assessor">
-                    <option>Accredit</option>
-                    <!-- <option>Blacklisted</option>
-                    <option>Disable</option> -->
-                    </select>
-               </div>
-               <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Select Insurance Product</label>
-                <select class="form-select" formControlName="insurance">
-                  <option>Accredit</option>
-                  <!-- <option>Blacklisted</option>
-                  <option>Disable</option> -->
+    <!-- Modal -->
+    <div class="modal fade" id="policyModal" tabindex="-1" aria-labelledby="policyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="policyModalLabel">
+              {{ showAdd ? 'Create Written Policy' : 'Update Written Policy' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="formValue">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="farmer" class="form-label">Select Farmer *</label>
+                  <select class="form-select" formControlName="farmer" id="farmer"
+                          (change)="onFarmerChange($event)" required>
+                    <option value="">Choose farmer...</option>
+                    <option *ngFor="let farmer of farmers" [value]="farmer.farmer_id">
+                      {{ farmer.first_name }} {{ farmer.last_name }} ({{ farmer.id_number }})
+                    </option>
                   </select>
-             </div>
-             <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Select Planting Window </label>
-              <select class="form-select" formControlName="planting">
-                <option>Accredit</option>
-                <!-- <option>Blacklisted</option>
-                <option>Disable</option> -->
+                  <div *ngIf="formValue.get('farmer')?.invalid && formValue.get('farmer')?.touched"
+                       class="text-danger small">
+                    Farmer is required
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="farm" class="form-label">Select Farm *</label>
+                  <select class="form-select" formControlName="farm" id="farm" required
+                          [disabled]="!formValue.get('farmer')?.value">
+                    <option value="">Choose farm...</option>
+                    <option *ngFor="let farm of filteredFarms" [value]="farm.farm_id">
+                      {{ farm.farm_name }} ({{ farm.farm_size }} {{ farm.unit_of_measure }})
+                    </option>
+                  </select>
+                  <div *ngIf="formValue.get('farm')?.invalid && formValue.get('farm')?.touched"
+                       class="text-danger small">
+                    Farm is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="insurance_product" class="form-label">Select Insurance Product *</label>
+                <select class="form-select" formControlName="insurance_product" id="insurance_product" required>
+                  <option value="">Choose insurance product...</option>
+                  <option *ngFor="let product of insuranceProducts" [value]="product.product_id">
+                    {{ product.crop_name }} - {{ product.crop_variety_name }}
+                  </option>
+                </select>
+                <div *ngIf="formValue.get('insurance_product')?.invalid && formValue.get('insurance_product')?.touched"
+                     class="text-danger small">
+                  Insurance product is required
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="premium_amount" class="form-label">Premium Amount (KES) *</label>
+                  <input type="number" formControlName="premium_amount" class="form-control"
+                         id="premium_amount" min="0" step="0.01" required>
+                  <div *ngIf="formValue.get('premium_amount')?.invalid && formValue.get('premium_amount')?.touched"
+                       class="text-danger small">
+                    Valid premium amount is required
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="sum_insured" class="form-label">Sum Insured (KES) *</label>
+                  <input type="number" formControlName="sum_insured" class="form-control"
+                         id="sum_insured" min="0" step="0.01" required>
+                  <div *ngIf="formValue.get('sum_insured')?.invalid && formValue.get('sum_insured')?.touched"
+                       class="text-danger small">
+                    Valid sum insured is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3" *ngIf="showUpdate">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" formControlName="status" id="status">
+                  <option value="WRITTEN">Written</option>
+                  <option value="CANCELLED">Cancelled</option>
+                  <option value="EXPIRED">Expired</option>
                 </select>
               </div>
-              <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Enter Land Size</label>
-                <input type="number" formControlName="landSize" class="form-control" id="exampleInputPassword1">
-              </div>
-              <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Select the Unit of Measure </label>
-                <select class="form-select" formControlName="measure">
-                  <option>Acre</option>
-                   <option>Hectare</option>
-
-                  </select>
-                </div>
-               </form>
-             </div>
-             <div class="modal-footer">
-               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <!-- <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Save</button> -->
-               <button type="button" *ngIf="showUpdate" (click)="updatePolicyDetails()"
-                 class="btn btn-primary">Update</button>
-             </div>
-           </div>
-         </div>
-       </div>
-
-      </section>
-  </main>
-
-
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" *ngIf="showAdd" (click)="postPolicyDetails()"
+                    class="btn btn-primary" [disabled]="formValue.invalid">Save Policy</button>
+            <button type="button" *ngIf="showUpdate" (click)="updatePolicyDetails()"
+                    class="btn btn-primary" [disabled]="formValue.invalid">Update Policy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

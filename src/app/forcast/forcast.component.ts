@@ -56,8 +56,10 @@ export class ForcastComponent implements OnInit {
 
     this.weatherService.getForecastData().subscribe({
       next: (data) => {
-        this.forecastDataList = data;
-        this.filteredData = data;
+        this.forecastDataList = data.results;
+        this.filteredData = data.results;
+        console.log('fores',this.filteredData);
+
         this.updatePagination();
         this.loading = false;
       },

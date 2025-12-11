@@ -27,12 +27,8 @@ import { ManageSubsidyComponent } from './manage-subsidy/manage-subsidy.componen
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
 import { FarmerComponent } from './farmer/farmer.component';
 import { QuotationComponent } from './quotation/quotation.component';
-import { InsuranceComponent } from './insurance/insurance.component';
+import { SubsidyComponent } from './subsidy/subsidy.component';
 import { PaidComponent } from './paid/paid.component';
-import { InvoiceComponent } from './invoice/invoice.component';
-import { ApprovedComponent } from './components/approved/approved.component';
-import { PendingComponent } from './pending/pending.component';
-import { SettledComponent } from './settled/settled.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaidClaimComponent } from './paid-claim/paid-claim.component';
 import { ClaimComponent } from './components/claim/claim.component';
@@ -41,6 +37,9 @@ import { WrittenComponent } from './written/written.component';
 import { ForcastComponent } from './forcast/forcast.component';
 import { HistoricalComponent } from './historical/historical.component';
 import { AdvisoryComponent } from './components/advisory/advisory.component';
+import { PendingSettlementComponent } from './subsidy-settlement/pending-settlement/pending-settlement.component';
+import { SettledComponent } from './subsidy-settlement/settled/settled.component';
+import { ApprovedComponent } from './subsidy-settlement/approved/approved.component';
 
 const routes: Routes = [
   { path: '', component: PagesLoginComponent },
@@ -54,9 +53,6 @@ const routes: Routes = [
   { path: 'roles', component: RoleComponent },
   {path: 'assignloss', component: AssignlossComponent},
   { path: 'charts-chartjs', component: LossAssesor },
-  {path: 'invoice', component: InvoiceComponent},
-  {path: 'approved', component: ApprovedComponent},
-  {path:'pending', component: PendingComponent},
   {path: 'settled', component: SettledComponent},
   {path: 'seasons', component: SeasonsComponent},
   {path: 'written', component: WrittenComponent},
@@ -67,7 +63,7 @@ const routes: Routes = [
   { path: 'add-organization', component: UsersManagementComponent },
   {path: 'farmer', component: FarmerComponent},
   {path: 'quotation', component: QuotationComponent},
-  {path: 'insurance', component: InsuranceComponent},
+  {path: 'insurance', component: SubsidyComponent},
   {path: 'paid', component: PaidComponent},
   {path: 'payment', component: PaymentComponent},
   {path: 'peid', component: PaidClaimComponent },
@@ -85,6 +81,14 @@ const routes: Routes = [
   { path: 'pages-faq', component: PagesFaqComponent },
 
   { path: 'user-profile', component: UsersProfileComponent },
+  {
+    path: 'subsidy-settlement',
+    children: [
+      { path: 'pending', component: PendingSettlementComponent },
+      { path: 'approved', component: ApprovedComponent },
+      { path: 'settled', component: SettledComponent }
+    ]
+  }
 ];
 
 @NgModule({
