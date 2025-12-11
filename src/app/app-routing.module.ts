@@ -29,8 +29,8 @@ import { FarmerComponent } from './farmer/farmer.component';
 import { QuotationComponent } from './quotation/quotation.component';
 import { SubsidyComponent } from './subsidy/subsidy.component';
 import { PaidComponent } from './paid/paid.component';
-import { PaymentComponent } from './payment/payment.component';
-import { PaidClaimComponent } from './paid-claim/paid-claim.component';
+import { PaymentComponent } from './claims/payment/payment.component';
+import { PaidClaimComponent } from './claims/paid-claim/paid-claim.component';
 import { ClaimComponent } from './components/claim/claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
 import { WrittenComponent } from './written/written.component';
@@ -40,6 +40,10 @@ import { AdvisoryComponent } from './components/advisory/advisory.component';
 import { PendingSettlementComponent } from './subsidy-settlement/pending-settlement/pending-settlement.component';
 import { SettledComponent } from './subsidy-settlement/settled/settled.component';
 import { ApprovedComponent } from './subsidy-settlement/approved/approved.component';
+import { CreateClaimComponent } from './claims/create-claim/create-claim.component';
+import { ApprovedClaimComponent } from './claims/approved-claim/approved-claim.component';
+import { PendingComponent } from './claims/pending/pending.component';
+import { OpenClaimComponent } from './claims/open-claim/open-claim.component';
 
 const routes: Routes = [
   { path: '', component: PagesLoginComponent },
@@ -87,6 +91,19 @@ const routes: Routes = [
       { path: 'pending', component: PendingSettlementComponent },
       { path: 'approved', component: ApprovedComponent },
       { path: 'settled', component: SettledComponent }
+    ]
+  },
+  { path: 'create-claim', component: CreateClaimComponent },
+  {
+    path: 'claims',
+    children: [
+      { path: 'create', component: CreateClaimComponent },
+      { path: 'open', component: OpenClaimComponent },
+      { path: 'pending', component: PendingComponent },
+      { path: 'approved', component: ApprovedClaimComponent },
+      { path: 'payment', component: PaymentComponent },
+      { path: 'paid', component: PaidClaimComponent },
+      { path: '', redirectTo: 'open', pathMatch: 'full' }
     ]
   }
 ];

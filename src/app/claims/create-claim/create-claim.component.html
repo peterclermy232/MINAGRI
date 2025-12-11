@@ -1,0 +1,508 @@
+<!-- create-claim.component.html - FIXED VERSION -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-file-medical mr-2"></i>
+            Create New Crop Insurance Claim
+          </h3>
+        </div>
+
+        <div class="card-body">
+          <!-- Progress Steps -->
+          <div class="mb-4">
+            <div class="progress-steps">
+              <div class="step" [class.active]="step >= 1" [class.completed]="step > 1">
+                <div class="step-number">1</div>
+                <div class="step-label">Policy Selection</div>
+              </div>
+              <div class="step-connector" [class.active]="step >= 2"></div>
+              <div class="step" [class.active]="step >= 2" [class.completed]="step > 2">
+                <div class="step-number">2</div>
+                <div class="step-label">Loss Details</div>
+              </div>
+              <div class="step-connector" [class.active]="step >= 3"></div>
+              <div class="step" [class.active]="step >= 3">
+                <div class="step-number">3</div>
+                <div class="step-label">Description & Submit</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading Spinner -->
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-2">Loading data...</p>
+          </div>
+
+          <!-- Claim Form -->
+          <form [formGroup]="claimForm" *ngIf="!loading">
+
+            <!-- STEP 1: Farmer and Policy Selection -->
+            <div *ngIf="step === 1" class="step-content">
+              <h4 class="mb-4">Step 1: Select Farmer and Policy</h4>
+
+              <div class="row">
+                <!-- Farmer Selection -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="farmer">Select Farmer <span class="text-danger">*</span></label>
+                    <select
+                      id="farmer"
+                      class="form-control"
+                      formControlName="farmer"
+                      (change)="onFarmerSelected()"
+                      [class.is-invalid]="isFieldInvalid('farmer')">
+                      <option value="">-- Select Farmer --</option>
+                      <option *ngFor="let farmer of farmers" [value]="farmer.farmer_id">
+                        {{ farmer.first_name }} {{ farmer.last_name }} ({{ farmer.id_number }})
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('farmer')">
+                      Please select a farmer
+                    </div>
+                  </div>
+
+                  <!-- Farmer Details Card -->
+                  <div *ngIf="selectedFarmer" class="alert alert-info">
+                    <h6 class="alert-heading">
+                      <i class="fas fa-user-circle mr-2"></i>Farmer Information
+                    </h6>
+                    <hr>
+                    <div class="row">
+                      <div class="col-6">
+                        <small class="text-muted">Name:</small><br>
+                        <strong>{{ selectedFarmer.first_name }} {{ selectedFarmer.last_name }}</strong>
+                      </div>
+                      <div class="col-6">
+                        <small class="text-muted">ID Number:</small><br>
+                        <strong>{{ selectedFarmer.id_number }}</strong>
+                      </div>
+                      <div class="col-6 mt-2">
+                        <small class="text-muted">Phone:</small><br>
+                        <strong>{{ selectedFarmer.phone_number }}</strong>
+                      </div>
+                      <div class="col-6 mt-2">
+                        <small class="text-muted">Email:</small><br>
+                        <strong>{{ selectedFarmer.email || 'N/A' }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Policy Selection -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="quotation">Select Active Policy <span class="text-danger">*</span></label>
+                    <select
+                      id="quotation"
+                      class="form-control"
+                      formControlName="quotation"
+                      (change)="onQuotationSelected()"
+                      [disabled]="!selectedFarmer"
+                      [class.is-invalid]="isFieldInvalid('quotation')">
+                      <option value="">-- Select Policy --</option>
+                      <option *ngFor="let quot of filteredQuotations" [value]="quot.quotation_id">
+                        {{ quot.policy_number }} - {{ quot.product_name }}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="isFieldInvalid('quotation')">
+                      Please select a policy
+                    </div>
+                    <small class="form-text text-muted" *ngIf="!selectedFarmer">
+                      Please select a farmer first
+                    </small>
+                    <small class="form-text text-warning" *ngIf="selectedFarmer && filteredQuotations.length === 0">
+                      <i class="fas fa-exclamation-triangle mr-1"></i>No active policies found for this farmer
+                    </small>
+                  </div>
+
+                  <!-- Policy Details Card -->
+                  <div *ngIf="selectedQuotation" class="alert alert-success">
+                    <h6 class="alert-heading">
+                      <i class="fas fa-file-contract mr-2"></i>Policy Information
+                    </h6>
+                    <hr>
+                    <div class="row">
+                      <div class="col-12">
+                        <small class="text-muted">Policy Number:</small><br>
+                        <strong>{{ selectedQuotation.policy_number }}</strong>
+                      </div>
+                      <div class="col-12 mt-2">
+                        <small class="text-muted">Product:</small><br>
+                        <strong>{{ selectedQuotation.product_name }}</strong>
+                      </div>
+                      <div class="col-12 mt-2">
+                        <small class="text-muted">Farm:</small><br>
+                        <strong>{{ selectedFarm?.farm_name || 'N/A' }}</strong>
+                      </div>
+                      <div class="col-6 mt-2">
+                        <small class="text-muted">Sum Insured:</small><br>
+                        <strong class="text-success">{{ formatCurrency(selectedQuotation.sum_insured) }}</strong>
+                      </div>
+                      <div class="col-6 mt-2">
+                        <small class="text-muted">Issue Date:</small><br>
+                        <strong>{{ formatDate(selectedQuotation.quotation_date) }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Navigation Buttons -->
+              <div class="text-right mt-4">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="nextStep()"
+                  [disabled]="!isStepValid(1)">
+                  Next Step <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 2: Loss Details -->
+            <div *ngIf="step === 2" class="step-content">
+              <h4 class="mb-4">Step 2: Loss Details</h4>
+
+              <div class="row">
+                <!-- Loss Type -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="loss_type">Type of Loss <span class="text-danger">*</span></label>
+                    <select
+                      id="loss_type"
+                      class="form-control"
+                      formControlName="loss_type"
+                      [class.is-invalid]="isFieldInvalid('loss_type')">
+                      <option value="">-- Select Loss Type --</option>
+                      <option *ngFor="let type of lossTypes" [value]="type">{{ type }}</option>
+                    </select>
+                    <div class="invalid-feedback">Please select loss type</div>
+                  </div>
+                </div>
+
+                <!-- Loss Date -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="loss_date">Date of Loss <span class="text-danger">*</span></label>
+                    <input
+                      type="date"
+                      id="loss_date"
+                      class="form-control"
+                      formControlName="loss_date"
+                      [max]="getMaxLossDate()"
+                      [class.is-invalid]="isFieldInvalid('loss_date')">
+                    <div class="invalid-feedback">Please enter loss date</div>
+                    <small class="form-text text-muted">Date when the loss occurred</small>
+                  </div>
+                </div>
+
+                <!-- Estimated Loss Amount -->
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="estimated_loss_amount">
+                      Estimated Loss Amount (RWF) <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="estimated_loss_amount"
+                      class="form-control"
+                      formControlName="estimated_loss_amount"
+                      min="1"
+                      step="1000"
+                      placeholder="Enter estimated loss amount"
+                      [class.is-invalid]="isFieldInvalid('estimated_loss_amount')">
+                    <div class="invalid-feedback">
+                      <span *ngIf="claimForm.get('estimated_loss_amount')?.hasError('required')">
+                        Please enter loss amount
+                      </span>
+                      <span *ngIf="claimForm.get('estimated_loss_amount')?.hasError('min')">
+                        Loss amount must be greater than 0
+                      </span>
+                    </div>
+                    <small class="form-text text-muted" *ngIf="selectedQuotation">
+                      Maximum claimable: {{ formatCurrency(calculateMaxClaimAmount()) }}
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Affected Area -->
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="affected_area_size">
+                      Affected Area Size <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="affected_area_size"
+                      class="form-control"
+                      formControlName="affected_area_size"
+                      min="0.1"
+                      step="0.1"
+                      placeholder="Area size"
+                      [class.is-invalid]="isFieldInvalid('affected_area_size')">
+                    <div class="invalid-feedback">
+                      <span *ngIf="claimForm.get('affected_area_size')?.hasError('required')">
+                        Required field
+                      </span>
+                      <span *ngIf="claimForm.get('affected_area_size')?.hasError('min')">
+                        Must be greater than 0
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Unit of Measure -->
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <label for="affected_area_unit">Unit</label>
+                    <select id="affected_area_unit" class="form-control" formControlName="affected_area_unit">
+                      <option value="Acres">Acres</option>
+                      <option value="Hectares">Hectares</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Immediate Cause -->
+                <div class="col-12">
+                  <div class="form-group">
+                    <label for="immediate_cause">
+                      Immediate Cause of Loss <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="immediate_cause"
+                      class="form-control"
+                      formControlName="immediate_cause"
+                      placeholder="What directly caused the loss?"
+                      [class.is-invalid]="isFieldInvalid('immediate_cause')">
+                    <div class="invalid-feedback">Please describe the immediate cause</div>
+                    <small class="form-text text-muted">
+                      Example: Heavy rains for 5 consecutive days, Severe drought for 3 months, etc.
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Navigation Buttons -->
+              <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" (click)="previousStep()">
+                  <i class="fas fa-arrow-left mr-2"></i> Previous
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="nextStep()"
+                  [disabled]="!isStepValid(2)">
+                  Next Step <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- STEP 3: Description and Location -->
+            <div *ngIf="step === 3" class="step-content">
+              <h4 class="mb-4">Step 3: Detailed Description and Location</h4>
+
+              <div class="row">
+                <!-- Loss Description -->
+                <div class="col-12">
+                  <div class="form-group">
+                    <label for="loss_description">
+                      Detailed Loss Description <span class="text-danger">*</span>
+                    </label>
+                    <textarea
+                      id="loss_description"
+                      class="form-control"
+                      formControlName="loss_description"
+                      rows="5"
+                      placeholder="Provide detailed description of the loss, including what happened, extent of damage, and any other relevant information..."
+                      [class.is-invalid]="isFieldInvalid('loss_description')"></textarea>
+                    <div class="invalid-feedback">
+                      <span *ngIf="claimForm.get('loss_description')?.hasError('required')">
+                        Description is required
+                      </span>
+                      <span *ngIf="claimForm.get('loss_description')?.hasError('minlength')">
+                        Description must be at least 20 characters (currently {{ claimForm.get('loss_description')?.value?.length || 0 }})
+                      </span>
+                    </div>
+                    <small class="form-text text-muted">
+                      Minimum 20 characters. Be as detailed as possible. Current: {{ claimForm.get('loss_description')?.value?.length || 0 }} characters
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Location Information -->
+                <div class="col-12">
+                  <h5 class="mt-3 mb-3">Loss Location</h5>
+                </div>
+
+                <!-- Province -->
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="province">Province <span class="text-danger">*</span></label>
+                    <select
+                      id="province"
+                      class="form-control"
+                      formControlName="province"
+                      [class.is-invalid]="isFieldInvalid('province')">
+                      <option value="">-- Select Province --</option>
+                      <option *ngFor="let prov of provinces" [value]="prov">{{ prov }}</option>
+                    </select>
+                    <div class="invalid-feedback">Please select province</div>
+                  </div>
+                </div>
+
+                <!-- District -->
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="district">District <span class="text-danger">*</span></label>
+                    <select
+                      id="district"
+                      class="form-control"
+                      formControlName="district"
+                      [disabled]="!claimForm.get('province')?.value"
+                      [class.is-invalid]="isFieldInvalid('district')">
+                      <option value="">-- Select District --</option>
+                      <option *ngFor="let dist of availableDistricts" [value]="dist">{{ dist }}</option>
+                    </select>
+                    <div class="invalid-feedback">Please select district</div>
+                    <small class="form-text text-muted" *ngIf="!claimForm.get('province')?.value">
+                      Select province first
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Sector -->
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="sector">Sector</label>
+                    <input
+                      type="text"
+                      id="sector"
+                      class="form-control"
+                      formControlName="sector"
+                      placeholder="Enter sector name">
+                    <small class="form-text text-muted">Optional</small>
+                  </div>
+                </div>
+
+                <!-- Witness Information -->
+                <div class="col-12">
+                  <h5 class="mt-3 mb-3">Witness Information (Optional)</h5>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="witness_name">Witness Name</label>
+                    <input
+                      type="text"
+                      id="witness_name"
+                      class="form-control"
+                      formControlName="witness_name"
+                      placeholder="Name of witness">
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="witness_contact">Witness Contact</label>
+                    <input
+                      type="tel"
+                      id="witness_contact"
+                      class="form-control"
+                      formControlName="witness_contact"
+                      placeholder="+250788123456">
+                  </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="col-12">
+                  <h5 class="mt-3 mb-3">Additional Information (Optional)</h5>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="police_report_number">Police Report Number</label>
+                    <input
+                      type="text"
+                      id="police_report_number"
+                      class="form-control"
+                      formControlName="police_report_number"
+                      placeholder="If applicable">
+                    <small class="form-text text-muted">
+                      Required for theft or vandalism cases
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Summary Box -->
+              <div class="alert alert-warning mt-4">
+                <h6 class="alert-heading">
+                  <i class="fas fa-info-circle mr-2"></i>Before You Submit
+                </h6>
+                <hr>
+                <ul class="mb-0">
+                  <li>Ensure all information provided is accurate and truthful</li>
+                  <li>A loss assessor will be assigned to verify your claim</li>
+                  <li>You will be contacted for site inspection</li>
+                  <li>Processing time: 5-10 business days</li>
+                  <li>Keep all supporting documents ready for verification</li>
+                </ul>
+              </div>
+
+              <!-- DEBUG: Show form status (Remove in production) -->
+              <div class="alert alert-info mt-3" *ngIf="!canSubmit()">
+                <strong>Form Status:</strong>
+                <ul class="mb-0 mt-2">
+                  <li *ngIf="!claimForm.get('farmer')?.value">❌ Farmer not selected</li>
+                  <li *ngIf="!claimForm.get('quotation')?.value">❌ Policy not selected</li>
+                  <li *ngIf="!claimForm.get('loss_type')?.value">❌ Loss type not selected</li>
+                  <li *ngIf="!claimForm.get('loss_date')?.value">❌ Loss date not entered</li>
+                  <li *ngIf="!claimForm.get('estimated_loss_amount')?.value || claimForm.get('estimated_loss_amount')?.invalid">
+                    ❌ Loss amount invalid
+                  </li>
+                  <li *ngIf="!claimForm.get('affected_area_size')?.value || claimForm.get('affected_area_size')?.invalid">
+                    ❌ Affected area invalid
+                  </li>
+                  <li *ngIf="!claimForm.get('immediate_cause')?.value">❌ Immediate cause not entered</li>
+                  <li *ngIf="!claimForm.get('loss_description')?.value || claimForm.get('loss_description')?.invalid">
+                    ❌ Loss description invalid (min 20 chars)
+                  </li>
+                  <li *ngIf="!claimForm.get('province')?.value">❌ Province not selected</li>
+                  <li *ngIf="!claimForm.get('district')?.value">❌ District not selected</li>
+                </ul>
+              </div>
+
+              <!-- Navigation Buttons -->
+              <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" (click)="previousStep()">
+                  <i class="fas fa-arrow-left mr-2"></i> Previous
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-success btn-lg"
+                  (click)="submitClaim()"
+                  [disabled]="!canSubmit()">
+                  <span *ngIf="!submitting">
+                    <i class="fas fa-check mr-2"></i> Submit Claim
+                  </span>
+                  <span *ngIf="submitting">
+                    <span class="spinner-border spinner-border-sm mr-2"></span>
+                    Submitting...
+                  </span>
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

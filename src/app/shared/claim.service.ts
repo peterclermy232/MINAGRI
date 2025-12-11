@@ -1,12 +1,41 @@
-// claims.service.ts
+// claim.service.ts - Enhanced version for your existing shared folder
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+
+export interface ClaimCreateRequest {
+  farmer: number;
+  quotation: number;
+  claim_number: string;
+  estimated_loss_amount: number;
+  status: string;
+  loss_details: {
+    loss_type: string;
+    loss_date: string;
+    affected_area_size: number;
+    affected_area_unit: string;
+    loss_description: string;
+    immediate_cause: string;
+    location: {
+      province: string;
+      district: string;
+      sector?: string;
+    };
+    witness?: {
+      name: string;
+      contact: string;
+    } | null;
+    police_report_number?: string | null;
+  };
+}
 
 export interface Claim {
   claim_id: number;
+  farmer: number;
   farmer_name: string;
+  quotation: number;
   policy_number: string;
   claim_number: string;
   estimated_loss_amount: number;
@@ -16,47 +45,13 @@ export interface Claim {
   approval_date?: string;
   payment_date?: string;
   payment_reference?: string;
-  farmer?: number;
-  quotation?: number;
   loss_assessor?: number;
-}
-
-export interface Invoice {
-  invoice_id: number;
-  organisation_name: string;
-  subsidy_name: string;
-  invoice_number: string;
-  amount: number;
-  status: string;
-  approved_date?: string;
-  settlement_date?: string;
-  payment_reference?: string;
-  date_time_added: string;
-  organisation?: number;
-  subsidy?: number;
-}
-
-export interface LossAssessor {
-  assessor_id: number;
-  user_name: string;
-  organisation_name: string;
-  status: string;
-  user?: number;
-  organisation?: number;
-}
-
-export interface Subsidy {
-  subsidy_id: number;
-  subsidy_name: string;
-  subsidy_rate: number;
-  organisation_name: string;
-  insurance_product_name?: string;
-  status: string;
+  loss_assessor_name?: string;
 }
 
 export interface ClaimStatistics {
   total_claims: number;
-  by_status: Array<{status: string, count: number}>;
+  by_status: Array<{ status: string; count: number }>;
   total_claimed: number;
   total_approved: number;
 }
@@ -64,194 +59,251 @@ export interface ClaimStatistics {
 @Injectable({
   providedIn: 'root'
 })
-export class ClaimsService {
-  private apiUrl = environment.apiUrl;
+export class ClaimService {
+  private baseUrl = `${environment.apiUrl}/claims`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
     return new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
   }
 
-  // ============== CLAIMS ENDPOINTS ==============
+  /**
+   * Create a new claim
+   */
+  createClaim(claimData: ClaimCreateRequest): Observable<Claim> {
+    return this.http.post<Claim>(`${this.baseUrl}/`, claimData, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        console.log('Claim created successfully:', response);
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
 
-  getClaims(params?: any): Observable<Claim[]> {
+  /**
+   * Get all claims with optional filters
+   */
+  getClaims(params?: {
+    status?: string;
+    farmer_id?: number;
+    loss_assessor_id?: number;
+  }): Observable<Claim[]> {
     let httpParams = new HttpParams();
+
     if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key]);
-        }
-      });
+      if (params.status) httpParams = httpParams.set('status', params.status);
+      if (params.farmer_id) httpParams = httpParams.set('farmer_id', params.farmer_id.toString());
+      if (params.loss_assessor_id) httpParams = httpParams.set('loss_assessor_id', params.loss_assessor_id.toString());
     }
-    return this.http.get<Claim[]>(`${this.apiUrl}/claims/`, {
+
+    return this.http.get<any>(`${this.baseUrl}/`, {
       headers: this.getHeaders(),
       params: httpParams
-    });
+    }).pipe(
+      map(response => Array.isArray(response) ? response : response.results || []),
+      catchError(this.handleError)
+    );
   }
 
-  getClaim(id: number): Observable<Claim> {
-    return this.http.get<Claim>(`${this.apiUrl}/claims/${id}/`, {
+  /**
+   * Get single claim by ID
+   */
+  getClaimById(id: number): Observable<Claim> {
+    return this.http.get<Claim>(`${this.baseUrl}/${id}/`, {
       headers: this.getHeaders()
-    });
+    }).pipe(catchError(this.handleError));
   }
 
-  createClaim(claim: Partial<Claim>): Observable<Claim> {
-    return this.http.post<Claim>(`${this.apiUrl}/claims/`, claim, {
+  /**
+   * Update claim
+   */
+  updateClaim(id: number, data: Partial<Claim>): Observable<Claim> {
+    return this.http.patch<Claim>(`${this.baseUrl}/${id}/`, data, {
       headers: this.getHeaders()
-    });
+    }).pipe(catchError(this.handleError));
   }
 
-  updateClaim(id: number, claim: Partial<Claim>): Observable<Claim> {
-    return this.http.patch<Claim>(`${this.apiUrl}/claims/${id}/`, claim, {
-      headers: this.getHeaders()
-    });
-  }
-
+  /**
+   * Assign loss assessor to claim
+   */
   assignAssessor(claimId: number, assessorId: number): Observable<Claim> {
     return this.http.post<Claim>(
-      `${this.apiUrl}/claims/${claimId}/assign_assessor/`,
+      `${this.baseUrl}/${claimId}/assign_assessor/`,
       { assessor_id: assessorId },
       { headers: this.getHeaders() }
-    );
+    ).pipe(catchError(this.handleError));
   }
 
+  /**
+   * Approve claim with approved amount
+   */
   approveClaim(claimId: number, approvedAmount: number): Observable<Claim> {
     return this.http.post<Claim>(
-      `${this.apiUrl}/claims/${claimId}/approve/`,
+      `${this.baseUrl}/${claimId}/approve/`,
       { approved_amount: approvedAmount },
       { headers: this.getHeaders() }
-    );
+    ).pipe(catchError(this.handleError));
   }
 
-  getClaimStatistics(): Observable<ClaimStatistics> {
-    return this.http.get<ClaimStatistics>(`${this.apiUrl}/claims/statistics/`, {
+  /**
+   * Get claim statistics
+   */
+  getStatistics(): Observable<ClaimStatistics> {
+    return this.http.get<ClaimStatistics>(`${this.baseUrl}/statistics/`, {
       headers: this.getHeaders()
-    });
+    }).pipe(catchError(this.handleError));
   }
 
-  // ============== LOSS ASSESSORS ENDPOINTS ==============
-
-  getLossAssessors(params?: any): Observable<LossAssessor[]> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key]);
-        }
-      });
-    }
-    return this.http.get<LossAssessor[]>(`${this.apiUrl}/loss-assessors/`, {
-      headers: this.getHeaders(),
-      params: httpParams
-    });
+  /**
+   * Get claims by status
+   */
+  getClaimsByStatus(status: string): Observable<Claim[]> {
+    return this.getClaims({ status });
   }
 
-  // ============== INVOICES ENDPOINTS ==============
-
-  getInvoices(params?: any): Observable<Invoice[]> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key]);
-        }
-      });
-    }
-    return this.http.get<Invoice[]>(`${this.apiUrl}/invoices/`, {
-      headers: this.getHeaders(),
-      params: httpParams
-    });
+  /**
+   * Get open claims (pending assessment)
+   */
+  getOpenClaims(): Observable<Claim[]> {
+    return this.getClaimsByStatus('OPEN');
   }
 
-  getInvoice(id: number): Observable<Invoice> {
-    return this.http.get<Invoice>(`${this.apiUrl}/invoices/${id}/`, {
-      headers: this.getHeaders()
-    });
+  /**
+   * Get claims under assessment
+   */
+  getClaimsUnderAssessment(): Observable<Claim[]> {
+    return this.getClaimsByStatus('UNDER_ASSESSMENT');
   }
 
-  createInvoice(invoice: Partial<Invoice>): Observable<Invoice> {
-    return this.http.post<Invoice>(`${this.apiUrl}/invoices/`, invoice, {
-      headers: this.getHeaders()
-    });
+  /**
+   * Get claims pending payment
+   */
+  getClaimsPendingPayment(): Observable<Claim[]> {
+    return this.getClaimsByStatus('PENDING_PAYMENT');
   }
 
-  approveInvoice(invoiceId: number): Observable<Invoice> {
-    return this.http.post<Invoice>(
-      `${this.apiUrl}/invoices/${invoiceId}/approve/`,
-      {},
-      { headers: this.getHeaders() }
-    );
+  /**
+   * Get paid claims
+   */
+  getPaidClaims(): Observable<Claim[]> {
+    return this.getClaimsByStatus('PAID');
   }
 
-  settleInvoice(invoiceId: number, paymentReference: string): Observable<Invoice> {
-    return this.http.post<Invoice>(
-      `${this.apiUrl}/invoices/${invoiceId}/settle/`,
-      { payment_reference: paymentReference },
-      { headers: this.getHeaders() }
-    );
+  /**
+   * Get claims for specific farmer
+   */
+  getFarmerClaims(farmerId: number): Observable<Claim[]> {
+    return this.getClaims({ farmer_id: farmerId });
   }
 
-  // ============== SUBSIDIES ENDPOINTS ==============
+  /**
+   * Export claims to CSV
+   */
+  exportToCSV(claims: Claim[], filename: string = 'claims'): void {
+    const headers = [
+      'Claim Number',
+      'Farmer Name',
+      'Policy Number',
+      'Estimated Loss',
+      'Approved Amount',
+      'Status',
+      'Claim Date',
+      'Approval Date'
+    ];
 
-  getSubsidies(params?: any): Observable<Subsidy[]> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key]);
-        }
-      });
-    }
-    return this.http.get<Subsidy[]>(`${this.apiUrl}/subsidies/`, {
-      headers: this.getHeaders(),
-      params: httpParams
-    });
-  }
-
-  // ============== UTILITY METHODS ==============
-
-  formatCurrency(amount: number, currency: string = 'USD'): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency
-    }).format(amount);
-  }
-
-  formatDate(dateString: string): string {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
-  }
-
-  exportToCSV(data: any[], filename: string, headers: string[]): void {
-    const rows = data.map(item =>
-      headers.map(header => {
-        const value = this.getNestedValue(item, header);
-        return typeof value === 'string' && value.includes(',')
-          ? `"${value}"`
-          : value;
-      })
-    );
+    const rows = claims.map(claim => [
+      claim.claim_number,
+      claim.farmer_name,
+      claim.policy_number,
+      claim.estimated_loss_amount.toString(),
+      claim.approved_amount?.toString() || 'N/A',
+      claim.status,
+      this.formatDate(claim.claim_date),
+      claim.approval_date ? this.formatDate(claim.approval_date) : 'N/A'
+    ]);
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.join(','))
+      ...rows.map(row => row.map(field => `"${field}"`).join(','))
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = url;
-    link.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`;
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}_${new Date().getTime()}.csv`);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
     link.click();
-    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
   }
 
-  private getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((current, prop) => current?.[prop], obj);
+  /**
+   * Format currency
+   */
+  formatCurrency(amount: number, currency: string = 'RWF'): string {
+    return new Intl.NumberFormat('en-RW', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0
+    }).format(amount);
+  }
+
+  /**
+   * Format date
+   */
+  formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  /**
+   * Generate claim number
+   */
+  generateClaimNumber(farmerId: number): string {
+    const timestamp = new Date().getTime();
+    return `CLM-${timestamp}-${farmerId}`;
+  }
+
+  /**
+   * Validate claim amount against sum insured
+   */
+  validateClaimAmount(claimAmount: number, sumInsured: number): boolean {
+    return claimAmount > 0 && claimAmount <= sumInsured;
+  }
+
+  /**
+   * Error handler
+   */
+  private handleError(error: any): Observable<never> {
+    console.error('Claim Service Error:', error);
+
+    let errorMessage = 'An error occurred';
+
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = error.error?.detail ||
+                     error.error?.message ||
+                     error.message ||
+                     `Error Code: ${error.status}`;
+    }
+
+    return throwError(() => new Error(errorMessage));
   }
 }

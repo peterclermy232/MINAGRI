@@ -35,10 +35,10 @@ import { FarmerComponent } from './farmer/farmer.component';
 import { QuotationComponent } from './quotation/quotation.component';
 import { SubsidyComponent } from './subsidy/subsidy.component';
 import { PaidComponent } from './paid/paid.component';
-import { PendingComponent } from './pending/pending.component';
+import { PendingComponent } from './claims/pending/pending.component';
 import { ClaimComponent } from './components/claim/claim.component';
-import { PaymentComponent } from './payment/payment.component';
-import { PaidClaimComponent } from './paid-claim/paid-claim.component';
+import { PaymentComponent } from './claims/payment/payment.component';
+import { PaidClaimComponent } from './claims/paid-claim/paid-claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
 import { WrittenComponent } from './written/written.component';
 import { AuthHeaderInterceptor } from './interceptors/auth-header.interceptor';
@@ -61,6 +61,10 @@ import { PendingSettlementComponent } from './subsidy-settlement/pending-settlem
 import { InvoiceService } from './shared/invoice';
 import { SettledComponent } from './subsidy-settlement/settled/settled.component';
 import { ApprovedComponent } from './subsidy-settlement/approved/approved.component';
+import { CreateClaimComponent } from './claims/create-claim/create-claim.component';
+import { OpenClaimComponent } from './claims/open-claim/open-claim.component';
+import { ApprovedClaimComponent } from './claims/approved-claim/approved-claim.component';
+
 
 @NgModule({
   declarations: [
@@ -108,7 +112,10 @@ import { ApprovedComponent } from './subsidy-settlement/approved/approved.compon
     FilterPipe,
     PendingSettlementComponent,
     ApprovedComponent,
-    SettledComponent
+    SettledComponent,
+    CreateClaimComponent,
+    OpenClaimComponent,
+    ApprovedClaimComponent
   ],
   imports: [
     BrowserModule,
