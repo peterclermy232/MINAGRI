@@ -31,7 +31,6 @@ import { SubsidyComponent } from './subsidy/subsidy.component';
 import { PaidComponent } from './paid/paid.component';
 import { PaymentComponent } from './claims/payment/payment.component';
 import { PaidClaimComponent } from './claims/paid-claim/paid-claim.component';
-import { ClaimComponent } from './components/claim/claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
 import { WrittenComponent } from './written/written.component';
 import { ForcastComponent } from './forcast/forcast.component';
@@ -71,7 +70,6 @@ const routes: Routes = [
   {path: 'paid', component: PaidComponent},
   {path: 'payment', component: PaymentComponent},
   {path: 'peid', component: PaidClaimComponent },
-  {path: 'claim', component: ClaimComponent},
   { path: 'crop', component: ManageCrops },
   { path: 'crop-varieties', component: CropVarietiesComponent },
 
@@ -98,12 +96,12 @@ const routes: Routes = [
     path: 'claims',
     children: [
       { path: 'create', component: CreateClaimComponent },
-      { path: 'open', component: OpenClaimComponent },
-      { path: 'pending', component: PendingComponent },
-      { path: 'approved', component: ApprovedClaimComponent },
-      { path: 'payment', component: PaymentComponent },
-      { path: 'paid', component: PaidClaimComponent },
-      { path: '', redirectTo: 'open', pathMatch: 'full' }
+      { path: 'opens', component: OpenClaimComponent },
+      { path: 'pendings', component: PendingComponent },
+      { path: 'approveds', component: ApprovedClaimComponent },
+      { path: 'payments', component: PaymentComponent },
+      { path: 'paids', component: PaidClaimComponent },
+      { path: '', redirectTo: 'opens', pathMatch: 'full' }
     ]
   }
 ];

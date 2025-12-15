@@ -5,65 +5,198 @@
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
         <li class="breadcrumb-item">Dashboard</li>
-        <ol class="breadcrumb-item active">Manage Crop Varieties</ol>
+        <li class="breadcrumb-item active">Manage Crop Varieties</li>
       </ol>
     </nav>
   </div>
+
   <section class="section">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+          <h5 class="card-title">Crop Varieties List</h5>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+            (click)="showModal()">
+            <i class="bi bi-plus-circle"></i> Add New Variety
+          </button>
+        </div>
 
+        <!-- Loading State -->
+        <div *ngIf="cropVarieties.loading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Loading crop varieties...</p>
+        </div>
 
+        <!-- Data Table -->
+        <div *ngIf="!cropVarieties.loading" class="table-responsive">
+          <table class="table table-hover table-striped">
+            <thead class="table-light">
+              <tr>
+                <th>#</th>
+                <th>Crop Variety</th>
+                <th>Crop</th>
+                <th>Organization</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let variety of cropVarieties.data; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ variety.cropVariety || variety.crop_variety }}</td>
+                <td>{{ variety.crop_name }}</td>
+                <td>{{ variety.organisation_name }}</td>
+                <td class="text-center">
+                  <span
+                    [class]="variety.status ? 'en-badge-success' : 'en-badge-warning'">
+                    {{ variety.status ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-warning"
+                      data-bs-toggle="modal"
+                      data-bs-target="#exampleModal"
+                      (click)="showModal(variety)"
+                      title="Edit">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteCropVariety(variety)"
+                      title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="cropVarieties.data.length === 0">
+                <td colspan="6" class="text-center py-4">
+                  <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                  <p class="mt-2 text-muted">No crop varieties found. Click "Add New Variety" to create one.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">{{modalMode.label}}</h5>
+            <h5 class="modal-title" id="exampleModalLabel">{{ modalMode.label }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <form (ngSubmit)="handleSubmit()" [formGroup]="cropVarietyForm" >
+          <form (ngSubmit)="handleSubmit()" [formGroup]="cropVarietyForm">
             <div class="modal-body">
-              <div class="mb-3">
-                <label class="form-label">Enter  Crop Variety Name</label>
-                <input type="text" formControlName="crop_variety" class="form-control">
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="crop_variety"
-                  [inputObject]="this.cropVarietyForm.get('crop_variety')"
-                ></app-error-section>
+              <!-- Debug info (remove in production) -->
+              <div *ngIf="formSubmitted" class="alert alert-info mb-3">
+                <small>
+                  <strong>Debug Info:</strong><br>
+                  Form Valid: {{ cropVarietyForm.valid }}<br>
+                  Crop Variety: {{ cropVarietyForm.get('crop_variety')?.value }}<br>
+                  Crop: {{ cropVarietyForm.get('crop')?.value }}<br>
+                  Status: {{ cropVarietyForm.get('status')?.value }}
+                </small>
               </div>
+
               <div class="mb-3">
-                <label class="form-label">Select Crop</label>
-                <select class="form-control" formControlName="crop_id">
-                  <option *ngFor="let crop of crops" [value]="crop.cropId">{{crop.crop}}</option>
+                <label class="form-label">
+                  Crop Variety Name <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="crop_variety"
+                  class="form-control"
+                  placeholder="Enter crop variety name"
+                  [class.is-invalid]="(formSubmitted || cropVarietyForm.get('crop_variety')?.touched) && cropVarietyForm.get('crop_variety')?.invalid">
+                <div
+                  *ngIf="(formSubmitted || cropVarietyForm.get('crop_variety')?.touched) && cropVarietyForm.get('crop_variety')?.invalid"
+                  class="invalid-feedback d-block">
+                  <div *ngIf="cropVarietyForm.get('crop_variety')?.errors?.['required']">
+                    Crop variety name is required
+                  </div>
+                  <div *ngIf="cropVarietyForm.get('crop_variety')?.errors?.['minlength']">
+                    Name must be at least 2 characters
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">
+                  Select Crop <span class="text-danger">*</span>
+                </label>
+                <select
+                  class="form-control"
+                  formControlName="crop"
+                  [class.is-invalid]="(formSubmitted || cropVarietyForm.get('crop')?.touched) && cropVarietyForm.get('crop')?.invalid">
+                  <option value="">-- Select a crop --</option>
+                  <option *ngFor="let crop of crops" [value]="crop.cropId">
+                    {{ crop.crop }}
+                  </option>
                 </select>
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="crop"
-                  [inputObject]="this.cropVarietyForm.get('crop_id')"
-                ></app-error-section>
+                <div
+                  *ngIf="(formSubmitted || cropVarietyForm.get('crop')?.touched) && cropVarietyForm.get('crop')?.invalid"
+                  class="invalid-feedback d-block">
+                  Please select a crop
+                </div>
               </div>
+
               <div class="mb-3">
-                <label class="form-label">Status</label>
-                <select class="form-control" formControlName="status">
-                  <option value="true">Active</option>
-                  <option value="false">Inactive</option>
+                <label class="form-label">
+                  Status <span class="text-danger">*</span>
+                </label>
+                <select
+                  class="form-control"
+                  formControlName="status"
+                  [class.is-invalid]="(formSubmitted || cropVarietyForm.get('status')?.touched) && cropVarietyForm.get('status')?.invalid">
+                  <option [value]="true">Active</option>
+                  <option [value]="false">Inactive</option>
                 </select>
-                <app-error-section
-                  [formSubmitted]="formSubmitted"
-                  inputProperty="status"
-                  [inputObject]="this.cropVarietyForm.get('status')"
-                ></app-error-section>
+                <div
+                  *ngIf="(formSubmitted || cropVarietyForm.get('status')?.touched) && cropVarietyForm.get('status')?.invalid"
+                  class="invalid-feedback d-block">
+                  Please select a status
+                </div>
               </div>
+
+              <!-- Hidden fields -->
+              <input type="hidden" formControlName="crop_variety_id">
+              <input type="hidden" formControlName="organisation">
             </div>
+
             <div class="modal-footer">
-              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button [disabled]="modalBtn.loading" type="submit" [class]="modalBtn.classes">{{modalBtn.text}}</button>
+              <button
+                type="button"
+                id="cancel"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+                [disabled]="modalBtn.loading">
+                Close
+              </button>
+              <button
+                [disabled]="modalBtn.loading"
+                type="submit"
+                [class]="modalBtn.classes">
+                <span *ngIf="modalBtn.loading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ modalBtn.text }}
+              </button>
             </div>
           </form>
         </div>
       </div>
     </div>
-
   </section>
 </main>

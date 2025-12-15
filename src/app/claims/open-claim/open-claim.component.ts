@@ -1,18 +1,8 @@
+// open-claim.component.ts - Refactored to use ClaimService
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
-
-interface Claim {
-  claim_id: number;
-  farmer_name: string;
-  policy_number: string;
-  claim_number: string;
-  estimated_loss_amount: number;
-  status: string;
-  claim_date: string;
-  loss_details?: any;
-}
+import { ClaimService, Claim } from '../../shared/claim.service';
+import { NotifierService } from '../../services/notifier.service';
 
 @Component({
   selector: 'app-open-claim',
@@ -34,43 +24,34 @@ export class OpenClaimComponent implements OnInit {
   selectedClaim: Claim | null = null;
   showDetailsModal = false;
 
-  private apiUrl = `${environment.apiUrl}/claims/`;
-
   constructor(
-    private http: HttpClient,
-    private router: Router
+    private claimService: ClaimService,
+    private router: Router,
+    private notifier: NotifierService
   ) {}
 
   ngOnInit(): void {
     this.loadOpenClaims();
   }
 
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
   loadOpenClaims(): void {
     this.loading = true;
     this.error = '';
 
-    this.http.get<any>(this.apiUrl, {
-      headers: this.getHeaders(),
-      params: { status: 'OPEN' }
-    }).subscribe({
+    this.claimService.getClaimsByStatus('OPEN').subscribe({
       next: (data) => {
-        this.openClaims = Array.isArray(data) ? data : data.results || [];
-        this.filteredClaims = this.openClaims;
+        this.openClaims = data;
+        this.filteredClaims = data;
         this.updatePagination();
         this.loading = false;
       },
       error: (err) => {
         this.error = 'Failed to load open claims';
         this.loading = false;
-        console.error(err);
+        this.notifier.showToast({
+          typ: 'error',
+          message: err.message || 'Failed to load open claims'
+        });
       }
     });
   }
@@ -127,39 +108,25 @@ export class OpenClaimComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-RW', {
-      style: 'currency',
-      currency: 'RWF',
-      minimumFractionDigits: 0
-    }).format(amount);
+    return this.claimService.formatCurrency(amount);
   }
 
   formatDate(dateString: string): string {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return this.claimService.formatDate(dateString);
   }
 
   exportToExcel(): void {
-    const headers = ['Claim Number', 'Farmer Name', 'Policy Number', 'Estimated Loss', 'Claim Date'];
-    const rows = this.filteredClaims.map(claim => [
-      claim.claim_number,
-      claim.farmer_name,
-      claim.policy_number,
-      claim.estimated_loss_amount.toString(),
-      this.formatDate(claim.claim_date)
-    ]);
-
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `open-claims-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+    this.claimService.exportToCSV(this.filteredClaims, 'open-claims');
+    this.notifier.showToast({
+      typ: 'success',
+      message: 'Claims exported successfully'
+    });
   }
+
+  getTotalEstimatedLoss(): number {
+    return this.filteredClaims.reduce((sum, claim) => sum + claim.estimated_loss_amount, 0);
+  }
+  getMin(a: number, b: number): number {
+  return Math.min(a, b);
+}
 }

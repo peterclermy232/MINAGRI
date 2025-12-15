@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { Observable, of, switchMap, throwError } from 'rxjs';
 import { ApiClientTokenResponse } from '../types';
 import * as moment from 'moment';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
   private baseUrl = `${environment.authUrl}/`;
+
   apiUserLogin() {
     return this.http
       .post(`/oauth2/token`, {
@@ -46,13 +47,19 @@ export class AuthService {
         tap(async (data: any) => {
           const storageData = {
             userToken: data.token,
-            refreshToken: data.refresh,  // Store refresh token
+            refreshToken: data.refresh,
             expiry: moment()
               .add('seconds', data.expires_in || 3600)
               .subtract('seconds', 60)
               .format('YYYY-MM-DD, h:mm:ss a'),
           };
           await this.setAppClientToken(storageData);
+
+          // Store user data if present in response
+          if (data.user) {
+            await this.setUserData(data.user);
+          }
+
           this.router.navigateByUrl('/dashboard');
         }),
         map((resp: any) => {
@@ -70,6 +77,7 @@ export class AuthService {
   async removeApiUserToken() {
     await localStorage.removeItem('apiToken');
     await localStorage.removeItem('userToken');
+    await localStorage.removeItem('userData');
   }
 
   async handleLogout() {
@@ -80,11 +88,46 @@ export class AuthService {
   async removeStorage() {
     await localStorage.removeItem('apiToken');
     await localStorage.removeItem('userToken');
+    await localStorage.removeItem('userData');
   }
 
   async setAppClientToken(data: { userToken: string; refreshToken?: string; expiry: string }) {
     const jsonData = JSON.stringify(data);
     await localStorage.setItem('userToken', jsonData);
+  }
+
+  // NEW METHOD: Store user data
+  async setUserData(user: any) {
+    const jsonData = JSON.stringify(user);
+    await localStorage.setItem('userData', jsonData);
+  }
+
+  // NEW METHOD: Get current user data
+  getCurrentUser(): any | null {
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+      try {
+        return JSON.parse(userData);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        return null;
+      }
+    }
+    return null;
+  }
+
+  // NEW METHOD: Get current user's organization ID
+  getCurrentUserOrganizationId(): number {
+    const user = this.getCurrentUser();
+    if (user) {
+      return user.organisation || user.organisation_id || 1;
+    }
+    return 1; // Default fallback
+  }
+
+  // NEW METHOD: Check if user is authenticated
+  isAuthenticated(): boolean {
+    return this.isloggedInUserTokenUsable() && this.getCurrentUser() !== null;
   }
 
   // NEW METHOD: Get current token synchronously for interceptor
@@ -124,22 +167,20 @@ export class AuthService {
     const refreshToken = this.getRefreshToken();
 
     if (!refreshToken) {
-      // No refresh token available, force re-login
       return throwError(() => new Error('No refresh token available'));
     }
 
     return this.http
-      .post(`/api/auth/token/refresh/`, {
+      .post(`${this.baseUrl}token/refresh/`, {
         refresh: refreshToken,
       })
       .pipe(
         tap(async (data: any) => {
-          // Update stored token with new access token
           const currentData = this.getStoredTokenData();
           if (currentData) {
             const storageData = {
               userToken: data.token,
-              refreshToken: currentData.refreshToken, // Keep existing refresh token
+              refreshToken: currentData.refreshToken,
               expiry: moment()
                 .add('seconds', data.expires_in || 3600)
                 .subtract('seconds', 60)
@@ -150,7 +191,6 @@ export class AuthService {
         }),
         catchError((error) => {
           console.error('Token refresh failed:', error);
-          // If refresh fails, clear tokens and force re-login
           this.removeStorage();
           return throwError(() => error);
         })
@@ -251,5 +291,29 @@ export class AuthService {
       }
     }
     return false;
+  }
+
+  // NEW METHOD: Get user role
+  getUserRole(): string | null {
+    const user = this.getCurrentUser();
+    return user?.user_role || user?.userRole || null;
+  }
+
+  // NEW METHOD: Check if user has specific role
+  hasRole(role: string): boolean {
+    const userRole = this.getUserRole();
+    return userRole === role;
+  }
+
+  // NEW METHOD: Get user's full name
+  getUserFullName(): string {
+    const user = this.getCurrentUser();
+    if (user) {
+      if (user.first_name && user.last_name) {
+        return `${user.first_name} ${user.last_name}`;
+      }
+      return user.user_name || user.userName || 'User';
+    }
+    return 'Guest';
   }
 }

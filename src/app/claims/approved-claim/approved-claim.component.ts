@@ -1,18 +1,8 @@
+// approved-claim.component.ts - Complete Implementation
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
-
-interface Claim {
-  claim_id: number;
-  farmer_name: string;
-  policy_number: string;
-  claim_number: string;
-  estimated_loss_amount: number;
-  approved_amount: number;
-  status: string;
-  claim_date: string;
-  approval_date: string;
-}
+import { ClaimService, Claim } from '../../shared/claim.service';
+import { NotifierService } from '../../services/notifier.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-approved-claim',
@@ -25,6 +15,8 @@ export class ApprovedClaimComponent implements OnInit {
   loading = false;
   error = '';
   searchTerm = '';
+  dateFrom = '';
+  dateTo = '';
 
   // Pagination
   currentPage = 1;
@@ -34,56 +26,80 @@ export class ApprovedClaimComponent implements OnInit {
   selectedClaim: Claim | null = null;
   showDetailsModal = false;
 
-  private apiUrl = `${environment.apiUrl}/claims/`;
+  // Add Math for template
+  Math = Math;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private claimService: ClaimService,
+    private notifier: NotifierService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadApprovedClaims();
-  }
-
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
   }
 
   loadApprovedClaims(): void {
     this.loading = true;
     this.error = '';
 
-    // Load claims with PENDING_PAYMENT status (these are approved)
-    this.http.get<any>(this.apiUrl, {
-      headers: this.getHeaders(),
-      params: { status: 'PENDING_PAYMENT' }
-    }).subscribe({
+    // PENDING_PAYMENT status means claims are approved but not yet paid
+    this.claimService.getClaimsPendingPayment().subscribe({
       next: (data) => {
-        this.approvedClaims = Array.isArray(data) ? data : data.results || [];
-        this.filteredClaims = this.approvedClaims;
+        this.approvedClaims = data;
+        this.filteredClaims = data;
         this.updatePagination();
         this.loading = false;
       },
       error: (err) => {
         this.error = 'Failed to load approved claims';
         this.loading = false;
-        console.error(err);
+        this.notifier.showToast({
+          typ: 'error',
+          message: err.message || 'Failed to load approved claims'
+        });
       }
     });
   }
 
-  applySearch(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredClaims = [...this.approvedClaims];
-    } else {
+  applyFilters(): void {
+    let filtered = [...this.approvedClaims];
+
+    // Search filter
+    if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
-      this.filteredClaims = this.approvedClaims.filter(claim =>
+      filtered = filtered.filter(claim =>
         claim.claim_number.toLowerCase().includes(term) ||
         claim.farmer_name.toLowerCase().includes(term) ||
         claim.policy_number.toLowerCase().includes(term)
       );
     }
+
+    // Date filters
+    if (this.dateFrom) {
+      const fromDate = new Date(this.dateFrom);
+      filtered = filtered.filter(claim =>
+        new Date(claim.approval_date || claim.claim_date) >= fromDate
+      );
+    }
+
+    if (this.dateTo) {
+      const toDate = new Date(this.dateTo);
+      filtered = filtered.filter(claim =>
+        new Date(claim.approval_date || claim.claim_date) <= toDate
+      );
+    }
+
+    this.filteredClaims = filtered;
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.dateFrom = '';
+    this.dateTo = '';
+    this.filteredClaims = [...this.approvedClaims];
     this.currentPage = 1;
     this.updatePagination();
   }
@@ -98,7 +114,11 @@ export class ApprovedClaimComponent implements OnInit {
   }
 
   getTotalApprovedAmount(): number {
-    return this.filteredClaims.reduce((sum, claim) => sum + claim.approved_amount, 0);
+    return this.filteredClaims.reduce((sum, claim) => sum + (claim.approved_amount || 0), 0);
+  }
+
+  getPageTotal(): number {
+    return this.paginatedClaims.reduce((sum, claim) => sum + (claim.approved_amount || 0), 0);
   }
 
   nextPage(): void {
@@ -123,40 +143,30 @@ export class ApprovedClaimComponent implements OnInit {
     this.selectedClaim = null;
   }
 
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-RW', {
-      style: 'currency',
-      currency: 'RWF',
-      minimumFractionDigits: 0
-    }).format(amount);
-  }
-
-  formatDate(dateString: string): string {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+  processPayment(claim: Claim): void {
+    // Navigate to payment page with claim info
+    this.router.navigate(['/claims/payment'], {
+      queryParams: { claimId: claim.claim_id }
     });
   }
 
-  exportToExcel(): void {
-    const headers = ['Claim Number', 'Farmer Name', 'Policy Number', 'Approved Amount', 'Approval Date'];
-    const rows = this.filteredClaims.map(claim => [
-      claim.claim_number,
-      claim.farmer_name,
-      claim.policy_number,
-      claim.approved_amount.toString(),
-      this.formatDate(claim.approval_date)
-    ]);
+  formatCurrency(amount: number | undefined): string {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+    .format(amount ?? 0);
+}
 
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `approved-claims-${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+
+  formatDate(date: string | undefined): string {
+  if (!date) return '—';
+  return new Date(date).toLocaleDateString();
+}
+
+
+  exportToExcel(): void {
+    this.claimService.exportToCSV(this.filteredClaims, 'approved-claims');
+    this.notifier.showToast({
+      typ: 'success',
+      message: 'Claims exported successfully'
+    });
   }
 }

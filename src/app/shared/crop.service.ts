@@ -16,6 +16,13 @@ export class CropService {
     private organizationsService: OrganizationService
   ) {}
 
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    });
+  }
   /**
    * Get all crops with their organizations
    */
@@ -144,107 +151,112 @@ updateCrop(payload: any, id: number): Observable<any> {
     );
   }
 
-  // ========== CROP VARIETY METHODS ==========
+  // ==================== CROP VARIETIES ====================
 
   /**
    * Get all crop varieties
    */
   getCropVarieties(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/crop_varieties/?request_type=cropApi`).pipe(
-      switchMap((cropVarResponse) => {
-        return this.organizationsService
-          .getOrganizationsShallow()
-          .pipe(map((orgsResponse) => ({ cropVarResponse, orgsResponse })));
-      }),
-      switchMap(({ cropVarResponse, orgsResponse }) => {
-        return this.getCropsShallow().pipe(
-          map((cropsResponse) => ({
-            cropVarResponse,
-            orgsResponse,
-            cropsResponse,
-          }))
-        );
-      }),
-      tap(({ cropVarResponse, orgsResponse, cropsResponse }) => {
-        console.log('Crop varieties loaded:', {
-          varieties: Array.isArray(cropVarResponse) ? cropVarResponse.length : 0,
-          orgs: orgsResponse,
-          crops: Array.isArray(cropsResponse) ? cropsResponse.length : 0
-        });
-        return of({ cropVarResponse, orgsResponse, cropsResponse });
-      }),
-      catchError((error) => {
-        console.error('Error fetching crop varieties:', error);
-        return throwError(() => error);
-      })
-    );
+    return this.http.get(`${this.baseUrl}/crop_varieties/`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get crop varieties with related details (crops and organizations)
+   */
+  getCropVarietiesWithDetails(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crop_varieties/with_details/`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get single crop variety by ID
+   */
+  getCropVariety(varietyId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crop_varieties/${varietyId}/`, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
    * Create a new crop variety
+   * Expected payload structure:
+   * {
+   *   crop: number (foreign key to Crop),
+   *   organisation: number (foreign key to Organisation),
+   *   crop_variety: string,
+   *   status: boolean,
+   *   deleted: boolean
+   * }
    */
-  postCropVariety(data: any): Observable<any> {
-    const payload = {
-      crop_variety: data.cropVariety || data.crop_variety,
-      cropId: data.cropId || data.crop,
-      organisationId: data.organisationId || 1,
-      status: data.status,
-      deleted: false,
-      request_type: 'cropApi'
-    };
-
-    console.log('Creating crop variety with payload:', payload);
-
-    return this.http.post<any>(`${this.baseUrl}/crop_varieties/`, payload).pipe(
-      tap((response) => {
-        console.log('Crop variety created successfully:', response);
-      }),
-      catchError((error) => {
-        console.error('Error creating crop variety:', error);
-        return throwError(() => error);
-      })
-    );
+  postCropVariety(payload: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/crop_varieties/`, payload, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
    * Update an existing crop variety
+   * Expected payload structure:
+   * {
+   *   crop: number,
+   *   organisation: number,
+   *   crop_variety: string,
+   *   status: boolean,
+   *   deleted: boolean,
+   *   record_version: number (for optimistic locking)
+   * }
    */
-  updateCropVariety(data: any, id: number): Observable<any> {
-    const payload = {
-      crop_variety: data.cropVariety || data.crop_variety,
-      cropId: data.cropId || data.crop,
-      organisationId: data.organisationId || 1,
-      status: data.status,
-      deleted: false,
-      recordVersion: data.recordVersion || 1,
-      request_type: 'cropApi'
-    };
-
-    console.log('Updating crop variety:', id, payload);
-
-    return this.http.put<any>(`${this.baseUrl}/crop_varieties/${id}/`, payload).pipe(
-      tap((response) => {
-        console.log('Crop variety updated successfully:', response);
-      }),
-      catchError((error) => {
-        console.error('Error updating crop variety:', error);
-        return throwError(() => error);
-      })
-    );
+  updateCropVariety(varietyId: number, payload: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/crop_varieties/${varietyId}/`, payload, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
-   * Delete a crop variety
+   * Partially update a crop variety
    */
-  deleteCropVariety(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/crop_varieties/${id}/`).pipe(
-      tap((response) => {
-        console.log('Crop variety deleted successfully:', response);
-      }),
-      catchError((error) => {
-        console.error('Error deleting crop variety:', error);
-        return throwError(() => error);
-      })
-    );
+  patchCropVariety(varietyId: number, payload: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/crop_varieties/${varietyId}/`, payload, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Delete a crop variety (soft delete by setting deleted=true)
+   */
+  deleteCropVariety(varietyId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/crop_varieties/${varietyId}/`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get crop varieties by crop ID
+   */
+  getCropVarietiesByCrop(cropId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crop_varieties/?crop=${cropId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get crop varieties by organization ID
+   */
+  getCropVarietiesByOrganisation(orgId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crop_varieties/?organisation=${orgId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  /**
+   * Get active crop varieties only
+   */
+  getActiveCropVarieties(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/crop_varieties/?status=true`, {
+      headers: this.getHeaders()
+    });
   }
 }

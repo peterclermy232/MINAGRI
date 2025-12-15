@@ -6,17 +6,26 @@ export interface Crop {
   organisationId: number;
   recordVersion?: number;
   status: boolean;
+  crop_id: number;
 
 }
 
 export interface CropVariety {
-  cropVarietyId?: number;
-  cropId: number;
-  organisationId: number;
-  recordVersion?: number;
-  deleted: boolean;
+  crop_variety_id: number;
+  cropVarietyId?: number; // Alias for backward compatibility
+  crop: number; // Foreign key to Crop
+  cropId?: number; // Alias for backward compatibility
+  crop_name?: string; // From serializer
+  organisation: number; // Foreign key to Organisation
+  organisationId?: number; // Alias for backward compatibility
+  organisation_name?: string; // From serializer
+  crop_variety: string;
+  cropVariety?: string; // Alias for backward compatibility
   status: boolean;
-  cropVariety: string;
+  deleted: boolean;
+  record_version: number;
+  recordVersion?: number; // Alias for backward compatibility
+  date_time_added: string;
 }
 
 export interface ENV {

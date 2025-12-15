@@ -1,12 +1,31 @@
-<!-- pending.component.html -->
+<main id="main" class="main">
+  <div class="pagetitle">
+      <h1>Pending Claims</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+          <li class="breadcrumb-item">Dashboard</li>
+          <li class="breadcrumb-item active">Pending Claims</li>
+        </ol>
+      </nav>
+    </div>
+  <section class="section">
+
+
+
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Pending Claims</h3>
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-clipboard-list mr-2"></i>Pending Claims Management
+          </h3>
           <div class="card-tools">
-            <button class="btn btn-sm btn-primary" (click)="loadPendingClaims()">
+            <button class="btn btn-sm btn-light mr-2" (click)="exportToExcel()">
+              <i class="fas fa-file-excel"></i> Export
+            </button>
+            <button class="btn btn-sm btn-light" (click)="loadPendingClaims()">
               <i class="fas fa-sync"></i> Refresh
             </button>
           </div>
@@ -16,69 +35,199 @@
           <!-- Alert Messages -->
           <div *ngIf="error" class="alert alert-danger alert-dismissible">
             <button type="button" class="close" (click)="error = ''">&times;</button>
-            {{ error }}
+            <i class="fas fa-exclamation-triangle mr-2"></i>{{ error }}
+          </div>
+
+          <!-- Statistics Cards -->
+          <div class="row mb-4">
+            <div class="col-lg-3 col-6">
+              <div class="small-box bg-warning">
+                <div class="inner">
+                  <h3>{{ openClaims.length }}</h3>
+                  <p>Open Claims</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-folder-open"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-6">
+              <div class="small-box bg-info">
+                <div class="inner">
+                  <h3>{{ underAssessmentClaims.length }}</h3>
+                  <p>Under Assessment</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-search-dollar"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-6">
+              <div class="small-box bg-primary">
+                <div class="inner">
+                  <h3>{{ allPendingClaims.length }}</h3>
+                  <p>Total Pending</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-6">
+              <div class="small-box bg-secondary">
+                <div class="inner">
+                  <h3>{{ formatCurrency(getTotalEstimatedLoss()) }}</h3>
+                  <p>Estimated Loss</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-dollar-sign"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group mb-0">
+                    <label class="mb-1">Search</label>
+                    <input type="text"
+                           class="form-control"
+                           [(ngModel)]="searchTerm"
+                           (ngModelChange)="applyFilters()"
+                           placeholder="Search claims...">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group mb-0">
+                    <label class="mb-1">Status Filter</label>
+                    <select class="form-control"
+                            [(ngModel)]="statusFilter"
+                            (ngModelChange)="applyFilters()">
+                      <option value="ALL">All Status</option>
+                      <option value="OPEN">Open</option>
+                      <option value="UNDER_ASSESSMENT">Under Assessment</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <label class="mb-1">&nbsp;</label>
+                  <button class="btn btn-secondary btn-block" (click)="clearFilters()">
+                    <i class="fas fa-times"></i> Clear
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Loading Spinner -->
-          <div *ngIf="loading" class="text-center">
-            <div class="spinner-border" role="status">
+          <div *ngIf="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
               <span class="sr-only">Loading...</span>
             </div>
+            <p class="mt-2">Loading pending claims...</p>
           </div>
 
           <!-- Claims Table -->
           <div *ngIf="!loading" class="table-responsive">
-            <table class="table table-bordered table-hover">
-              <thead>
+            <table class="table table-bordered table-hover table-striped">
+              <thead class="thead-dark">
                 <tr>
+                  <th>#</th>
                   <th>Claim Number</th>
                   <th>Farmer Name</th>
                   <th>Policy Number</th>
                   <th>Estimated Loss</th>
                   <th>Status</th>
+                  <th>Assessor</th>
                   <th>Claim Date</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let claim of pendingClaims">
-                  <td>{{ claim.claim_number }}</td>
+                <tr *ngFor="let claim of paginatedClaims; let i = index">
+                  <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                  <td>
+                    <strong class="text-primary">{{ claim.claim_number }}</strong>
+                  </td>
                   <td>{{ claim.farmer_name }}</td>
                   <td>{{ claim.policy_number }}</td>
-                  <td>{{ formatCurrency(claim.estimated_loss_amount) }}</td>
+                  <td class="text-right">{{ formatCurrency(claim.estimated_loss_amount) }}</td>
                   <td>
-                    <span class="badge"
-                          [ngClass]="{'badge-warning': claim.status === 'OPEN',
-                                     'badge-info': claim.status === 'UNDER_ASSESSMENT'}">
+                    <span class="badge" [ngClass]="getStatusBadgeClass(claim.status)">
+                      <i class="fas"
+                         [ngClass]="{'fa-folder-open': claim.status === 'OPEN',
+                                     'fa-search': claim.status === 'UNDER_ASSESSMENT'}"></i>
                       {{ claim.status }}
                     </span>
                   </td>
-                  <td>{{ formatDate(claim.claim_date) }}</td>
                   <td>
+                    <small *ngIf="claim.loss_assessor_name" class="text-success">
+                      <i class="fas fa-user-check"></i> {{ claim.loss_assessor_name }}
+                    </small>
+                    <small *ngIf="!claim.loss_assessor_name" class="text-muted">
+                      <i class="fas fa-user-times"></i> Not assigned
+                    </small>
+                  </td>
+                  <td>{{ formatDate(claim.claim_date) }}</td>
+                  <td class="text-nowrap">
                     <button class="btn btn-sm btn-info mr-1"
                             (click)="viewClaimDetails(claim)"
                             title="View Details">
-                      <i class="fas fa-eye"></i>
+                      <i class="bi bi-bullseye"></i>
                     </button>
                     <button *ngIf="claim.status === 'OPEN'"
                             class="btn btn-sm btn-primary mr-1"
                             (click)="openAssignModal(claim)"
                             title="Assign Assessor">
-                      <i class="fas fa-user-plus"></i>
+                      <i class="bi bi-person-plus"></i>
                     </button>
                     <button *ngIf="claim.status === 'UNDER_ASSESSMENT'"
                             class="btn btn-sm btn-success"
                             (click)="openApproveModal(claim)"
-                            title="Approve">
-                      <i class="fas fa-check"></i>
+                            title="Approve Claim">
+                      <i class="bi bi-check"></i>
                     </button>
                   </td>
                 </tr>
-                <tr *ngIf="pendingClaims.length === 0">
-                  <td colspan="7" class="text-center">No pending claims found</td>
+                <tr *ngIf="paginatedClaims.length === 0">
+                  <td colspan="9" class="text-center py-4">
+                    <i class="bi bi-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No pending claims found</p>
+                  </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="row mt-3" *ngIf="filteredClaims.length > pageSize">
+            <div class="col-md-6">
+              <p class="text-muted">
+                Showing {{ (currentPage - 1) * pageSize + 1 }} to
+                {{ Math.min(currentPage * pageSize, filteredClaims.length) }} of
+                {{ filteredClaims.length }} entries
+              </p>
+            </div>
+            <div class="col-md-6">
+              <nav>
+                <ul class="pagination justify-content-end mb-0">
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <a class="page-link" (click)="previousPage()">Previous</a>
+                  </li>
+                  <li class="page-item"
+                      *ngFor="let page of [].constructor(Math.min(5, totalPages)); let i = index"
+                      [class.active]="currentPage === i + 1">
+                    <a class="page-link" (click)="goToPage(i + 1)">{{ i + 1 }}</a>
+                  </li>
+                  <li class="page-item" [class.disabled]="currentPage === totalPages">
+                    <a class="page-link" (click)="nextPage()">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
         </div>
       </div>
@@ -88,34 +237,64 @@
 
 <!-- Assign Assessor Modal -->
 <div class="modal" [style.display]="showAssignModal ? 'block' : 'none'">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Assign Loss Assessor</h5>
-        <button type="button" class="close" (click)="closeAssignModal()">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-user-plus mr-2"></i>Assign Loss Assessor
+        </h5>
+        <button type="button" class="close text-white" (click)="closeAssignModal()">
           <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label>Claim Number:</label>
-          <p class="font-weight-bold">{{ selectedClaim?.claim_number }}</p>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Claim Number:</label>
+              <p class="font-weight-bold">{{ selectedClaim?.claim_number }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Farmer:</label>
+              <p class="font-weight-bold">{{ selectedClaim?.farmer_name }}</p>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Farmer:</label>
-          <p class="font-weight-bold">{{ selectedClaim?.farmer_name }}</p>
+
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <label>Estimated Loss:</label>
+              <p class="font-weight-bold text-danger">
+                {{ formatCurrency(selectedClaim?.estimated_loss_amount || 0) }}
+              </p>
+            </div>
+          </div>
         </div>
+
+        <hr>
+
         <div class="form-group">
-          <label for="assessorSelect">Select Assessor *</label>
+          <label for="assessorSelect">Select Loss Assessor <span class="text-danger">*</span></label>
           <select id="assessorSelect"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   [(ngModel)]="selectedAssessorId">
             <option [value]="null">-- Select Assessor --</option>
             <option *ngFor="let assessor of lossAssessors"
                     [value]="assessor.assessor_id">
-              {{ assessor.user_name }} ({{ assessor.organisation_name }})
+              {{ assessor.user_name }} - {{ assessor.organisation_name }}
             </option>
           </select>
+          <small class="form-text text-muted">
+            The selected assessor will be responsible for evaluating this claim
+          </small>
+        </div>
+
+        <div class="alert alert-info" *ngIf="lossAssessors.length === 0">
+          <i class="fas fa-info-circle"></i>
+          No active loss assessors available. Please add assessors first.
         </div>
       </div>
       <div class="modal-footer">
@@ -127,7 +306,8 @@
                 [disabled]="!selectedAssessorId || loading"
                 (click)="assignAssessor()">
           <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
-          Assign
+          <i class="fas fa-user-plus mr-1" *ngIf="!loading"></i>
+          Assign Assessor
         </button>
       </div>
     </div>
@@ -136,31 +316,71 @@
 
 <!-- Approve Claim Modal -->
 <div class="modal" [style.display]="showApproveModal ? 'block' : 'none'">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Approve Claim</h5>
-        <button type="button" class="close" (click)="closeApproveModal()">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-check-circle mr-2"></i>Approve Claim
+        </h5>
+        <button type="button" class="close text-white" (click)="closeApproveModal()">
           <span>&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label>Claim Number:</label>
-          <p class="font-weight-bold">{{ selectedClaim?.claim_number }}</p>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Claim Number:</label>
+              <p class="font-weight-bold">{{ selectedClaim?.claim_number }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Farmer:</label>
+              <p class="font-weight-bold">{{ selectedClaim?.farmer_name }}</p>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Estimated Loss:</label>
-          <p class="font-weight-bold">{{ formatCurrency(selectedClaim?.estimated_loss_amount || 0) }}</p>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Estimated Loss:</label>
+              <p class="font-weight-bold text-danger">
+                {{ formatCurrency(selectedClaim?.estimated_loss_amount || 0) }}
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Assessor:</label>
+              <p class="font-weight-bold text-success">
+                {{ selectedClaim?.loss_assessor_name || 'N/A' }}
+              </p>
+            </div>
+          </div>
         </div>
+
+        <hr>
+
         <div class="form-group">
-          <label for="approvedAmount">Approved Amount *</label>
+          <label for="approvedAmount">Approved Amount (RWF) <span class="text-danger">*</span></label>
           <input type="number"
                  id="approvedAmount"
-                 class="form-control"
+                 class="form-control form-control-lg"
                  [(ngModel)]="approvedAmount"
                  min="0"
-                 step="0.01">
+                 step="1000"
+                 placeholder="Enter approved amount">
+          <small class="form-text text-muted">
+            Enter the final approved amount for this claim
+          </small>
+        </div>
+
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle mr-2"></i>
+          <strong>Important:</strong> Once approved, the claim will move to pending payment status.
+          Please ensure the amount is correct before approving.
         </div>
       </div>
       <div class="modal-footer">
@@ -168,11 +388,88 @@
           Cancel
         </button>
         <button type="button"
-                class="btn btn-success"
+                class="btn btn-success btn-lg"
                 [disabled]="!approvedAmount || loading"
                 (click)="approveClaim()">
           <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
-          Approve
+          <i class="fas fa-check mr-1" *ngIf="!loading"></i>
+          Approve Claim
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal" [style.display]="showDetailsModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-info-circle mr-2"></i>Claim Details
+        </h5>
+        <button type="button" class="close text-white" (click)="closeDetailsModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" *ngIf="selectedClaim">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2">Claim Information</h6>
+            <table class="table table-sm">
+              <tr>
+                <td><strong>Claim Number:</strong></td>
+                <td>{{ selectedClaim.claim_number }}</td>
+              </tr>
+              <tr>
+                <td><strong>Status:</strong></td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(selectedClaim.status)">
+                    {{ selectedClaim.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Claim Date:</strong></td>
+                <td>{{ formatDate(selectedClaim.claim_date) }}</td>
+              </tr>
+              <tr>
+                <td><strong>Estimated Loss:</strong></td>
+                <td class="text-danger font-weight-bold">
+                  {{ formatCurrency(selectedClaim.estimated_loss_amount) }}
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2">Farmer & Policy</h6>
+            <table class="table table-sm">
+              <tr>
+                <td><strong>Farmer Name:</strong></td>
+                <td>{{ selectedClaim.farmer_name }}</td>
+              </tr>
+              <tr>
+                <td><strong>Policy Number:</strong></td>
+                <td>{{ selectedClaim.policy_number }}</td>
+              </tr>
+              <tr>
+                <td><strong>Assessor:</strong></td>
+                <td>
+                  <span *ngIf="selectedClaim.loss_assessor_name" class="text-success">
+                    <i class="fas fa-user-check"></i> {{ selectedClaim.loss_assessor_name }}
+                  </span>
+                  <span *ngIf="!selectedClaim.loss_assessor_name" class="text-muted">
+                    Not assigned
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDetailsModal()">
+          Close
         </button>
       </div>
     </div>
@@ -180,5 +477,6 @@
 </div>
 
 <!-- Modal Backdrop -->
-<div class="modal-backdrop fade show"
-     *ngIf="showAssignModal || showApproveModal"></div>
+<div class="modal-backdrop fade show" *ngIf="showAssignModal || showApproveModal || showDetailsModal"></div>
+</section>
+</main>

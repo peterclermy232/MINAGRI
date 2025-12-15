@@ -36,7 +36,6 @@ import { QuotationComponent } from './quotation/quotation.component';
 import { SubsidyComponent } from './subsidy/subsidy.component';
 import { PaidComponent } from './paid/paid.component';
 import { PendingComponent } from './claims/pending/pending.component';
-import { ClaimComponent } from './components/claim/claim.component';
 import { PaymentComponent } from './claims/payment/payment.component';
 import { PaidClaimComponent } from './claims/paid-claim/paid-claim.component';
 import { SeasonsComponent } from './seasons/seasons.component';
@@ -102,7 +101,6 @@ import { ApprovedClaimComponent } from './claims/approved-claim/approved-claim.c
     SubsidyComponent,
     PaidComponent,
     PendingComponent,
-    ClaimComponent,
     PaymentComponent,
     PaidClaimComponent,
     SeasonsComponent,

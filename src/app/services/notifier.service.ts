@@ -8,7 +8,7 @@ export class NotifierService {
   constructor() {}
 
   // ------------------- TOAST NOTIFICATION -------------------
-  showToast(data: { typ: 'success' | 'error'; message: string }) {
+  showToast(data: { typ: 'success' | 'error' | 'info' | 'warning'; message: string }) {
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
@@ -32,6 +32,9 @@ export class NotifierService {
     typ: 'success' | 'error' | 'warning';
     message: string;
     timer?: boolean;
+    confirm?: boolean;
+    confirmText?: string;
+    cancelText?: string;
   }): Promise<any> {
     const title =
       data.typ === 'success'

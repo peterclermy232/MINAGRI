@@ -29,7 +29,7 @@ export class CropVarietiesComponent implements OnInit {
   crops: Crop[] = [];
   cropVarieties: {
     loading: boolean;
-    data: Crop[] | any[];
+    data: any[];
   } = {
     loading: false,
     data: [],
@@ -38,19 +38,19 @@ export class CropVarietiesComponent implements OnInit {
     columns: [
       {
         label: 'Crop Variety',
-        data: 'cropVariety',
+        data: 'crop_variety',
         dynamic: true,
         classes: '',
       },
       {
         label: 'Crop',
-        data: 'crop',
+        data: 'crop_name',
         dynamic: true,
         classes: '',
       },
       {
         label: 'Organization',
-        data: 'organisation',
+        data: 'organisation_name',
         dynamic: true,
         classes: '',
       },
@@ -62,6 +62,7 @@ export class CropVarietiesComponent implements OnInit {
       },
     ],
   };
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
@@ -70,14 +71,17 @@ export class CropVarietiesComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.cropVarietyForm = this.fb.group({
-      crop_variety: ['', [Validators.required]],
-      crop_id: ['', [Validators.required]],
+      crop_variety: ['', [Validators.required, Validators.minLength(2)]],
+      crop: ['', [Validators.required]],
       status: [true, Validators.required],
-      cropVarietyId: [''],
+      crop_variety_id: [''],
+      organisation: [''],      
     });
   }
+
   ngOnInit(): void {
     this.getCropVarieties();
+    this.loadCrops();
   }
 
   showModal(crop?: CropVariety) {
@@ -85,7 +89,7 @@ export class CropVarietiesComponent implements OnInit {
       this.modalMode.typ = 'edit';
       this.modalMode.label = 'Edit Crop Variety';
       this.modalBtn = {
-        text: 'Edit Crop Variety',
+        text: 'Update Crop Variety',
         classes: 'btn btn-warning',
         loading: false,
       };
@@ -102,12 +106,68 @@ export class CropVarietiesComponent implements OnInit {
       this.resetForm();
     }
   }
+
   setCropInfo(crop: CropVariety) {
-    this.cropVarietyForm.get('crop_id')!.setValue(crop.cropId);
-    this.cropVarietyForm.get('crop_variety')!.setValue(crop.cropVariety);
-    this.cropVarietyForm.get('status')!.setValue(crop.status);
-    this.cropVarietyForm.get('cropVarietyId')!.setValue(crop.cropVarietyId);
+    // Map backend field names to form controls
+    this.cropVarietyForm.patchValue({
+      crop: crop.cropId || crop.crop, // Use cropId alias
+      crop_variety: crop.cropVariety || crop.crop_variety,
+      status: crop.status,
+      organisation: crop.organisationId || crop.organisation,
+      crop_variety_id: crop.cropVarietyId || crop.crop_variety_id,
+    });
   }
+
+  loadCrops() {
+    this.cropService.getCrops().subscribe(
+      (resp: any) => {
+        console.log('Crops response:', resp);
+
+        // Handle different response formats
+        let cropsArray: any[] = [];
+
+        if (Array.isArray(resp)) {
+          // Direct array response
+          cropsArray = resp;
+        } else if (resp.results && Array.isArray(resp.results)) {
+          // Paginated response with results array
+          cropsArray = resp.results;
+        } else if (resp.cropsResponse) {
+          // Custom response format from with_details endpoint
+          if (Array.isArray(resp.cropsResponse)) {
+            cropsArray = resp.cropsResponse;
+          } else if (resp.cropsResponse.results && Array.isArray(resp.cropsResponse.results)) {
+            cropsArray = resp.cropsResponse.results;
+          } else if (typeof resp.cropsResponse === 'object') {
+            // If cropsResponse is an object, try to convert it to array
+            cropsArray = Object.values(resp.cropsResponse);
+          }
+        } else {
+          console.warn('Unexpected crops response format:', resp);
+          cropsArray = [];
+        }
+
+        console.log('Extracted crops array:', cropsArray);
+
+        // Map to match types.d.ts
+        this.crops = cropsArray.map((crop: any) => ({
+          ...crop,
+          cropId: crop.crop_id || crop.cropId,
+          organisationId: crop.organisation || crop.organisationId,
+        }));
+
+        console.log('Mapped crops:', this.crops);
+      },
+      (err) => {
+        console.error('Error loading crops:', err);
+        this.notifierService.showSweetAlert({
+          typ: 'error',
+          message: 'Failed to load crops',
+        });
+      }
+    );
+  }
+
   getCropVarieties() {
     this.cropVarieties.loading = true;
     this.cropService
@@ -119,43 +179,71 @@ export class CropVarietiesComponent implements OnInit {
       )
       .subscribe(
         (resp: any) => {
-          // this.crops.data = resp;
-          const orgs = resp.orgsResponse.results;
-          const crop = resp.cropsResponse;
-          console.log('cropvars resp', resp);
-          this.crops = crop;
-          this.cropVarieties.data = resp.cropVarResponse.map((cropVar: any) => {
-            const org = orgs.find(
-              (typ: any) => typ.organisation_id === cropVar.organisationId
-            );
-            const cr = crop.find((cp: any) => cp.cropId === cropVar.cropId);
-            return {
-              ...cropVar,
-              crop: cr ? cr.crop : 'none',
-              organisation: org ? org.organisation_name : 'none',
-            };
-          });
+          console.log('Crop varieties response:', resp);
+
+          // Handle different response formats
+          let varietiesArray: any[] = [];
+
+          if (Array.isArray(resp)) {
+            // Direct array response
+            varietiesArray = resp;
+          } else if (resp.results && Array.isArray(resp.results)) {
+            // Paginated response with results array
+            varietiesArray = resp.results;
+          } else if (resp.cropVarResponse && Array.isArray(resp.cropVarResponse)) {
+            // Custom response format (from with_details endpoint)
+            varietiesArray = resp.cropVarResponse;
+          } else {
+            console.warn('Unexpected crop varieties response format:', resp);
+            varietiesArray = [];
+          }
+
+          // Map to match existing types.d.ts interface
+          this.cropVarieties.data = varietiesArray.map((variety: any) => ({
+            ...variety,
+            cropVarietyId: variety.crop_variety_id || variety.cropVarietyId,
+            cropVariety: variety.crop_variety || variety.cropVariety,
+            cropId: variety.crop || variety.cropId,
+            crop_name: variety.crop_name || 'N/A',
+            organisationId: variety.organisation || variety.organisationId,
+            organisation_name: variety.organisation_name || 'N/A',
+          }));
+
+          console.log('Mapped varieties:', this.cropVarieties.data);
         },
         (err) => {
-          console.log('crop err', err);
+          console.error('Crop varieties error:', err);
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: 'Failed to load crop varieties',
+          });
         }
       );
   }
+
   createCropVariety() {
-    console.log('creating variety');
+    console.log('Creating variety');
     this.modalBtn = {
       loading: true,
       text: 'Processing...',
       classes: 'btn btn-primary',
     };
+
+    // Get organization ID from AuthService
+    const organisationId = this.authService.getCurrentUserOrganizationId();
+
+    const payload = {
+      crop: this.cropVarietyForm.get('crop')?.value,
+      crop_variety: this.cropVarietyForm.get('crop_variety')?.value,
+      organisation: organisationId,
+      status: this.cropVarietyForm.get('status')?.value,
+      deleted: false,
+    };
+
+    console.log('Create payload:', payload);
+
     this.cropService
-      .postCropVariety({
-        cropId: this.cropVarietyForm.get('crop_id')?.value,
-        cropVariety: this.cropVarietyForm.get('crop_variety')?.value,
-        deleted: false,
-        organisationId: 1,
-        status: this.cropVarietyForm.get('status')?.value,
-      })
+      .postCropVariety(payload)
       .pipe(
         finalize(() => {
           this.modalBtn = {
@@ -167,7 +255,7 @@ export class CropVarietiesComponent implements OnInit {
       )
       .subscribe(
         (resp) => {
-          console.log('create resp', resp);
+          console.log('Create response:', resp);
           this.notifierService.showSweetAlert({
             typ: 'success',
             message: 'Crop variety successfully created!',
@@ -175,11 +263,27 @@ export class CropVarietiesComponent implements OnInit {
           });
           this.resetForm();
           this.getCropVarieties();
+
+          // Close modal
+          const closeBtn = document.getElementById('cancel') as HTMLElement;
+          closeBtn?.click();
         },
         (err) => {
-          console.log('crop err', err);
-          const errorMessage =
-            err.error.errors[0].message || 'Invalid data submitted';
+          console.error('Create error:', err);
+          let errorMessage = 'Failed to create crop variety';
+
+          if (err.error) {
+            if (typeof err.error === 'string') {
+              errorMessage = err.error;
+            } else if (err.error.detail) {
+              errorMessage = err.error.detail;
+            } else if (err.error.crop_variety) {
+              errorMessage = Array.isArray(err.error.crop_variety)
+                ? err.error.crop_variety[0]
+                : err.error.crop_variety;
+            }
+          }
+
           this.notifierService.showSweetAlert({
             typ: 'error',
             message: errorMessage,
@@ -187,51 +291,64 @@ export class CropVarietiesComponent implements OnInit {
         }
       );
   }
+
   updateCropVariety() {
-    console.log('updating variety');
+    console.log('Updating variety');
     this.modalBtn = {
       loading: true,
       text: 'Processing...',
-      classes: 'btn btn-primary',
+      classes: 'btn btn-warning',
     };
-    // console.log('varietyform', this.cropVarietyForm);
+
+    const cropVarietyId = this.cropVarietyForm.get('crop_variety_id')?.value;
+
+    const payload = {
+      crop: this.cropVarietyForm.get('crop')?.value,
+      crop_variety: this.cropVarietyForm.get('crop_variety')?.value,
+      organisation: this.cropVarietyForm.get('organisation')?.value,
+      status: this.cropVarietyForm.get('status')?.value,
+      deleted: false,
+      record_version: this.currentCrop?.record_version || 1,
+    };
+
     this.cropService
-      .updateCropVariety(
-        {
-          cropId: this.cropVarietyForm.get('crop_id')?.value,
-          cropVarietyId: this.cropVarietyForm.get('cropVarietyId')!.value,
-          cropVariety: this.cropVarietyForm.get('crop_variety')!.value,
-          deleted: false,
-          organisationId: 1,
-          status: this.cropVarietyForm.get('status')?.value,
-          recordVersion: this.currentCrop?.recordVersion,
-        },
-        this.cropVarietyForm.get('crop_id')!.value
-      )
+      .updateCropVariety(cropVarietyId, payload)
       .pipe(
         finalize(() => {
           this.modalBtn = {
             loading: false,
             text: 'Update Crop Variety',
-            classes: 'btn btn-primary',
+            classes: 'btn btn-warning',
           };
         })
       )
       .subscribe(
         (resp) => {
-          console.log('create resp', resp);
+          console.log('Update response:', resp);
           this.notifierService.showSweetAlert({
             typ: 'success',
-            message: 'Crop variety successfully created!',
+            message: 'Crop variety successfully updated!',
             timer: true,
           });
           this.resetForm();
           this.getCropVarieties();
+
+          // Close modal
+          const closeBtn = document.getElementById('cancel') as HTMLElement;
+          closeBtn?.click();
         },
         (err) => {
-          console.log('crop err', err);
-          const errorMessage =
-            err.error.errors[0].message || 'Invalid data submitted';
+          console.error('Update error:', err);
+          let errorMessage = 'Failed to update crop variety';
+
+          if (err.error) {
+            if (typeof err.error === 'string') {
+              errorMessage = err.error;
+            } else if (err.error.detail) {
+              errorMessage = err.error.detail;
+            }
+          }
+
           this.notifierService.showSweetAlert({
             typ: 'error',
             message: errorMessage,
@@ -240,25 +357,65 @@ export class CropVarietiesComponent implements OnInit {
       );
   }
 
+  deleteCropVariety(variety: CropVariety) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you want to delete the crop variety "${variety.cropVariety || variety.crop_variety}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const varietyId = variety.cropVarietyId || variety.crop_variety_id;
+        this.cropService.deleteCropVariety(varietyId).subscribe(
+          () => {
+            this.notifierService.showSweetAlert({
+              typ: 'success',
+              message: 'Crop variety deleted successfully!',
+              timer: true,
+            });
+            this.getCropVarieties();
+          },
+          (err) => {
+            console.error('Delete error:', err);
+            this.notifierService.showSweetAlert({
+              typ: 'error',
+              message: 'Failed to delete crop variety',
+            });
+          }
+        );
+      }
+    });
+  }
+
   resetForm() {
-    this.cropVarietyForm.reset();
+    this.cropVarietyForm.reset({
+      status: true,
+      crop_variety: '',
+      crop: '',
+      organisation: '',
+      crop_variety_id: '',
+    });
     this.cropVarietyForm.markAsPristine();
-    this.modalBtn = {
-      loading: false,
-      text: 'Create Variety Crop',
-      classes: 'btn btn-primary',
-    };
+    this.cropVarietyForm.markAsUntouched();
+    this.formSubmitted = false;
+    this.currentCrop = null;
   }
 
   handleSubmit() {
+    this.formSubmitted = true;
+
     if (this.cropVarietyForm.invalid) {
-      console.log('invalid');
-      this.formSubmitted = true;
+      console.log('Form is invalid');
       return;
     }
 
     this.formSubmitted = false;
-    if (this.cropVarietyForm.get('cropVarietyId')?.value) {
+
+    if (this.cropVarietyForm.get('crop_variety_id')?.value) {
       this.updateCropVariety();
     } else {
       this.createCropVariety();

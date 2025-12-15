@@ -1,4 +1,15 @@
-<!-- paid-claim.component.html - FIXED VERSION -->
+<main  id="main" class="main">
+  <div class="pagetitle">
+      <h1>Paid Claims</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+          <li class="breadcrumb-item">Dashboard</li>
+          <li class="breadcrumb-item active">Paid Claims</li>
+        </ol>
+      </nav>
+    </div>
+  <section class="section">
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">
@@ -159,12 +170,12 @@
                     <button class="btn btn-sm btn-info mr-1"
                             (click)="openDetailsModal(claim)"
                             title="View Details">
-                      <i class="fas fa-eye"></i>
+                      <i class="bi bi-eye"></i>
                     </button>
                     <button class="btn btn-sm btn-secondary"
                             (click)="printReceipt(claim)"
                             title="Print Receipt">
-                      <i class="fas fa-print"></i>
+                      <i class="bi bi-printer"></i>
                     </button>
                   </td>
                 </tr>
@@ -304,3 +315,5 @@
 
 <!-- Modal Backdrop -->
 <div class="modal-backdrop fade show" *ngIf="showDetailsModal"></div>
+  </section>
+</main>
