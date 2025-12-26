@@ -1,1 +1,224 @@
 <main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Manage Product Categories</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Products</li>
+        <li class="breadcrumb-item active">Product Categories</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <!-- Action Bar -->
+    <nav class="navbar navbar-light bg-light mb-3">
+      <div class="container-fluid">
+        <button
+          class="btn btn-success"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#productCategoryModal"
+          (click)="showCreateModal()">
+          <i class="bi bi-plus-circle"></i> Add New Product Category
+        </button>
+      </div>
+    </nav>
+
+    <!-- Search Bar -->
+    <div class="d-flex justify-content-between mb-3">
+      <div class="search" style="flex: 1; max-width: 400px;">
+        <input
+          class="form-control"
+          type="text"
+          [(ngModel)]="searchText"
+          (input)="onSearch()"
+          placeholder="Search by category, description, cover type..." />
+      </div>
+      <button class="btn btn-outline-success" type="button">
+        <i class="bi bi-download"></i> Export
+      </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div *ngIf="!isLoading" class="table-responsive">
+      <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Product Category</th>
+            <th scope="col">Description</th>
+            <th scope="col">Cover Type</th>
+            <th scope="col">Organisation</th>
+            <th scope="col" class="text-center">Status</th>
+            <th scope="col" class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let category of filteredCategories; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ category.product_category }}</td>
+            <td>{{ category.description }}</td>
+            <td>{{ category.cover_type_name }}</td>
+            <td>{{ category.organisation_name }}</td>
+            <td class="text-center">
+              <span
+                class="badge"
+                [ngClass]="category.status ? 'bg-success' : 'bg-danger'">
+                {{ category.status ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="text-center">
+              <button
+                class="btn btn-sm btn-info text-white me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#productCategoryModal"
+                (click)="showEditModal(category)"
+                title="Edit">
+                <i class="bi bi-pencil-square"></i> Edit
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteProductCategory(category)"
+                title="Delete">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredCategories.length === 0">
+            <td colspan="7" class="text-center text-muted">
+              No product categories found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="productCategoryModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">
+              {{ isEditMode ? 'Edit Product Category' : 'Create Product Category' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="productCategoryForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="product_category" class="form-label">
+                    Product Category Name <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="product_category"
+                    class="form-control"
+                    [class.is-invalid]="formSubmitted && f['product_category'].errors"
+                    id="product_category">
+                  <div class="invalid-feedback" *ngIf="formSubmitted && f['product_category'].errors">
+                    Product category name is required
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="cover_type_id" class="form-label">
+                    Cover Type <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    formControlName="cover_type_id"
+                    class="form-select"
+                    [class.is-invalid]="formSubmitted && f['cover_type_id'].errors"
+                    id="cover_type_id">
+                    <option value="">Select Cover Type</option>
+                    <option *ngFor="let ct of coverTypes" [value]="ct.cover_type_id">
+                      {{ ct.cover_type }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="formSubmitted && f['cover_type_id'].errors">
+                    Cover type is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="organisation_id" class="form-label">
+                    Organisation <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    formControlName="organisation_id"
+                    class="form-select"
+                    [class.is-invalid]="formSubmitted && f['organisation_id'].errors"
+                    id="organisation_id">
+                    <option value="">Select Organisation</option>
+                    <option *ngFor="let org of organisations" [value]="org.organisation_id">
+                      {{ org.organisation_name }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="formSubmitted && f['organisation_id'].errors">
+                    Organisation is required
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="status" class="form-label">
+                    Status <span class="text-danger">*</span>
+                  </label>
+                  <select
+                    formControlName="status"
+                    class="form-select"
+                    id="status">
+                    <option [value]="true">Active</option>
+                    <option [value]="false">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="description" class="form-label">
+                  Description <span class="text-danger">*</span>
+                </label>
+                <textarea
+                  formControlName="description"
+                  class="form-control"
+                  [class.is-invalid]="formSubmitted && f['description'].errors"
+                  id="description"
+                  rows="3"></textarea>
+                <div class="invalid-feedback" *ngIf="formSubmitted && f['description'].errors">
+                  Description is required
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              (click)="closeModal()">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn"
+              [ngClass]="isEditMode ? 'btn-warning' : 'btn-primary'"
+              (click)="handleSubmit()"
+              [disabled]="modalBtn.loading">
+              <span *ngIf="modalBtn.loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ modalBtn.text }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

@@ -1,53 +1,112 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+
+export interface RoleType {
+  role_id?: number;
+  organisation: number;
+  role_name: string;
+  role_description?: string;
+  role_status: string;
+  permissions?: any;
+  is_system_role?: boolean;
+  organisation_name?: string;
+  user_count?: number;
+  date_time_added?: string;
+  date_time_modified?: string;
+}
+
+export interface RoleResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: RoleType[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoleService {
-  private baseUrl = `${environment.apiUrl}/users`;
+  private apiUrl = `${environment.apiUrl}/roles`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  // Get users by role
-  getUsersByRole(role: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/`)
-      .pipe(
-        map((res: any) => {
-          const users = Array.isArray(res) ? res : res?.results || [];
-          return users.filter((user: any) => user.user_role === role);
-        }),
-        catchError(this.handleError)
-      );
+  // Get all roles with optional filters
+  getAllRoles(params?: {
+    organisation_id?: number;
+    status?: string;
+    search?: string;
+  }): Observable<RoleResponse> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      if (params.organisation_id) {
+        httpParams = httpParams.set('organisation_id', params.organisation_id.toString());
+      }
+      if (params.status) {
+        httpParams = httpParams.set('status', params.status);
+      }
+      if (params.search) {
+        httpParams = httpParams.set('search', params.search);
+      }
+    }
+
+    return this.http.get<RoleResponse>(this.apiUrl + '/', { params: httpParams });
   }
 
-  // Update user role
-  updateUserRole(userId: number, role: string): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${userId}/`, {
-      user_role: role
-    }).pipe(catchError(this.handleError));
-  }
-
-  // Get available roles
+  // Get available role names for dropdown
   getAvailableRoles(): Observable<string[]> {
-    return new Observable(observer => {
-      observer.next([
-        'ADMIN',
-        'USER',
-        'ASSESSOR',
-        'MANAGER',
-        'API USER',
-        'SUPERUSER'
-      ]);
-      observer.complete();
-    });
+    return this.http.get<string[]>(`${this.apiUrl}/available_roles/`);
   }
 
-  private handleError(error: any) {
-    console.error('An error occurred:', error);
-    return throwError(() => error);
+  // Get single role by ID
+  getRoleById(roleId: number): Observable<RoleType> {
+    return this.http.get<RoleType>(`${this.apiUrl}/${roleId}/`);
+  }
+
+  // Create new role
+  createRole(roleData: Partial<RoleType>): Observable<RoleType> {
+    return this.http.post<RoleType>(this.apiUrl + '/', roleData);
+  }
+
+  // Update existing role
+  updateRole(roleId: number, roleData: Partial<RoleType>): Observable<RoleType> {
+    return this.http.patch<RoleType>(`${this.apiUrl}/${roleId}/`, roleData);
+  }
+
+  // Delete role
+  deleteRole(roleId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${roleId}/`);
+  }
+
+  // Get users assigned to a role
+  getRoleUsers(roleId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${roleId}/users/`);
+  }
+
+  // Get role statistics
+  getRoleStatistics(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/statistics/`);
+  }
+
+  // Activate role
+  activateRole(roleId: number): Observable<RoleType> {
+    return this.http.post<RoleType>(`${this.apiUrl}/${roleId}/activate/`, {});
+  }
+
+  // Deactivate role
+  deactivateRole(roleId: number): Observable<RoleType> {
+    return this.http.post<RoleType>(`${this.apiUrl}/${roleId}/deactivate/`, {});
+  }
+
+  // Get all users (for user-role assignment)
+  getAllUsers(): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/users/`);
+  }
+
+  // Update user's role
+  updateUserRole(userId: number, payload: any): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/users/${userId}/`, payload);
   }
 }

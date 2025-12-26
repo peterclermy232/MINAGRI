@@ -1,101 +1,260 @@
 <main id="main" class="main">
   <div class="pagetitle">
-     <h1>Manage Role</h1>
-     <nav>
-        <ol class="breadcrumb">
-           <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-           <li class="breadcrumb-item">Roles</li>
-           <ol class="breadcrumb-item active">Role</ol>
-        </ol>
-     </nav>
+    <h1>Manage Roles</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Administration</li>
+        <li class="breadcrumb-item active">Roles</li>
+      </ol>
+    </nav>
   </div>
+
   <section class="section">
-      <nav class="navbar navbar-ligth ">
-        <div class="container">
-          <div class="flex-centered">
-            <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
-              data-bs-target="#exampleModal">Add New Role</button>
+    <!-- Action Bar -->
+    <nav class="navbar navbar-light bg-light mb-3">
+      <div class="container-fluid">
+        <button
+          (click)="showAddModal()"
+          class="btn btn-success"
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#roleModal">
+          <i class="bi bi-plus-circle me-2"></i>Add New Role
+        </button>
+      </div>
+    </nav>
+
+    <!-- Search and Filter -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            class="form-control"
+            type="text"
+            [(ngModel)]="searchText"
+            (keyup)="onSearch()"
+            placeholder="Search by role name or description" />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <select
+          class="form-select"
+          [(ngModel)]="selectedStatusFilter"
+          (change)="filterRolesByStatus()">
+          <option value="">All Status</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-outline-success w-100" type="button">
+          <i class="bi bi-download me-2"></i>Export
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading roles...</p>
+    </div>
+
+    <!-- Roles Table -->
+    <div *ngIf="!isLoading" class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col">Role ID</th>
+                <th scope="col">Role Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Organisation</th>
+                <th scope="col">Users</th>
+                <th scope="col">Status</th>
+                <th scope="col">Type</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let role of filteredRoles">
+                <td>{{ role.role_id }}</td>
+                <td>
+                  <strong>{{ role.role_name }}</strong>
+                </td>
+                <td>
+                  {{ role.role_description || 'No description' }}
+                </td>
+                <td>{{ role.organisation_name || 'N/A' }}</td>
+                <td>
+                  <span class="badge bg-info">{{ role.user_count || 0 }} users</span>
+                </td>
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="getStatusBadgeClass(role.role_status)">
+                    {{ role.role_status }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    *ngIf="role.is_system_role"
+                    class="badge bg-warning text-dark">
+                    System Role
+                  </span>
+                  <span
+                    *ngIf="!role.is_system_role"
+                    class="badge bg-secondary">
+                    Custom Role
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-info"
+                      data-bs-toggle="modal"
+                      data-bs-target="#roleModal"
+                      (click)="showEditModal(role)"
+                      title="Edit Role">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary"
+                      (click)="viewRoleUsers(role)"
+                      title="View Users">
+                      <i class="bi bi-people"></i>
+                    </button>
+                    <button
+                      *ngIf="role.role_status === 'ACTIVE'"
+                      type="button"
+                      class="btn btn-sm btn-warning"
+                      (click)="deactivateRole(role)"
+                      title="Deactivate">
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                    <button
+                      *ngIf="role.role_status === 'INACTIVE'"
+                      type="button"
+                      class="btn btn-sm btn-success"
+                      (click)="activateRole(role)"
+                      title="Activate">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                    <button
+                      *ngIf="!role.is_system_role"
+                      type="button"
+                      class="btn btn-sm btn-danger"
+                      (click)="deleteRole(role)"
+                      title="Delete Role">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredRoles.length === 0">
+                <td colspan="8" class="text-center py-4">
+                  <i class="bi bi-inbox display-4 text-muted"></i>
+                  <p class="mt-3 text-muted">No roles found</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Role Modal -->
+    <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="roleModalLabel">
+              {{ isEditMode ? 'Edit Role' : 'Create New Role' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="roleForm">
+              <!-- Role Name -->
+              <div class="mb-3">
+                <label for="roleName" class="form-label">
+                  Role Name <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="role_name"
+                  class="form-control"
+                  id="roleName"
+                  [class.is-invalid]="formSubmitted && f['role_name'].invalid"
+                  placeholder="e.g., MANAGER, ADMIN">
+                <div *ngIf="formSubmitted && f['role_name'].invalid" class="invalid-feedback">
+                  <div *ngIf="f['role_name'].errors?.['required']">Role name is required</div>
+                  <div *ngIf="f['role_name'].errors?.['minlength']">Role name must be at least 2 characters</div>
+                </div>
+                <small class="text-muted">Role name will be stored in uppercase</small>
+              </div>
+
+              <!-- Role Description -->
+              <div class="mb-3">
+                <label for="roleDescription" class="form-label">Description</label>
+                <textarea
+                  formControlName="role_description"
+                  class="form-control"
+                  id="roleDescription"
+                  rows="3"
+                  placeholder="Brief description of the role's responsibilities"></textarea>
+              </div>
+
+              <!-- Status -->
+              <div class="mb-3">
+                <label for="roleStatus" class="form-label">
+                  Status <span class="text-danger">*</span>
+                </label>
+                <select
+                  class="form-select"
+                  formControlName="role_status"
+                  id="roleStatus"
+                  [class.is-invalid]="formSubmitted && f['role_status'].invalid">
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+                <div *ngIf="formSubmitted && f['role_status'].invalid" class="invalid-feedback">
+                  Status is required
+                </div>
+              </div>
+
+              <!-- System Role Warning -->
+              <div *ngIf="isEditMode && selectedRole?.is_system_role" class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>System Role:</strong> Only description and status can be modified.
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              [disabled]="modalBtn.loading">
+              Cancel
+            </button>
+            <button
+              type="button"
+              (click)="handleSubmit()"
+              class="btn btn-primary"
+              [disabled]="modalBtn.loading">
+              <span *ngIf="modalBtn.loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ modalBtn.text }}
+            </button>
           </div>
         </div>
-      </nav>
-       <!--search input-->
-       <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
-        </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
-
-     <table class="table table-bordered table-striped table-hover mt-3 w-100">
-       <thead>
-         <tr >
-          <th scope="col">Organisation ID</th>
-           <th scope="col">Role Name</th>
-           <th scope="col">Description</th>
-           <th scope="col">Status</th>
-           <th scope="col">Action</th>
-
-         </tr>
-       </thead>
-       <tbody>
-         <tr *ngFor ="let users of users">
-          <td>{{users.id}}</td>
-           <td>{{users.name}}</td>
-           <td>{{users.description}}</td>
-           <td>{{users.select}}</td>
-
-           <td>
-             <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal" (click)="onEdit( users)" class="btn btn-info">Edit</button>
-             <button  class="btn btn-danger mx-3">View</button>
-           </td>
-         </tr>
-       </tbody>
-
-     </table>
-
-     <!-- Modal -->
-     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-       <div class="modal-dialog">
-         <div class="modal-content">
-           <div class="modal-header">
-             <h5 class="modal-title" id="exampleModalLabel">Role Type</h5>
-             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-           </div>
-           <div class="modal-body">
-             <form [formGroup]="formValue">
-               <div class="mb-3">
-                 <label for="exampleInputEmail1" class="form-label">Enter Role Name</label>
-                 <input type="text" formControlName="name" class="form-control" id="exampleInputEmail1"
-                   aria-describedby="emailHelp">
-
-               </div>
-               <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Enter Role Description</label>
-                 <input type="text" formControlName="description" class="form-control" id="exampleInputPassword1">
-               </div>
-
-
-
-                <div class="mb-3">
-                 <label for="exampleInputPassword1" class="form-label">Status</label>
-                 <select class="form-select" formControlName="select">
-                  <option>Active</option>
-                     <option>Inactive</option>
-
-                 </select>
-               </div>
-             </form>
-           </div>
-           <div class="modal-footer">
-             <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-             <!-- <button type="button"  *ngIf="showAdd" (click)="postEmployeeDetails()" class="btn btn-primary">Add</button> -->
-             <button type="button" *ngIf="showUpdate" (click)="updateUserRole()"
-               class="btn btn-primary">Update</button>
-           </div>
-         </div>
-       </div>
-     </div>
-
-    </section>
+      </div>
+    </div>
+  </section>
 </main>

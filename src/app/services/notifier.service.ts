@@ -29,7 +29,7 @@ export class NotifierService {
 
   // ------------------- SWEET ALERT (INFO, WARN, ERROR, SUCCESS) -------------------
   showSweetAlert(data: {
-    typ: 'success' | 'error' | 'warning';
+    typ: 'success' | 'error' | 'warning' | 'info';
     message: string;
     timer?: boolean;
     confirm?: boolean;

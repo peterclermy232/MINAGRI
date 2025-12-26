@@ -1,231 +1,282 @@
 <main id="main" class="main">
-    <div class="pagetitle">
-       <h1>Manage Product Insurance</h1>
-       <nav>
-          <ol class="breadcrumb">
-             <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-             <li class="breadcrumb-item">Products Insurance</li>
-             <ol class="breadcrumb-item active">Products Insurance</ol>
-          </ol>
-       </nav>
-    </div>
-    <section class="section">
+  <div class="pagetitle">
+    <h1>Manage Product Insurance</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Products Insurance</li>
+        <li class="breadcrumb-item active">Products Insurance</li>
+      </ol>
+    </nav>
+  </div>
 
-       <nav class="navbar navbar-ligth ">
-         <div class="container-fluid">
+  <!-- Alert Messages -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
 
-           <div class="flex-centered">
-             <button  class="justify-content-end btn btn-success" type="button" data-bs-toggle="modal"
-               data-bs-target="#exampleModal">Add New Product  Insurance</button>
-           </div>
-         </div>
-       </nav>
-        <!--search input-->
-      <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <section class="section">
+    <!-- Action Bar -->
+    <nav class="navbar navbar-light">
+      <div class="container-fluid">
+        <div class="flex-centered">
+          <button class="btn btn-success" type="button" (click)="openAddModal()">
+            <i class="bi bi-plus-circle"></i> Add New Product Insurance
+          </button>
         </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
+      </div>
+    </nav>
 
-       <table class="table table-bordered table-striped table-hover mt-3 w-100">
-         <thead>
-           <tr>
+    <!-- Search and Export -->
+    <div class="d-flex justify-content-between mt-2 mb-3">
+      <div class="search">
+        <input
+          class="form-control"
+          type="text"
+          [(ngModel)]="searchText"
+          (input)="searchProducts()"
+          placeholder="Search by product name, organization, or crop" />
+      </div>
+      <button class="btn btn-success" type="button" (click)="exportProducts()">
+        <i class="bi bi-download"></i> Export
+      </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover mt-3">
+        <thead class="table-primary">
+          <tr>
             <th scope="col">Product ID</th>
-             <th scope="col">Enter  Season Name</th>
-             <th scope="col">Organization</th>
-             <th scope="col">Product Category</th>
-             <th scope="col">Farm Category</th>
-             <th scope="col">Average Premium Rate</th>
-             <th scope="col">Crop</th>
-             <th scope="col">Crop Varieties</th>
-             <th scope="col">Season date Start</th>
-             <th scope="col">Season date End</th>
-             <th scope="col">Window date Start</th>
-             <th scope="col">Window date Start</th>
-             <th scope="col">Loading Name</th>
-             <th scope="col">Organization Loading</th>
-             <th scope="col">Select Type(%/Fixed)</th>
-             <th scope="col">Paremeter Name</th>
-             <th scope="col">Upload File</th>
-             <th scope="col">Action</th>
+            <th scope="col">Product Name</th>
+            <th scope="col">Organization</th>
+            <th scope="col">Product Category</th>
+            <th scope="col">Season</th>
+            <th scope="col">Crop</th>
+            <th scope="col">Crop Variety</th>
+            <th scope="col">Premium Rate (%)</th>
+            <th scope="col">Sum Insured</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredProducts.length === 0 && !loading">
+            <td colspan="11" class="text-center">No products found</td>
+          </tr>
+          <tr *ngFor="let product of filteredProducts">
+            <td>{{ product.product_id }}</td>
+            <td>{{ product.product_name }}</td>
+            <td>{{ product.organisation_name || 'N/A' }}</td>
+            <td>{{ product.product_category_name || 'N/A' }}</td>
+            <td>{{ product.season_name || 'N/A' }}</td>
+            <td>{{ product.crop_name || 'N/A' }}</td>
+            <td>{{ product.crop_variety_name || 'N/A' }}</td>
+            <td>{{ product.average_premium_rate }}%</td>
+            <td>{{ product.sum_insured | currency }}</td>
+            <td>
+              <span [class]="'badge ' + (product.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary')">
+                {{ product.status }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="btn btn-warning btn-sm me-1"
+                (click)="openEditModal(product)"
+                title="Edit">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                class="btn btn-danger btn-sm"
+                (click)="deleteProduct(product)"
+                title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="productModalLabel">
+              {{ isEditMode ? 'Edit Product Insurance' : 'Add New Product Insurance' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
 
-           </tr>
-         </thead>
-         <tbody>
-           <tr >
-            <td>1</td>
-             <td>July</td>
-             <td>TECH</td>
-             <td>MaiZE</td>
-             <td>1 acres</td>
-             <td>34c</td>
-             <td>Maize</td>
-             <td>Maizebread</td>
-             <td>1/2/34</td>
-             <td>4/9/34</td>
-             <td>Fer</td>
-             <td>Sept</td>
-             <td>Loading</td>
-             <td>Organization</td>
-             <td>Fixed</td>
-             <td>Paremeter</td>
-             <td>File</td>
+          <div class="modal-body">
+            <form [formGroup]="productForm">
 
-             <td>
-               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
-                 data-bs-target="#exampleModal"  class="btn btn-warning btn-sm">Edit</button>
-               <!-- <button  class="btn btn-danger">View</button> -->
-             </td>
-           </tr>
-         </tbody>
-
-       </table>
-
-       <!-- Modal -->
-       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-         <div class="modal-dialog modal-lg">
-           <div class="modal-content w-100">
-             <div class="modal-header">
-               <h5 class="modal-title" id="exampleModalLabel">Manage Product Insurance</h5>
-               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-             </div>
-             <div class="modal-body w-100">
-               <form [formGroup]="formValue">
-                <div class="row align-items-start ">
-                 <div class="col mb-3">
-                   <label  class="form-label">Enter  Season Name</label>
-                   <input type="text" formControlName="name" class="form-control"
-                     aria-describedby="emailHelp">
-                 </div>
-                 <div class="col mb-3">
-                    <label  class="form-label">Select Organization</label>
-                    <select class="form-select">
-                        <option>Insurance Company</option>
-                        <option>Default select</option>
-                      </select>
-                 </div>
-                </div>
-
-                <div class="row align-items-start">
-                 <div class="col mb-3">
-                    <label  class="form-label">Select Product Catagory</label>
-                    <select class="form-select">
-                        <option>Insurance Company</option>
-                        <option>Default select</option>
-                      </select>
-                 </div>
-                 <div class="col mb-3">
-                    <label class="form-label">Select Farmer Category</label>
-                    <select class="form-select">
-                        <option>On</option>
-                        <option>Off</option>
-                      </select>
-                 </div>
-                </div>
-
-                <div class="row align-items-start">
-                 <div class="col mb-3">
-                    <label  class="form-label">Select Average Rate</label>
-                    <select class="form-select">
-                        <option>Insurance Company</option>
-                        <option>Default select</option>
-                      </select>
-                 </div>
-                 <div class="col mb-3">
-                    <label  class="form-label">Select Crops </label>
-                    <select class="form-select">
-                        <option>Insurance Company</option>
-                        <option>Default select</option>
-                      </select>
-                 </div>
-
-                 </div>
-
-
-                 <div class="mb-3">
-                    <label  class="form-label">Select Crop Varieties</label>
-                    <select class="form-select">
-                        <option>Insurance Company</option>
-                        <option>Default select</option>
-                      </select>
-                 </div>
-
-                 <div class="row align-items-start">
-                 <div class="col mb-3">
-                    <label  class="form-label">Season Start Date</label>
-                    <input class="date form-control"  type="date">
-                 </div>
-                 <div class="col mb-3">
-                    <label  class="form-label">Season End Date</label>
-                    <input class="date form-control"  type="date">
-                 </div>
-                 </div>
-
-                 <div class="row align-items-start">
-                 <div class="col mb-3">
-                    <label class="form-label">Window Start Date</label>
-                    <input class="date form-control"  type="date">
-                 </div>
-                 <div class="col mb-3">
-                    <label  class="form-label">Window End Date</label>
-                    <input class="date form-control"  type="date">
-                 </div>
-                 </div>
-
-                 <h3>Loading</h3>
-                 <div class="row align-items-start">
-                 <div class="col mb-3">
-                    <label  class="form-label">Enter Loading Name</label>
-                    <input type="text" formControlName="name" class="form-control"
-                      aria-describedby="emailHelp">
-
-                  </div>
-
-                  <div class="col mb-3">
-                    <label  class="form-label">Select Organization the Loading applies for</label>
-                    <select class="form-select">
-                        <option>Insurance Company</option>
-                        <option>Default select</option>
-                      </select>
-                 </div>
-                 </div>
-
-                 <div class="row align-items-start">
-                 <div class="col mb-3">
-                    <label  class="form-label">Select Type(%/Fixed)</label>
-                    <select class="form-select">
-                        <option>Insurance Company</option>
-                        <option>Default select</option>
-                      </select>
-                 </div>
-                  <div class="col mb-3">
-                    <label  class="form-label">Paremeter Name</label>
-                    <input type="text" formControlName="name" class="form-control"
-                      aria-describedby="emailHelp">
+              <!-- Basic Information -->
+              <h6 class="mb-3 text-primary">Basic Information</h6>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Product Name *</label>
+                  <input
+                    type="text"
+                    formControlName="product_name"
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('product_name')" />
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('product_name')">
+                    {{ getFieldError('product_name') }}
                   </div>
                 </div>
 
-                  <div class="mb-3">
-                    <label  class="form-label">Upload</label>
-                    <input type="file" formControlName="name" class="form-control"
-                      aria-describedby="emailHelp">
+                <div class="col-md-6">
+                  <label class="form-label">Select Organization *</label>
+                  <select
+                    formControlName="organisation"
+                    class="form-select"
+                    [class.is-invalid]="isFieldInvalid('organisation')">
+                    <option value="">Select Organization</option>
+                    <option *ngFor="let org of organizations" [value]="org.organisation_type_id">
+                      {{ org.organisation_type }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('organisation')">
+                    Organization is required
                   </div>
+                </div>
+              </div>
 
-               </form>
-             </div>
-             <div class="modal-footer">
-               <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-               <button type="button"  class="btn btn-primary">Save</button>
-               <!-- <button type="button"
-                 class="btn btn-primary">Update</button> -->
-             </div>
-           </div>
-         </div>
-       </div>
+              <!-- Product Details -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Select Product Category *</label>
+                  <select
+                    formControlName="product_category"
+                    class="form-select"
+                    [class.is-invalid]="isFieldInvalid('product_category')">
+                    <option value="">Select Category</option>
+                    <option *ngFor="let cat of productCategories" [value]="cat.product_category_id">
+                      {{ cat.product_category }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('product_category')">
+                    Product category is required
+                  </div>
+                </div>
 
-      </section>
-  </main>
+                <div class="col-md-6">
+                  <label class="form-label">Select Season *</label>
+                  <select
+                    formControlName="season"
+                    class="form-select"
+                    [class.is-invalid]="isFieldInvalid('season')">
+                    <option value="">Select Season</option>
+                    <option *ngFor="let season of seasons" [value]="season.season_id">
+                      {{ season.season }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('season')">
+                    Season is required
+                  </div>
+                </div>
+              </div>
 
+              <!-- Crop Information -->
+              <h6 class="mb-3 text-primary">Crop Information</h6>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Select Crop *</label>
+                  <select
+                    formControlName="crop"
+                    class="form-select"
+                    [class.is-invalid]="isFieldInvalid('crop')">
+                    <option value="">Select Crop</option>
+                    <option *ngFor="let crop of crops" [value]="crop.crop_id">
+                      {{ crop.crop }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('crop')">
+                    Crop is required
+                  </div>
+                </div>
 
+                <div class="col-md-6">
+                  <label class="form-label">Select Crop Variety</label>
+                  <select formControlName="crop_variety" class="form-select">
+                    <option value="">Select Crop Variety (Optional)</option>
+                    <option *ngFor="let variety of cropVarieties" [value]="variety.crop_variety_id">
+                      {{ variety.crop_variety }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Financial Information -->
+              <h6 class="mb-3 text-primary">Financial Information</h6>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label class="form-label">Average Premium Rate (%) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    formControlName="average_premium_rate"
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('average_premium_rate')" />
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('average_premium_rate')">
+                    {{ getFieldError('average_premium_rate') }}
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Sum Insured *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    formControlName="sum_insured"
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('sum_insured')" />
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('sum_insured')">
+                    {{ getFieldError('sum_insured') }}
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Status *</label>
+                  <select formControlName="status" class="form-select">
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="saveProduct()"
+              [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditMode ? 'Update' : 'Save' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>

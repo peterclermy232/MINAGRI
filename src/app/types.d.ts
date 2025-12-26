@@ -61,6 +61,7 @@ export interface OrganizationType {
   organisation_type: string;
   organisation_type_status: string;
   record_version?: number;
+
 }
 
 export interface Organization {

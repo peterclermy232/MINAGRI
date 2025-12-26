@@ -1,18 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-  CoverType,
-  Crop,
-  CropVariety,
-  Organization,
-  ProductCategory,
-} from '../types';
-import { AuthService } from '../shared/auth.service';
-import { UserService } from '../shared/user.service';
-import { CropService } from '../shared/crop.service';
+import { ProductService } from '../shared/product.service';
 import { NotifierService } from '../services/notifier.service';
 import { finalize } from 'rxjs';
-import { ProductService } from '../shared/product.service';
 
 @Component({
   selector: 'app-manage-product',
@@ -22,63 +12,22 @@ import { ProductService } from '../shared/product.service';
 export class ManageProductComponent implements OnInit {
   productCategoryForm: FormGroup;
   formSubmitted = false;
-  currentProductCategory: null | ProductCategory = null;
-  modalMode = {
-    label: 'Create Product Category',
-    typ: 'Create',
-  };
+  currentProductCategory: any = null;
+  isEditMode = false;
+
   modalBtn = {
     loading: false,
     text: 'Create Product Category',
-    classes: 'btn btn-primary',
-  };
-  organisations: Organization[] = [];
-  coverTypes: CoverType[] = [];
-  productCategories: {
-    loading: boolean;
-    data: Crop[] | any[];
-  } = {
-    loading: false,
-    data: [],
   };
 
-  dataTable = {
-    columns: [
-      {
-        label: 'Product Category',
-        data: 'productCategory',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Description',
-        data: 'description',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Cover Type',
-        data: 'coverType',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Organisation',
-        data: 'organisation',
-        dynamic: true,
-        classes: '',
-      },
-      {
-        label: 'Status',
-        data: 'status',
-        dynamic: false,
-        classes: 'text-center',
-      },
-    ],
-  };
+  organisations: any[] = [];
+  coverTypes: any[] = [];
+  productCategories: any[] = [];
+  filteredCategories: any[] = [];
+  isLoading = false;
+  searchText = '';
+
   constructor(
-    private authService: AuthService,
-    private userService: UserService,
     private productService: ProductService,
     private notifierService: NotifierService,
     private fb: FormBuilder
@@ -92,224 +41,245 @@ export class ManageProductComponent implements OnInit {
       productCategoryId: [null],
     });
   }
-  // "coverTypeId": 1,
-  // "deleted":false,
-  // "description": "category two",
-  // "organisationId":1,
-  // "productCategory": "cat2",
-  // "productCategoryId":1,
-  // "recordVersion": 1,
-  // "status": true
+
   ngOnInit(): void {
     this.getProductCategories();
   }
 
-  showModal(productCategory?: ProductCategory) {
-    if (productCategory) {
-      this.modalMode.typ = 'edit';
-      this.modalMode.label = 'Edit Product Category';
-      this.modalBtn = {
-        text: 'Edit Crop Variety',
-        classes: 'btn btn-warning',
-        loading: false,
-      };
-      this.currentProductCategory = productCategory;
-      this.setProductCategoryInfo(productCategory);
-    } else {
-      this.modalMode.typ = 'create';
-      this.modalMode.label = 'Create Product Category';
-      this.modalBtn = {
-        text: 'Create Product Category',
-        classes: 'btn btn-primary',
-        loading: false,
-      };
-      this.resetForm();
-    }
-  }
-  setProductCategoryInfo(product: ProductCategory) {
-    this.productCategoryForm
-      .get('cover_type_id')!
-      .setValue(product.coverTypeId);
-    this.productCategoryForm.get('description')!.setValue(product.description);
-    this.productCategoryForm
-      .get('organisation_id')!
-      .setValue(product.organisationId);
-    this.productCategoryForm
-      .get('product_category')!
-      .setValue(product.productCategory);
-    this.productCategoryForm
-      .get('productCategoryId')!
-      .setValue(product.productCategoryId);
-    this.productCategoryForm.get('status')!.setValue(product.status);
-  }
   getProductCategories() {
-    this.productCategories.loading = true;
+    this.isLoading = true;
     this.productService
       .getProductCategories()
-      .pipe(
-        finalize(() => {
-          this.productCategories.loading = false;
-        })
-      )
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe(
         (resp: any) => {
-          console.log('resp', resp);
-          const orgs = resp.organisationsResponse.results;
-          const coverTypes = resp.coverTypesResponse;
-          const prodcats = resp.productCategoryResponse;
-          // this.crops.data = resp;
-          this.coverTypes = coverTypes;
+          console.log('rsp', resp);
+
+          const orgs = resp.organisationsResponse?.results || resp.organisationsResponse || [];
+         const coverTypesData = resp.coverTypesResponse?.results || resp.coverTypesResponse || [];
+          const prodcatsData = resp.productCategoryResponse?.results || resp.productCategoryResponse || [];
+
+          this.coverTypes = coverTypesData;
           this.organisations = orgs;
-          console.log('resp categories', resp);
-          this.productCategories.data = prodcats.map(
-            (productCat: ProductCategory) => {
-              const org = orgs.find(
-                (typ: any) => typ.organisation_id === productCat.organisationId
-              );
-              console.log('org', org);
-              const coverType = coverTypes.find(
-                (cty: any) => cty.coverTypeId === productCat.coverTypeId
-              );
-              return {
-                ...productCat,
-                coverType: coverType ? coverType.coverType : 'none',
-                organisation: org ? org.organisation_name : 'none',
-              };
-            }
-          );
-        },
-        (err) => {
-          console.log('crop err', err);
-        }
-      );
-  }
-  createProductCategory() {
-    console.log('creating variety');
-    this.modalBtn = {
-      loading: true,
-      text: 'Processing...',
-      classes: 'btn btn-primary',
-    };
-    this.productService
-      .postProductCategory({
-        coverTypeId: this.productCategoryForm.get('cover_type_id')?.value,
-        deleted: false,
-        description: this.productCategoryForm.get('description')?.value,
-        organisationId: this.productCategoryForm.get('organisation_id')?.value,
-        productCategory:
-          this.productCategoryForm.get('product_category')?.value,
-        status: this.productCategoryForm.get('status')?.value,
-      })
-      .pipe(
-        finalize(() => {
-          this.modalBtn = {
-            loading: false,
-            text: 'Create Product Category',
-            classes: 'btn btn-primary',
-          };
-        })
-      )
-      .subscribe(
-        (resp) => {
-          console.log('create resp', resp);
-          this.notifierService.showSweetAlert({
-            typ: 'success',
-            message: 'Product category successfully created!',
-            timer: true,
+
+          this.productCategories = prodcatsData.map((productCat: any) => {
+            const org = orgs.find(
+              (o: any) => o.organisation_id === productCat.organisationId
+            );
+            const coverType = coverTypesData.find(
+              (ct: any) => ct.cover_type_id === productCat.coverTypeId
+            );
+
+            return {
+              ...productCat,
+              coverTypeName: coverType ? coverType.cover_type : 'N/A',
+              organisationName: org ? org.organisation_name : 'N/A',
+            };
           });
-          this.resetForm();
-          this.getProductCategories();
+
+          this.filteredCategories = [...this.productCategories];
         },
         (err) => {
-          console.log('crop err', err);
-          const errorMessage =
-            err.error.errors[0].message || 'Invalid data submitted';
+          console.error('Error fetching product categories:', err);
           this.notifierService.showSweetAlert({
             typ: 'error',
-            message: errorMessage,
-          });
-        }
-      );
-  }
-  updateProductCategory() {
-    this.modalBtn = {
-      loading: true,
-      text: 'Processing...',
-      classes: 'btn btn-primary',
-    };
-    // console.log('varietyform', this.cropVarietyForm);
-    this.productService
-      .updateProductCategory(
-        {
-          coverTypeId: this.productCategoryForm.get('cover_type_id')?.value,
-          deleted: false,
-          description: this.productCategoryForm.get('description')?.value,
-          organisationId:
-            this.productCategoryForm.get('organisation_id')?.value,
-          productCategory:
-            this.productCategoryForm.get('product_category')?.value,
-          status: this.productCategoryForm.get('status')?.value,
-          recordVersion: this.currentProductCategory?.recordVersion,
-          productCategoryId: this.currentProductCategory?.productCategoryId,
-        },
-        this.currentProductCategory!.productCategoryId
-      )
-      .pipe(
-        finalize(() => {
-          this.modalBtn = {
-            loading: false,
-            text: 'Update Product Category',
-            classes: 'btn btn-primary',
-          };
-        })
-      )
-      .subscribe(
-        (resp) => {
-          console.log('create resp', resp);
-          this.notifierService.showSweetAlert({
-            typ: 'success',
-            message: 'Product category successfully updated!',
-            timer: true,
-          });
-          this.resetForm();
-          this.getProductCategories();
-        },
-        (err) => {
-          console.log('crop err', err);
-          const errorMessage =
-            err.error.errors[0].message || 'Invalid data submitted';
-          this.notifierService.showSweetAlert({
-            typ: 'error',
-            message: errorMessage,
+            message: 'Failed to load product categories',
           });
         }
       );
   }
 
-  resetForm() {
-    this.productCategoryForm.reset();
-    this.productCategoryForm.markAsPristine();
-    this.modalBtn = {
-      loading: false,
-      text: 'Create Product Category',
-      classes: 'btn btn-primary',
-    };
-  }
-
-  handleSubmit() {
-    console.log('prodtc', this.productCategoryForm);
-    if (this.productCategoryForm.invalid) {
-      console.log('invalid');
-      this.formSubmitted = true;
+  onSearch() {
+    if (!this.searchText.trim()) {
+      this.filteredCategories = [...this.productCategories];
       return;
     }
 
-    this.formSubmitted = false;
+    const search = this.searchText.toLowerCase();
+    this.filteredCategories = this.productCategories.filter(cat =>
+      cat.product_category?.toLowerCase().includes(search) ||
+      cat.description?.toLowerCase().includes(search) ||
+      cat.coverTypeName?.toLowerCase().includes(search) ||
+      cat.organisationName?.toLowerCase().includes(search)
+    );
+  }
 
-    if (this.productCategoryForm.get('productCategoryId')?.value) {
+  showCreateModal() {
+    this.isEditMode = false;
+    this.currentProductCategory = null;
+    this.productCategoryForm.reset({ status: true });
+    this.modalBtn.text = 'Create Product Category';
+  }
+
+  showEditModal(productCategory: any) {
+    this.isEditMode = true;
+    this.currentProductCategory = productCategory;
+    this.modalBtn.text = 'Update Product Category';
+
+    this.productCategoryForm.patchValue({
+      cover_type_id: productCategory.coverTypeId,
+      description: productCategory.description,
+      organisation_id: productCategory.organisationId,
+      product_category: productCategory.product_category,
+      status: productCategory.status,
+      productCategoryId: productCategory.product_category_id,
+    });
+  }
+
+  handleSubmit() {
+    this.formSubmitted = true;
+
+    if (this.productCategoryForm.invalid) {
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'Please fill all required fields',
+      });
+      return;
+    }
+
+    if (this.isEditMode) {
       this.updateProductCategory();
     } else {
       this.createProductCategory();
     }
+  }
+
+  createProductCategory() {
+    this.modalBtn.loading = true;
+    this.modalBtn.text = 'Processing...';
+
+    const payload = {
+      cover_type: this.productCategoryForm.get('cover_type_id')?.value,
+      deleted: false,
+      description: this.productCategoryForm.get('description')?.value,
+      organisation: this.productCategoryForm.get('organisation_id')?.value,
+      product_category: this.productCategoryForm.get('product_category')?.value,
+      status: this.productCategoryForm.get('status')?.value,
+    };
+
+    this.productService
+      .postProductCategory(payload)
+      .pipe(
+        finalize(() => {
+          this.modalBtn.loading = false;
+          this.modalBtn.text = 'Create Product Category';
+        })
+      )
+      .subscribe(
+        (resp) => {
+          this.notifierService.showSweetAlert({
+            typ: 'success',
+            message: 'Product category created successfully!',
+            timer: true,
+          });
+          this.closeModal();
+          this.getProductCategories();
+        },
+        (err) => {
+          const errorMessage =
+            err.error?.errors?.[0]?.message ||
+            err.error?.detail ||
+            'Failed to create product category';
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: errorMessage,
+          });
+        }
+      );
+  }
+
+  updateProductCategory() {
+    this.modalBtn.loading = true;
+    this.modalBtn.text = 'Processing...';
+
+    const payload = {
+      coverTypeId: this.productCategoryForm.get('cover_type_id')?.value,
+      deleted: false,
+      description: this.productCategoryForm.get('description')?.value,
+      organisationId: this.productCategoryForm.get('organisation_id')?.value,
+      product_category: this.productCategoryForm.get('product_category')?.value,
+      status: this.productCategoryForm.get('status')?.value,
+      recordVersion: this.currentProductCategory?.recordVersion || 1,
+      product_category_id: this.currentProductCategory?.product_category_id,
+      cover_type: parseInt(this.productCategoryForm.get('cover_type_id')?.value),
+     organisation: parseInt(this.productCategoryForm.get('organisation_id')?.value)
+    };
+
+    this.productService
+      .updateProductCategory(payload, this.currentProductCategory.product_category_id)
+      .pipe(
+        finalize(() => {
+          this.modalBtn.loading = false;
+          this.modalBtn.text = 'Update Product Category';
+        })
+      )
+      .subscribe(
+        (resp) => {
+          this.notifierService.showSweetAlert({
+            typ: 'success',
+            message: 'Product category updated successfully!',
+            timer: true,
+          });
+          this.closeModal();
+          this.getProductCategories();
+        },
+        (err) => {
+          const errorMessage =
+            err.error?.errors?.[0]?.message ||
+            err.error?.detail ||
+            'Failed to update product category';
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: errorMessage,
+          });
+        }
+      );
+  }
+
+  deleteProductCategory(category: any) {
+    if (!confirm(`Are you sure you want to delete "${category.product_category}"?`)) {
+      return;
+    }
+
+    const payload = {
+      ...category,
+      deleted: true,
+      status: false,
+    };
+
+    this.productService
+      .updateProductCategory(payload, category.product_category_id)
+      .subscribe(
+        (resp) => {
+          this.notifierService.showSweetAlert({
+            typ: 'success',
+            message: 'Product category deleted successfully!',
+            timer: true,
+          });
+          this.getProductCategories();
+        },
+        (err) => {
+          this.notifierService.showSweetAlert({
+            typ: 'error',
+            message: 'Failed to delete product category',
+          });
+        }
+      );
+  }
+
+  closeModal() {
+    this.productCategoryForm.reset({ status: true });
+    this.formSubmitted = false;
+    this.isEditMode = false;
+    this.currentProductCategory = null;
+
+    // Close modal programmatically
+    const modalElement = document.getElementById('productCategoryModal');
+    const modal = (window as any).bootstrap?.Modal?.getInstance(modalElement);
+    modal?.hide();
+  }
+
+  get f() {
+    return this.productCategoryForm.controls;
   }
 }

@@ -1,22 +1,228 @@
-table.table {
-  border-collapse: collapse !important;
-  width: 100% !important;
+/* manage-product-insurance.component.css */
+
+.main {
+  padding: 20px;
 }
 
-table.table th,
-table.table td {
-  border: 1px solid #dee2e6 !important;
-  padding: 8px !important;
-  vertical-align: middle;
-  white-space: nowrap;
+.pagetitle h1 {
+  font-size: 24px;
+  margin-bottom: 0;
+  font-weight: 600;
+  color: #012970;
 }
 
+.breadcrumb {
+  font-size: 14px;
+  font-weight: 500;
+  color: #899bbd;
+}
+
+.breadcrumb a {
+  color: #899bbd;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: #51678f;
+}
+
+.breadcrumb-item.active {
+  color: #51678f;
+}
+
+/* Action Bar */
+.navbar {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+  font-weight: 500;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+}
+
+/* Search Box */
+.search input {
+  min-width: 300px;
+  border-radius: 5px;
+}
+
+/* Table Styles */
 .table-responsive {
   overflow-x: auto;
 }
 
-thead th {
-  background: #f8f9fa !important;
-  font-weight: bold;
-  text-align: center;
+.table {
+  font-size: 14px;
+}
+
+.table thead {
+  background-color: #f6f9ff;
+  color: #012970;
+}
+
+.table thead th {
+  font-weight: 600;
+  padding: 12px 8px;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 12px 8px;
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f6f9ff;
+}
+
+/* Status Badges */
+.badge {
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.btn-warning {
+  color: #000;
+}
+
+/* Modal Styles */
+.modal-xl {
+  max-width: 90%;
+}
+
+.modal-header {
+  background-color: #f6f9ff;
+  border-bottom: 2px solid #012970;
+}
+
+.modal-title {
+  color: #012970;
+  font-weight: 600;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #012970;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.form-control,
+.form-select {
+  border-radius: 5px;
+  border: 1px solid #d4d4d4;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #4154f1;
+  box-shadow: 0 0 0 0.2rem rgba(65, 84, 241, 0.25);
+}
+
+.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  display: block;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Alert Messages */
+.alert {
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Loading Spinner */
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Section Headers */
+h6.text-primary {
+  font-weight: 600;
+  border-bottom: 2px solid #4154f1;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .search input {
+    min-width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .d-flex.justify-content-between {
+    flex-direction: column;
+  }
+
+  .modal-xl {
+    max-width: 95%;
+  }
+
+  .table {
+    font-size: 12px;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 8px 4px;
+  }
+}
+
+/* Custom Scrollbar */
+.table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Empty State */
+.text-center td {
+  padding: 40px;
+  color: #899bbd;
+  font-style: italic;
+}
+
+/* Button Icons */
+.btn i {
+  margin-right: 5px;
+}
+
+.btn-sm i {
+  margin-right: 0;
 }
