@@ -1,4 +1,3 @@
-// pages-login.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -49,39 +48,40 @@ export class PagesLoginComponent implements OnInit {
   }
 
   handleLogin(): void {
-    this.loginBtn = {
-      text: 'Processing...',
-      loading: true,
-    };
+  this.loginBtn = {
+    text: 'Processing...',
+    loading: true,
+  };
 
-    const username = this.loginForm.get('username')!.value.trim();
-    const password = this.loginForm.get('password')!.value;
+  const username = this.loginForm.get('username')!.value.trim();
+  const password = this.loginForm.get('password')!.value;
 
-    console.log('Attempting login with:', { username, password: '***' });
+  this.authService
+    .appUserLogin(username, password)
+    .pipe(
+      finalize(() => {
+        this.loginBtn = {
+          text: 'Login',
+          loading: false,
+        };
+      })
+    )
+    .subscribe({
+      next: (token: string) => {
+        console.log('Login successful');
+        this.resetForm();
+        this.showToast('success', 'Successfully logged in!');
 
-    this.authService
-      .appUserLogin(username, password)
-      .pipe(
-        finalize(() => {
-          this.loginBtn = {
-            text: 'Login',
-            loading: false,
-          };
-        })
-      )
-      .subscribe({
-        next: (token: string) => {
-          console.log('Login successful, token received');
-          this.resetForm();
-          this.showToast('success', 'Successfully logged in!');
-          // Navigation is handled by AuthService
-        },
-        error: (err: any) => {
-          console.error('Login error:', err);
-          this.handleLoginError(err);
-        }
-      });
-  }
+        // Redirect to the attempted URL or dashboard
+        const redirectUrl = this.authService.redirectUrl || '/dashboard';
+        this.router.navigate([redirectUrl]);
+      },
+      error: (err: any) => {
+        console.error('Login error:', err);
+        this.handleLoginError(err);
+      }
+    });
+}
 
   handleLoginError(err: any): void {
     let errorMessage = 'An error occurred during login. Please try again.';

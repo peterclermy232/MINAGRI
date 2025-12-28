@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
+public redirectUrl: string = '/dashboard';
   constructor(private http: HttpClient, private router: Router) {}
   private baseUrl = `${environment.authUrl}/`;
 
@@ -281,17 +282,28 @@ export class AuthService {
 
   // NEW METHOD: Check if logged in user token is usable
   isloggedInUserTokenUsable(): boolean {
-    const jsonDt = localStorage.getItem('userToken');
-    if (jsonDt) {
-      try {
-        const jsonParsed: { userToken: string; expiry: string } = JSON.parse(jsonDt);
-        return !moment().isAfter(jsonParsed.expiry);
-      } catch (error) {
-        return false;
-      }
-    }
+  const jsonDt = localStorage.getItem('userToken');
+
+  if (!jsonDt) {
     return false;
   }
+
+  try {
+    const jsonParsed: { userToken: string; expiry: string } = JSON.parse(jsonDt);
+    const expired = moment().isAfter(jsonParsed.expiry);
+
+    if (expired) {
+      this.removeStorage();
+      return false;
+    }
+
+    return true;
+  } catch {
+    this.removeStorage();
+    return false;
+  }
+}
+
 
   // NEW METHOD: Get user role
   getUserRole(): string | null {

@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FarmerService } from 'src/app/shared/farmer.service';
-import { FarmerModel } from './farmer';
+import { FarmerModel } from './manage-farmers';
 
 @Component({
-  selector: 'app-manage-farmer',
-  templateUrl: './manage-farmer.component.html',
-  styleUrls: ['./manage-farmer.component.css']
+  selector: 'app-manage-farmers',
+  templateUrl: './manage-farmers.component.html',
+  styleUrls: ['./manage-farmers.component.css']
 })
-export class ManageFarmerComponent implements OnInit {
+export class ManageFarmersComponent implements OnInit {
 
   formValue!: FormGroup;
   farmerModelObj: FarmerModel = new FarmerModel();
@@ -328,3 +328,4 @@ export class ManageFarmerComponent implements OnInit {
     }
   }
 }
+

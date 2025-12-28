@@ -12,7 +12,7 @@ import { OrganizationTypeComponent } from './components/Organization/organizatio
 import {  RoleComponent } from './components/role/role.component';
 
 import { UsersManagementComponent } from './components/UserManagement/users-management.component';
-import { ManageFarmerComponent } from './components/manage-farmer/manage-farmer.component';
+import { ManageFarmsComponent } from './components/manage-farms/manage-farms.component';
 
 import { AssignlossComponent } from './components/assignLoss/assignloss.component';
 import { ManageCrops } from './components/manage-crops/manage-crops.component';
@@ -63,6 +63,7 @@ import { ApprovedComponent } from './subsidy-settlement/approved/approved.compon
 import { CreateClaimComponent } from './claims/create-claim/create-claim.component';
 import { OpenClaimComponent } from './claims/open-claim/open-claim.component';
 import { ApprovedClaimComponent } from './claims/approved-claim/approved-claim.component';
+import { ManageFarmersComponent } from './components/manage-farmers/manage-farmers.component';
 
 
 @NgModule({
@@ -78,7 +79,7 @@ import { ApprovedClaimComponent } from './claims/approved-claim/approved-claim.c
     ErrorSectionComponent,
 
     UsersManagementComponent,
-    ManageFarmerComponent,
+    ManageFarmsComponent,
 
     LossAssesor,
     AssignlossComponent,
@@ -113,7 +114,8 @@ import { ApprovedClaimComponent } from './claims/approved-claim/approved-claim.c
     SettledComponent,
     CreateClaimComponent,
     OpenClaimComponent,
-    ApprovedClaimComponent
+    ApprovedClaimComponent,
+    ManageFarmersComponent
   ],
   imports: [
     BrowserModule,

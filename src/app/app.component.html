@@ -1,5 +1,4 @@
-<app-header *ngIf="!(_router.url === '/register' || _router.url === '/' || _router.url === '/pages-error404')" ></app-header>
-<app-sidebar *ngIf="!(_router.url === '/register' || _router.url === '/' || _router.url === '/pages-error404')" ></app-sidebar>
+<app-header *ngIf="showLayout"></app-header>
+<app-sidebar *ngIf="showLayout"></app-sidebar>
 <router-outlet></router-outlet>
-<app-footer *ngIf="!(_router.url === '/register' || _router.url === '/' || _router.url === '/pages-error404')" ></app-footer>
-
+<app-footer *ngIf="showLayout"></app-footer>
