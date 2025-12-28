@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { LossAssessor } from '../components/crop-varieties/crops';
 
 @Injectable({
   providedIn: 'root'
@@ -43,10 +44,10 @@ export class LossAssessorService {
       .pipe(catchError(this.handleError));
   }
 
-  updateLossAssessor(data: any, id: number): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${id}/`, data)
-      .pipe(catchError(this.handleError));
-  }
+  updateLossAssessor(id: number, data: Partial<LossAssessor>): Observable<LossAssessor> {
+  return this.http.put<LossAssessor>(`${this.baseUrl}/${id}/`, data)
+    .pipe(catchError(this.handleError));
+}
 
   deleteLossAssessor(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/${id}/`)

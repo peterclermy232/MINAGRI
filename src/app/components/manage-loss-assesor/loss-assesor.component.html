@@ -1,120 +1,214 @@
 <main id="main" class="main">
-   <div class="pagetitle">
-      <h1>Manage Loss Assesor</h1>
-      <nav>
-         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
-            <li class="breadcrumb-item">Dashboard</li>
-            <li class="breadcrumb-item active">Manage Loss Assesor</li>
-         </ol>
-      </nav>
-   </div>
-   <section class="section">
 
-      <nav class="navbar navbar-ligth ">
-        <div class="container">
-          <div class="d-flex">
-            <button  class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
-              data-bs-target="#exampleModal">Create New Loss Assessors</button>
-          </div>
-        </div>
-      </nav>
-       <!--search input-->
-       <div class="d-flex justify-content-lg-between mt-2">
-        <div class="search  ">
-        <input class="form-control mt-2 mb-2 input-sm " type="text"  placeholder="Search by name" />
-        </div>
-        <button  class="btn btn-success btn-lg"  type="button">Export</button>
-       </div>
+  <!-- PAGE TITLE -->
+  <div class="pagetitle">
+    <h1>Manage Loss Assessors</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item">Dashboard</li>
+        <li class="breadcrumb-item active">Manage Loss Assessors</li>
+      </ol>
+    </nav>
+  </div>
 
+  <section class="section">
+
+    <!-- ADD BUTTON -->
+    <nav class="navbar navbar-light">
+      <div class="container">
+        <div class="flex-centered">
+          <button
+            class="btn btn-success"
+            type="button"
+            (click)="clickAddEmployee()"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal">
+            Add New Loss Assessor
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- SEARCH + EXPORT -->
+    <div class="d-flex justify-content-lg-between mt-2">
+      <div class="search">
+        <input
+          class="form-control mt-2 mb-2 input-sm"
+          type="text"
+          placeholder="Search assessor..."
+          [(ngModel)]="searchText"
+          (input)="onSearch()"
+        />
+      </div>
+
+      <button class="btn btn-success btn-lg" type="button">
+        Export
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="text-center mt-3">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
       <table class="table table-bordered table-striped table-hover mt-3 w-100">
         <thead>
           <tr>
-           <th scope="col">Username</th>
-
-            <th scope="col">Organisation</th>
-            <th scope="col">User</th>
-            <th scope="col">Practice Number</th>
-            <th scope="col">Status</th>
-            <th scope="col">Action</th>
-
-
+            <th>ID</th>
+            <th>User</th>
+            <th>Organisation</th>
+            <th>Practice Number</th>
+            <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr *ngFor="let  users of lossData" >
-           <td>{{ users.user_name}}</td>
 
-            <td>{{ users.organisation_name}}</td>
-            <td>{{ users.user}}</td>
-            <td>{{ users.practiceNumber}}</td>
-            <td>
-               {{ users.status}}
-            </td>
-
-
-            <td>
-              <button  style="color: aliceblue;" (click)="onEdit( users)" type="button" data-bs-toggle="modal"
-                data-bs-target="#exampleModal"class="btn btn-warning btn-sm">Edit</button>
-
+          <!-- EMPTY STATE -->
+          <tr *ngIf="filteredAssessors.length === 0 && !isLoading">
+            <td colspan="6" class="text-center">
+              No loss assessors found. Total: {{ lossAssessors.length }}
             </td>
           </tr>
+
+          <!-- DATA ROWS -->
+          <tr *ngFor="let assessor of filteredAssessors">
+            <td>{{ assessor.assessor_id }}</td>
+            <td>{{ assessor.user_name }}</td>
+            <td>{{ assessor.organisation_name }}</td>
+            <td>{{ assessor.practice_number }}</td>
+            <td>
+              <span class="badge"
+                [ngClass]="{
+                  'bg-success': assessor.status === 'ACTIVE',
+                  'bg-secondary': assessor.status === 'INACTIVE',
+                  'bg-danger': assessor.status === 'SUSPENDED'
+                }">
+                {{ assessor.status }}
+              </span>
+            </td>
+            <td>
+              <button
+                class="btn btn-warning btn-sm me-1"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModal"
+                (click)="onEdit(assessor)">
+                Edit
+              </button>
+
+              <button
+                class="btn btn-danger btn-sm"
+                (click)="deleteAssessor(assessor)">
+                Delete
+              </button>
+            </td>
+          </tr>
+
         </tbody>
-
       </table>
+    </div>
 
-      <!-- Modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Manage Loss Assesor</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form [formGroup]="formValue">
+    <!-- MODAL -->
+    <div class="modal fade" id="exampleModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
 
-
-
-               <h3>Manage Loss Assessors</h3>
-
-                <div class="mb-3">
-                  <label  class="form-label">Select Organisation</label>
-
-                  <select class="form-select" formControlName="status">
-                     <option>organisation</option>
-                    <!-- <option>Blacklisted</option>
-                    <option>Disable</option> -->
-                  </select>
-                </div>
-                 <div class="mb-3">
-                  <label  class="form-label">Select User</label>
-                  <input type="text" formControlName="user" class="form-control" >
-                </div>
-
-               <div class="mb-3">
-                 <label  class="form-label">Practice Number</label>
-                 <input type="text" formControlName="practiceNumber" class="form-control" >
-               </div>
-               <div class="mb-3">
-                  <label  class="form-label">Status</label>
-                  <select class="form-select" formControlName="status">
-                     <option>Acredited</option>
-                    <option>Blacklisted</option>
-                    <option>Disable</option>
-                  </select>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" id="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" *ngIf="showAdd" (click)="postEmployeeDetails()"  class="btn btn-primary">Save</button>
-              <button type="button" *ngIf="showUpdate" (click)="updateEmployeeDetails()"
-                class="btn btn-primary">Update</button>
-            </div>
+          <div class="modal-header">
+            <h5 class="modal-title">
+              {{ showAdd ? 'Add New Loss Assessor' : 'Edit Loss Assessor' }}
+            </h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
           </div>
+
+          <div class="modal-body">
+            <form [formGroup]="formValue">
+
+              <h5 class="text-primary mb-3">Assessor Information</h5>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Organisation</label>
+                  <select class="form-control" formControlName="organisation">
+                    <option value="">Select Organisation</option>
+                    <option *ngFor="let org of organizations"
+                      [value]="org.organisation_id">
+                      {{ org.organisation_name }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">User</label>
+                  <select class="form-control" formControlName="user">
+                    <option value="">Select User</option>
+                    <option *ngFor="let u of users" [value]="u.user_id">
+                      {{ u.user_name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Practice Number</label>
+                  <input
+                    type="text"
+                    formControlName="practice_number"
+                    class="form-control">
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Status</label>
+                  <select class="form-control" formControlName="status">
+                    <option *ngFor="let s of statusOptions" [value]="s">
+                      {{ s }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              id="cancel"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal">
+              Close
+            </button>
+
+            <button
+              type="button"
+              *ngIf="showAdd"
+              class="btn btn-primary"
+              (click)="postEmployeeDetails()"
+              [disabled]="isLoading || formValue.invalid">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+              Add Assessor
+            </button>
+
+            <button
+              type="button"
+              *ngIf="showUpdate"
+              class="btn btn-primary"
+              (click)="updateEmployeeDetails()"
+              [disabled]="isLoading || formValue.invalid">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+              Update Assessor
+            </button>
+          </div>
+
         </div>
       </div>
+    </div>
 
-     </section>
+  </section>
 </main>
