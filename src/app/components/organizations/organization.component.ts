@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { NotifierService } from '../../services/notifier.service';
 import { OrganizationService } from 'src/app/shared/organization.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 @Component({
   selector: 'app-organization',
@@ -36,12 +37,17 @@ export class OrganizationComponent implements OnInit {
   countries: { country: string; country_id: string }[] = [];
   organizationTypes: OrganizationType[] = [];
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private organizationService: OrganizationService,
     private notifierService: NotifierService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private permissionService: PermissionService,
   ) {
     this.organizationForm = this.fb.group({
       organisation_type_id: ['', [Validators.required]],
@@ -57,7 +63,22 @@ export class OrganizationComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.getOrganizations();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('products');
+    this.canUpdate = this.permissionService.canUpdate('products');
+    this.canDelete = this.permissionService.canDelete('products');
+    this.canRead = this.permissionService.canRead('products');
+
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   setOrganization(organization: Organization) {

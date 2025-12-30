@@ -6,14 +6,19 @@ import { ApiClientTokenResponse } from '../types';
 import * as moment from 'moment';
 import { map, catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { PermissionService } from './permission.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 public redirectUrl: string = '/dashboard';
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient,
+     private router: Router,
+     private permissionService: PermissionService
+    ) {}
   private baseUrl = `${environment.authUrl}/`;
+  private apiUrl = `${environment.apiUrl}/`;
 
   apiUserLogin() {
     return this.http
@@ -37,6 +42,77 @@ public redirectUrl: string = '/dashboard';
         })
       );
   }
+  private loadUserPermissions(user: any): void {
+  // Set user role in permission service immediately
+  this.permissionService.setUserRole(user.user_role);
+
+  // Load default permissions as fallback immediately
+  // This ensures the app is functional even if API call fails
+  this.permissionService.loadRolePermissions(user.user_role);
+
+  // Get token for API request
+  const tokenData = this.getStoredTokenData();
+  if (!tokenData) {
+    console.warn('No token available, using default permissions');
+    return;
+  }
+
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${tokenData.userToken}`
+  });
+
+  // Fetch role details from API to get permissions
+  // This will override the default permissions if successful
+  this.http.get<any>(`${this.apiUrl}roles/`, { headers })
+    .pipe(
+      map(response => {
+        // FIXED: Handle paginated response
+        // The API returns { count, next, previous, results }
+        console.log('Roles API response structure:', {
+          hasResults: !!response?.results,
+          isArray: Array.isArray(response),
+          type: typeof response
+        });
+
+        if (response && response.results && Array.isArray(response.results)) {
+          // Standard paginated response
+          const foundRole = response.results.find((role: any) => role.role_name === user.user_role);
+          console.log('Found role in paginated results:', foundRole ? foundRole.role_name : 'not found');
+          return foundRole;
+        } else if (Array.isArray(response)) {
+          // Fallback: if API returns array directly (non-paginated)
+          const foundRole = response.find((role: any) => role.role_name === user.user_role);
+          console.log('Found role in array:', foundRole ? foundRole.role_name : 'not found');
+          return foundRole;
+        } else {
+          console.error('Unexpected API response format:', response);
+          return null;
+        }
+      }),
+      catchError(error => {
+        console.error('Error loading role permissions from API:', error);
+        console.warn('Continuing with default permissions for role:', user.user_role);
+        return of(null);
+      })
+    )
+    .subscribe({
+      next: (roleData) => {
+        if (roleData && roleData.permissions) {
+          console.log('✓ Loaded API permissions for role:', user.user_role);
+          console.log('Permissions:', Object.keys(roleData.permissions));
+          // Override default permissions with API permissions
+          this.permissionService.setPermissions(roleData.permissions);
+        } else {
+          console.warn('✗ Role data not found in API response');
+          console.log('Using default permissions for role:', user.user_role);
+        }
+      },
+      error: (error) => {
+        console.error('Subscription error:', error);
+        console.log('Using default permissions for role:', user.user_role);
+      }
+    });
+}
 
   appUserLogin(username: string, password: string) {
     return this.http
@@ -60,7 +136,8 @@ public redirectUrl: string = '/dashboard';
           if (data.user) {
             await this.setUserData(data.user);
           }
-
+     // Load user permissions
+        this.loadUserPermissions(data.user);
           this.router.navigateByUrl('/dashboard');
         }),
         map((resp: any) => {
@@ -204,6 +281,8 @@ public redirectUrl: string = '/dashboard';
       this.handleLogout().then(() => {
         observer.next();
         observer.complete();
+        // Clear permissions
+      this.permissionService.clearPermissions();
       }).catch((error) => {
         observer.error(error);
       });
@@ -328,4 +407,5 @@ public redirectUrl: string = '/dashboard';
     }
     return 'Guest';
   }
+
 }

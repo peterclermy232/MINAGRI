@@ -12,7 +12,7 @@
 
   <section class="section">
     <!-- Action Bar -->
-    <nav class="navbar navbar-light bg-light mb-3">
+    <nav class="navbar navbar-light bg-light mb-3" *ngIf="canCreate">
       <div class="container-fluid">
         <button
           (click)="showAddModal()"
@@ -112,9 +112,9 @@
                     Custom Role
                   </span>
                 </td>
-                <td>
+                <td *ngIf="canUpdate || canDelete">
                   <div class="btn-group" role="group">
-                    <button
+                    <button *ngIf="canUpdate"
                       type="button"
                       class="btn btn-sm btn-info"
                       data-bs-toggle="modal"
@@ -147,7 +147,7 @@
                       <i class="bi bi-check-circle"></i>
                     </button>
                     <button
-                      *ngIf="!role.is_system_role"
+                      *ngIf="!role.is_system_role && canDelete"
                       type="button"
                       class="btn btn-sm btn-danger"
                       (click)="deleteRole(role)"

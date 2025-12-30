@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { finalize, first } from 'rxjs';
+import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { environment } from 'src/environments/environment';
 import { ApiService, Organization } from 'src/app/shared/api.service';
@@ -21,7 +21,8 @@ export class PagesRegisterComponent implements OnInit {
     text: 'Create Account',
   };
   organizations: Organization[] = [];
-  countries: any[] = [];
+  availableRoles: any[] = [];
+  showRoleField = false; // Control visibility of role field
 
   constructor(
     private fb: FormBuilder,
@@ -32,11 +33,12 @@ export class PagesRegisterComponent implements OnInit {
     this.registerForm = this.fb.group({
       first_name: ['', [Validators.required, Validators.minLength(2)]],
       last_name: ['', [Validators.required, Validators.minLength(2)]],
-      user_email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       user_phone_number: ['', [Validators.pattern(/^[0-9]{10,15}$/)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
       organisation_id: [''],
+      user_role: ['CUSTOMER'], // Default role
       terms: [false, [Validators.requiredTrue]]
     }, {
       validators: this.passwordMatchValidator
@@ -45,7 +47,7 @@ export class PagesRegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOrganizations();
-    //this.loadCountries();
+    this.loadAvailableRoles();
   }
 
   // Custom validator to check if passwords match
@@ -73,14 +75,20 @@ export class PagesRegisterComponent implements OnInit {
     });
   }
 
-  loadCountries(): void {
-    this.http
-    .get('/api/countries/?all=true').subscribe({
+  loadAvailableRoles(): void {
+    this.http.get(`${environment.authUrl}/register/`).subscribe({
       next: (response: any) => {
-        this.countries = response.results || response;
+        this.availableRoles = response.available_roles || [];
+        console.log('Available roles:', this.availableRoles);
       },
       error: (err) => {
-        console.error('Error loading countries:', err);
+        console.error('Error loading roles:', err);
+        // Fallback to common roles if API fails
+        this.availableRoles = [
+          { role_name: 'CUSTOMER', role_description: 'Customer' },
+          { role_name: 'AGENT', role_description: 'Agent' },
+          { role_name: 'USER', role_description: 'User' }
+        ];
       }
     });
   }
@@ -102,16 +110,24 @@ export class PagesRegisterComponent implements OnInit {
       loading: true,
     };
 
-    // Prepare registration data
+    // Prepare registration data to match backend serializer
     const registrationData = {
-      user_email: this.registerForm.get('user_email')!.value,
+      email: this.registerForm.get('email')!.value,
       password: this.registerForm.get('password')!.value,
       first_name: this.registerForm.get('first_name')!.value,
       last_name: this.registerForm.get('last_name')!.value,
-      user_name: `${this.registerForm.get('first_name')!.value}.${this.registerForm.get('last_name')!.value}`,
-      user_phone_number: this.registerForm.get('user_phone_number')!.value,
-      organisation_id: this.registerForm.get('organisation_id')!.value,
+      user_phone_number: this.registerForm.get('user_phone_number')!.value || '',
+      organisation_id: this.registerForm.get('organisation_id')!.value || null,
+      user_role: this.registerForm.get('user_role')!.value || 'CUSTOMER'
     };
+
+    // Remove empty/null values
+    Object.keys(registrationData).forEach(key => {
+      if (registrationData[key as keyof typeof registrationData] === '' ||
+          registrationData[key as keyof typeof registrationData] === null) {
+        delete registrationData[key as keyof typeof registrationData];
+      }
+    });
 
     this.http
       .post(`${environment.authUrl}/register/`, registrationData)
@@ -131,19 +147,24 @@ export class PagesRegisterComponent implements OnInit {
           Swal.fire({
             icon: 'success',
             title: 'Registration Successful!',
-            text: 'Your account has been created. You will be redirected to the dashboard.',
+            text: 'Your account has been created. Redirecting to login...',
             timer: 2000,
             showConfirmButton: false
           }).then(() => {
-            // User is automatically logged in after registration
-            // Token is already stored by the backend response
-            localStorage.setItem('userToken', JSON.stringify({
-              userToken: response.token,
-              refreshToken: response.refresh,
-              expiry: new Date(Date.now() + 3600000).toISOString() // 1 hour from now
-            }));
+            // Store tokens if backend returns them
+            if (response.token && response.refresh) {
+              localStorage.setItem('userToken', JSON.stringify({
+                userToken: response.token,
+                refreshToken: response.refresh,
+                expiry: new Date(Date.now() + 3600000).toISOString()
+              }));
 
-            this.router.navigate(['/login']);
+              // Redirect to dashboard if logged in automatically
+              this.router.navigate(['/']);
+            } else {
+              // Redirect to login page
+              this.router.navigate(['/login']);
+            }
           });
         },
         error: (err: any) => {
@@ -157,10 +178,29 @@ export class PagesRegisterComponent implements OnInit {
     let errorMessage = 'Registration failed. Please try again.';
 
     try {
-      if (err?.error?.error) {
+      if (err?.error?.errors) {
+        // Handle serializer errors
+        const errors = err.error.errors;
+        const errorMessages = [];
+
+        for (const field in errors) {
+          if (errors.hasOwnProperty(field)) {
+            const fieldErrors = errors[field];
+            if (Array.isArray(fieldErrors)) {
+              errorMessages.push(...fieldErrors);
+            } else {
+              errorMessages.push(fieldErrors);
+            }
+          }
+        }
+
+        errorMessage = errorMessages.join('. ');
+      } else if (err?.error?.error) {
         errorMessage = err.error.error;
-      } else if (err?.error?.user_email) {
-        errorMessage = 'This email is already registered.';
+      } else if (err?.error?.email) {
+        errorMessage = Array.isArray(err.error.email)
+          ? err.error.email[0]
+          : err.error.email;
       } else if (err?.error?.message) {
         errorMessage = err.error.message;
       } else if (err?.message) {
@@ -180,7 +220,9 @@ export class PagesRegisterComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.registerForm.reset();
+    this.registerForm.reset({
+      user_role: 'CUSTOMER' // Reset to default role
+    });
     this.registerForm.markAsPristine();
     this.registerForm.markAsUntouched();
     this.formSubmitted = false;

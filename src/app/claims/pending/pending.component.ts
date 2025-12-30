@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { ClaimService, Claim } from '../../shared/claim.service';
 import { NotifierService } from '../../services/notifier.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 interface LossAssessor {
   assessor_id: number;
@@ -46,17 +47,36 @@ export class PendingComponent implements OnInit {
   pageSize = 10;
   totalPages = 1;
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   private assessorUrl = `${environment.apiUrl}/loss_assessors/`;
 
   constructor(
     private http: HttpClient,
     private claimService: ClaimService,
-    private notifier: NotifierService
+    private notifier: NotifierService,
+    private permissionService: PermissionService,
   ) {}
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.loadPendingClaims();
     this.loadLossAssessors();
+  }
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('claims');
+    this.canUpdate = this.permissionService.canUpdate('claims');
+    this.canDelete = this.permissionService.canDelete('claims');
+    this.canRead = this.permissionService.canRead('claims');
+
+    console.log('Claims permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   private getHeaders(): HttpHeaders {

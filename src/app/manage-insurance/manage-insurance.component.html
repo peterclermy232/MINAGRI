@@ -23,7 +23,7 @@
 
   <section class="section">
     <!-- Action Bar -->
-    <nav class="navbar navbar-light">
+    <nav class="navbar navbar-light" *ngIf="canCreate">
       <div class="container-fluid">
         <div class="flex-centered">
           <button class="btn btn-success" type="button" (click)="openAddModal()">
@@ -70,7 +70,7 @@
             <th scope="col">Premium Rate (%)</th>
             <th scope="col">Sum Insured</th>
             <th scope="col">Status</th>
-            <th scope="col">Actions</th>
+            <th scope="col" *ngIf="canUpdate || canDelete">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -92,14 +92,14 @@
                 {{ product.status }}
               </span>
             </td>
-            <td>
-              <button
+            <td *ngIf="canUpdate || canDelete">
+              <button *ngIf="canUpdate"
                 class="btn btn-warning btn-sm me-1"
                 (click)="openEditModal(product)"
                 title="Edit">
                 <i class="bi bi-pencil"></i>
               </button>
-              <button
+              <button *ngIf="canDelete"
                 class="btn btn-danger btn-sm"
                 (click)="deleteProduct(product)"
                 title="Delete">

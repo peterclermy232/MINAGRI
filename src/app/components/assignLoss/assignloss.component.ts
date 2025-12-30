@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AssignService } from 'src/app/shared/assign.service';
 import { AssignModel } from './assign';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 @Component({
   selector: 'app-assignloss',
@@ -22,17 +23,36 @@ export class AssignlossComponent implements OnInit {
   assessorOptions = ["Accredit", "Blacklisted", "Disable"];
 searchTerm: string = '';
 filteredData: any[] = [];
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private formbuilder: FormBuilder,
-    private api: AssignService
+    private api: AssignService,
+    private permissionService: PermissionService,
   ) {}
 
   ngOnInit(): void {
     this.formValue = this.formbuilder.group({
       assessor: ['', Validators.required],
     });
-
+    this.loadPermissions();
     this.getAllEmployee();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('products');
+    this.canUpdate = this.permissionService.canUpdate('products');
+    this.canDelete = this.permissionService.canDelete('products');
+    this.canRead = this.permissionService.canRead('products');
+
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   clickAddEmployee() {

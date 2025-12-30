@@ -5,6 +5,7 @@ import { UserService } from 'src/app/shared/user.service';
 import { OrganizationService } from 'src/app/shared/organization.service';
 import { NotifierService } from 'src/app/services/notifier.service';
 import { finalize } from 'rxjs';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 interface LossAssessor {
   assessor_id: number;
@@ -44,19 +45,39 @@ export class LossAssesor implements OnInit {
 
   statusOptions = ['ACTIVE', 'INACTIVE', 'SUSPENDED'];
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private fb: FormBuilder,
     private api: LossAssessorService,
     private userService: UserService,
     private orgService: OrganizationService,
-    private notifier: NotifierService
+    private notifier: NotifierService,
+    private permissionService: PermissionService,
   ) {}
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.initializeForm();
     this.loadUsers();
     this.loadOrganizations();
     this.loadAllAssessors();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('products');
+    this.canUpdate = this.permissionService.canUpdate('products');
+    this.canDelete = this.permissionService.canDelete('products');
+    this.canRead = this.permissionService.canRead('products');
+
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   initializeForm(): void {

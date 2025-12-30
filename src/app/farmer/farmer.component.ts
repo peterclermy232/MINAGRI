@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { RegistritionService } from '../shared/registrition.service';
 import { FarmerSelf } from './farmer-self';
+import { PermissionService } from '../shared/permission.service';
 
 
 @Component({
@@ -16,8 +17,13 @@ export class FarmerComponent implements OnInit {
   registrationData !:any;
   showAdd!: boolean;
   showUpdate!:boolean;
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(private formbuilder:FormBuilder,
-    private api : RegistritionService
+    private api : RegistritionService,
+    private permissionService: PermissionService,
     ) { }
 
   ngOnInit(): void {
@@ -27,10 +33,24 @@ export class FarmerComponent implements OnInit {
       lastName : [''],
       phoneNumber : [''],
       idNumber : [''],
-      
-      
+
+
     })
+    this.loadPermissions();
     this.getAllEmployee();
+  }
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('farmer');
+    this.canUpdate = this.permissionService.canUpdate('farmer');
+    this.canDelete = this.permissionService.canDelete('farmer');
+    this.canRead = this.permissionService.canRead('farmer');
+
+    console.log('Farmer permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
   clickAddEmployee(){
     this.formValue.reset();
@@ -44,7 +64,7 @@ export class FarmerComponent implements OnInit {
     this.farmerSelfObj.lastName = this.formValue.value.lastName;
     this.farmerSelfObj.phoneNumber = this.formValue.value.phoneNumber;
     this.farmerSelfObj.idNumber = this.formValue.value.idNumber;
-    
+
     this.api.postRegistration(this. farmerSelfObj)
     .subscribe(res=>{
       console.log(res);
@@ -77,12 +97,12 @@ export class FarmerComponent implements OnInit {
     this. farmerSelfObj.id = row.id;
     this.formValue.controls['firstName'].setValue(row.firstName);
     this.formValue.controls['secondName'].setValue(row.secondName);
-    
+
     this.formValue.controls['lastName'].setValue(row.lastName);
     this.formValue.controls['phoneNumber'].setValue(row.phoneNumber);
     this.formValue.controls['idNumber'].setValue(row.idNumber);
-    
-   
+
+
   }
   updateEmployeeDetails(){
     this. farmerSelfObj.firstName = this.formValue.value.varietyName;
@@ -90,9 +110,9 @@ export class FarmerComponent implements OnInit {
     this.farmerSelfObj.lastName = this.formValue.value.lastName;
     this.farmerSelfObj.phoneNumber = this.formValue.value.phoneNumber;
     this.farmerSelfObj.idNumber = this.formValue.value.idNumber;
-    
-    
-    
+
+
+
     this.api.updateRegistration(this. farmerSelfObj,this. farmerSelfObj.id)
     .subscribe(res=>{
       alert("Updated Successfully")
@@ -101,7 +121,7 @@ export class FarmerComponent implements OnInit {
       this.formValue.reset();
       this.getAllEmployee();
     })
-  
+
   }
-  
+
 }

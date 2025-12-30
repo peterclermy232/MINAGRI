@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HistoricalData, WeatherService } from '../shared/weather.service';
+import { PermissionService } from '../shared/permission.service';
 
 @Component({
   selector: 'app-historical',
@@ -28,16 +29,35 @@ export class HistoricalComponent implements OnInit {
   pageSize = 10;
   totalPages = 1;
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private formbuilder: FormBuilder,
-    private weatherService: WeatherService
+    private weatherService: WeatherService,
+    private permissionService: PermissionService,
   ) { }
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.initializeForm();
     this.loadHistoricalData();
   }
 
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('historical');
+    this.canUpdate = this.permissionService.canUpdate('historical');
+    this.canDelete = this.permissionService.canDelete('historical');
+    this.canRead = this.permissionService.canRead('historical');
+
+    console.log('historical permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
+  }
   initializeForm(): void {
     this.formValue = this.formbuilder.group({
       location: ['', [Validators.required]],

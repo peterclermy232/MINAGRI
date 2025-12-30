@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../shared/product.service';
 import { NotifierService } from '../services/notifier.service';
+import { PermissionService } from '../shared/permission.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -14,6 +15,7 @@ export class ManageProductComponent implements OnInit {
   formSubmitted = false;
   currentProductCategory: any = null;
   isEditMode = false;
+  isViewMode = false; // NEW: Track if in view-only mode
 
   modalBtn = {
     loading: false,
@@ -27,9 +29,16 @@ export class ManageProductComponent implements OnInit {
   isLoading = false;
   searchText = '';
 
+  // NEW: Permission flags
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
+
   constructor(
     private productService: ProductService,
     private notifierService: NotifierService,
+    private permissionService: PermissionService, // NEW: Inject PermissionService
     private fb: FormBuilder
   ) {
     this.productCategoryForm = this.fb.group({
@@ -43,10 +52,38 @@ export class ManageProductComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // NEW: Load permissions
+    this.loadPermissions();
     this.getProductCategories();
   }
 
+  /**
+   * NEW: Load user permissions for products
+   */
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('products');
+    this.canUpdate = this.permissionService.canUpdate('products');
+    this.canDelete = this.permissionService.canDelete('products');
+    this.canRead = this.permissionService.canRead('products');
+
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
+  }
+
   getProductCategories() {
+    // Check read permission before fetching
+    if (!this.canRead) {
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'You do not have permission to view product categories',
+      });
+      return;
+    }
+
     this.isLoading = true;
     this.productService
       .getProductCategories()
@@ -56,7 +93,7 @@ export class ManageProductComponent implements OnInit {
           console.log('rsp', resp);
 
           const orgs = resp.organisationsResponse?.results || resp.organisationsResponse || [];
-         const coverTypesData = resp.coverTypesResponse?.results || resp.coverTypesResponse || [];
+          const coverTypesData = resp.coverTypesResponse?.results || resp.coverTypesResponse || [];
           const prodcatsData = resp.productCategoryResponse?.results || resp.productCategoryResponse || [];
 
           this.coverTypes = coverTypesData;
@@ -72,8 +109,8 @@ export class ManageProductComponent implements OnInit {
 
             return {
               ...productCat,
-              coverTypeName: coverType ? coverType.cover_type : 'N/A',
-              organisationName: org ? org.organisation_name : 'N/A',
+              cover_type_name: coverType ? coverType.cover_type : 'N/A',
+              organisation_name: org ? org.organisation_name : 'N/A',
             };
           });
 
@@ -99,20 +136,40 @@ export class ManageProductComponent implements OnInit {
     this.filteredCategories = this.productCategories.filter(cat =>
       cat.product_category?.toLowerCase().includes(search) ||
       cat.description?.toLowerCase().includes(search) ||
-      cat.coverTypeName?.toLowerCase().includes(search) ||
-      cat.organisationName?.toLowerCase().includes(search)
+      cat.cover_type_name?.toLowerCase().includes(search) ||
+      cat.organisation_name?.toLowerCase().includes(search)
     );
   }
 
   showCreateModal() {
+    // Check create permission
+    if (!this.canCreate) {
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'You do not have permission to create product categories',
+      });
+      return;
+    }
+
     this.isEditMode = false;
+    this.isViewMode = false;
     this.currentProductCategory = null;
     this.productCategoryForm.reset({ status: true });
     this.modalBtn.text = 'Create Product Category';
   }
 
   showEditModal(productCategory: any) {
+    // Check update permission
+    if (!this.canUpdate) {
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'You do not have permission to edit product categories',
+      });
+      return;
+    }
+
     this.isEditMode = true;
+    this.isViewMode = false;
     this.currentProductCategory = productCategory;
     this.modalBtn.text = 'Update Product Category';
 
@@ -126,7 +183,33 @@ export class ManageProductComponent implements OnInit {
     });
   }
 
+  /**
+   * NEW: Show view-only modal
+   */
+  showViewModal(productCategory: any) {
+    this.isEditMode = false;
+    this.isViewMode = true;
+    this.currentProductCategory = productCategory;
+
+    this.productCategoryForm.patchValue({
+      cover_type_id: productCategory.coverTypeId,
+      description: productCategory.description,
+      organisation_id: productCategory.organisationId,
+      product_category: productCategory.product_category,
+      status: productCategory.status,
+      productCategoryId: productCategory.product_category_id,
+    });
+
+    // Disable all form controls in view mode
+    this.productCategoryForm.disable();
+  }
+
   handleSubmit() {
+    // Don't allow submit in view mode
+    if (this.isViewMode) {
+      return;
+    }
+
     this.formSubmitted = true;
 
     if (this.productCategoryForm.invalid) {
@@ -145,6 +228,15 @@ export class ManageProductComponent implements OnInit {
   }
 
   createProductCategory() {
+    // Double-check create permission
+    if (!this.canCreate) {
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'You do not have permission to create product categories',
+      });
+      return;
+    }
+
     this.modalBtn.loading = true;
     this.modalBtn.text = 'Processing...';
 
@@ -189,6 +281,15 @@ export class ManageProductComponent implements OnInit {
   }
 
   updateProductCategory() {
+    // Double-check update permission
+    if (!this.canUpdate) {
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'You do not have permission to update product categories',
+      });
+      return;
+    }
+
     this.modalBtn.loading = true;
     this.modalBtn.text = 'Processing...';
 
@@ -202,7 +303,7 @@ export class ManageProductComponent implements OnInit {
       recordVersion: this.currentProductCategory?.recordVersion || 1,
       product_category_id: this.currentProductCategory?.product_category_id,
       cover_type: parseInt(this.productCategoryForm.get('cover_type_id')?.value),
-     organisation: parseInt(this.productCategoryForm.get('organisation_id')?.value)
+      organisation: parseInt(this.productCategoryForm.get('organisation_id')?.value)
     };
 
     this.productService
@@ -237,6 +338,15 @@ export class ManageProductComponent implements OnInit {
   }
 
   deleteProductCategory(category: any) {
+    // Check delete permission
+    if (!this.canDelete) {
+      this.notifierService.showSweetAlert({
+        typ: 'error',
+        message: 'You do not have permission to delete product categories',
+      });
+      return;
+    }
+
     if (!confirm(`Are you sure you want to delete "${category.product_category}"?`)) {
       return;
     }
@@ -269,8 +379,10 @@ export class ManageProductComponent implements OnInit {
 
   closeModal() {
     this.productCategoryForm.reset({ status: true });
+    this.productCategoryForm.enable(); // Re-enable form when closing
     this.formSubmitted = false;
     this.isEditMode = false;
+    this.isViewMode = false;
     this.currentProductCategory = null;
 
     // Close modal programmatically

@@ -13,7 +13,7 @@
 
   <section class="section">
     <!-- Action Buttons -->
-    <nav class="navbar navbar-light">
+    <nav class="navbar navbar-light" *ngIf="canCreate">
       <div class="container-fluid">
         <div class="flex-centered">
           <button class="btn btn-success" (click)="clickAddAdvisory()" type="button"
@@ -130,7 +130,7 @@
                 <th scope="col">Message</th>
                 <th scope="col">Recipients</th>
                 <th scope="col">Status</th>
-                <th scope="col">Actions</th>
+                <th scope="col" *ngIf="canUpdate || canDelete">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -172,9 +172,9 @@
                     {{ item.status }}
                   </span>
                 </td>
-                <td>
+                <td *ngIf="canUpdate || canDelete">
                   <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-outline-primary"
+                    <button type="button" class="btn btn-outline-primary" *ngIf="canUpdate"
         data-bs-toggle="modal" data-bs-target="#advisoryModal"
         (click)="onEdit(item)"
         title="Edit">
@@ -188,7 +188,7 @@
   <i class="bi bi-arrow-repeat"></i>
 </button>
 
-                    <button type="button" class="btn btn-outline-danger"
+                    <button type="button" class="btn btn-outline-danger" *ngIf="canDelete"
                             (click)="deleteAdvisory(item)"
                             title="Delete">
                       <i class="bi bi-trash"></i>

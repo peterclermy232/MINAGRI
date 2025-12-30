@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { QuotationService } from '../shared/quotation.service';
 import { PolicyModel } from './quotation';
+import { PermissionService } from '../shared/permission.service';
 
 @Component({
   selector: 'app-quotation',
@@ -31,9 +32,14 @@ export class QuotationComponent implements OnInit {
   pageSize: number = 10;
   totalPages: number = 1;
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private formbuilder: FormBuilder,
-    private api: QuotationService
+    private api: QuotationService,
+    private permissionService: PermissionService,
   ) { }
 
   ngOnInit(): void {
@@ -55,11 +61,25 @@ export class QuotationComponent implements OnInit {
     this.allFarms = [];
     this.insuranceProducts = [];
 
+    this.loadPermissions();
     // Load data
     this.loadFarmers();
     this.loadAllFarms(); // Load all farms for reference
     this.loadInsuranceProducts();
     this.getAllQuotations();
+  }
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('quotations');
+    this.canUpdate = this.permissionService.canUpdate('quotations');
+    this.canDelete = this.permissionService.canDelete('quotations');
+    this.canRead = this.permissionService.canRead('quotations');
+
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   clickAddEmployee() {

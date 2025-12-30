@@ -11,8 +11,8 @@
   </div>
 
   <section class="section">
-    <!-- Action Bar -->
-    <nav class="navbar navbar-light bg-light mb-3">
+    <!-- Action Bar - Only show if user can create -->
+    <nav class="navbar navbar-light bg-light mb-3" *ngIf="canCreate">
       <div class="container-fluid">
         <button
           class="btn btn-success"
@@ -58,7 +58,8 @@
             <th scope="col">Cover Type</th>
             <th scope="col">Organisation</th>
             <th scope="col" class="text-center">Status</th>
-            <th scope="col" class="text-center">Actions</th>
+            <!-- Only show Actions column if user has update or delete permission -->
+            <th scope="col" class="text-center" *ngIf="canUpdate || canDelete">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -75,8 +76,11 @@
                 {{ category.status ? 'Active' : 'Inactive' }}
               </span>
             </td>
-            <td class="text-center">
+            <!-- Actions column - only show if user has permissions -->
+            <td class="text-center" *ngIf="canUpdate || canDelete">
+              <!-- Edit button - only show if user can update -->
               <button
+                *ngIf="canUpdate"
                 class="btn btn-sm btn-info text-white me-2"
                 data-bs-toggle="modal"
                 data-bs-target="#productCategoryModal"
@@ -84,16 +88,30 @@
                 title="Edit">
                 <i class="bi bi-pencil-square"></i> Edit
               </button>
+
+              <!-- Delete button - only show if user can delete -->
               <button
+                *ngIf="canDelete"
                 class="btn btn-sm btn-danger"
                 (click)="deleteProductCategory(category)"
                 title="Delete">
                 <i class="bi bi-trash"></i> Delete
               </button>
+
+              <!-- View button - show if user can only read (no update/delete) -->
+              <button
+                *ngIf="!canUpdate && !canDelete"
+                class="btn btn-sm btn-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#productCategoryModal"
+                (click)="showViewModal(category)"
+                title="View Details">
+                <i class="bi bi-eye"></i> View
+              </button>
             </td>
           </tr>
           <tr *ngIf="filteredCategories.length === 0">
-            <td colspan="7" class="text-center text-muted">
+            <td [attr.colspan]="canUpdate || canDelete ? 7 : 6" class="text-center text-muted">
               No product categories found
             </td>
           </tr>
@@ -107,7 +125,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="modalLabel">
-              {{ isEditMode ? 'Edit Product Category' : 'Create Product Category' }}
+              {{ isViewMode ? 'View Product Category' : (isEditMode ? 'Edit Product Category' : 'Create Product Category') }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -116,13 +134,14 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="product_category" class="form-label">
-                    Product Category Name <span class="text-danger">*</span>
+                    Product Category Name <span class="text-danger" *ngIf="!isViewMode">*</span>
                   </label>
                   <input
                     type="text"
                     formControlName="product_category"
                     class="form-control"
                     [class.is-invalid]="formSubmitted && f['product_category'].errors"
+                    [readonly]="isViewMode"
                     id="product_category">
                   <div class="invalid-feedback" *ngIf="formSubmitted && f['product_category'].errors">
                     Product category name is required
@@ -131,12 +150,13 @@
 
                 <div class="col-md-6 mb-3">
                   <label for="cover_type_id" class="form-label">
-                    Cover Type <span class="text-danger">*</span>
+                    Cover Type <span class="text-danger" *ngIf="!isViewMode">*</span>
                   </label>
                   <select
                     formControlName="cover_type_id"
                     class="form-select"
                     [class.is-invalid]="formSubmitted && f['cover_type_id'].errors"
+                    [disabled]="isViewMode"
                     id="cover_type_id">
                     <option value="">Select Cover Type</option>
                     <option *ngFor="let ct of coverTypes" [value]="ct.cover_type_id">
@@ -152,12 +172,13 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="organisation_id" class="form-label">
-                    Organisation <span class="text-danger">*</span>
+                    Organisation <span class="text-danger" *ngIf="!isViewMode">*</span>
                   </label>
                   <select
                     formControlName="organisation_id"
                     class="form-select"
                     [class.is-invalid]="formSubmitted && f['organisation_id'].errors"
+                    [disabled]="isViewMode"
                     id="organisation_id">
                     <option value="">Select Organisation</option>
                     <option *ngFor="let org of organisations" [value]="org.organisation_id">
@@ -171,11 +192,12 @@
 
                 <div class="col-md-6 mb-3">
                   <label for="status" class="form-label">
-                    Status <span class="text-danger">*</span>
+                    Status <span class="text-danger" *ngIf="!isViewMode">*</span>
                   </label>
                   <select
                     formControlName="status"
                     class="form-select"
+                    [disabled]="isViewMode"
                     id="status">
                     <option [value]="true">Active</option>
                     <option [value]="false">Inactive</option>
@@ -185,12 +207,13 @@
 
               <div class="mb-3">
                 <label for="description" class="form-label">
-                  Description <span class="text-danger">*</span>
+                  Description <span class="text-danger" *ngIf="!isViewMode">*</span>
                 </label>
                 <textarea
                   formControlName="description"
                   class="form-control"
                   [class.is-invalid]="formSubmitted && f['description'].errors"
+                  [readonly]="isViewMode"
                   id="description"
                   rows="3"></textarea>
                 <div class="invalid-feedback" *ngIf="formSubmitted && f['description'].errors">
@@ -205,9 +228,11 @@
               class="btn btn-secondary"
               data-bs-dismiss="modal"
               (click)="closeModal()">
-              Cancel
+              {{ isViewMode ? 'Close' : 'Cancel' }}
             </button>
+            <!-- Only show submit button if not in view mode -->
             <button
+              *ngIf="!isViewMode"
               type="button"
               class="btn"
               [ngClass]="isEditMode ? 'btn-warning' : 'btn-primary'"

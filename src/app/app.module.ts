@@ -64,6 +64,13 @@ import { CreateClaimComponent } from './claims/create-claim/create-claim.compone
 import { OpenClaimComponent } from './claims/open-claim/open-claim.component';
 import { ApprovedClaimComponent } from './claims/approved-claim/approved-claim.component';
 import { ManageFarmersComponent } from './components/manage-farmers/manage-farmers.component';
+import { HasPermissionDirective } from './directives/has-permission.directive';
+import { HasRoleDirective } from './directives/has-role.directive';
+import { AuthService } from './shared/auth.service';
+import { PermissionService } from './shared/permission.service';
+import { AuthGuard } from './guards/auth.guard';
+import { LoginGuard } from './guards/login.guard';
+import { PermissionGuard } from './guards/permission.guard';
 
 
 @NgModule({
@@ -115,7 +122,9 @@ import { ManageFarmersComponent } from './components/manage-farmers/manage-farme
     CreateClaimComponent,
     OpenClaimComponent,
     ApprovedClaimComponent,
-    ManageFarmersComponent
+    ManageFarmersComponent,
+    HasPermissionDirective,  // Add directive
+    HasRoleDirective,
   ],
   imports: [
     BrowserModule,
@@ -144,8 +153,13 @@ import { ManageFarmersComponent } from './components/manage-farmers/manage-farme
     //   useClass: MockBackendInterceptor,
     //   multi: true,
     // },
-    AdvisoryService,
-    InvoiceService,
+    AuthService,
+    PermissionService,
+    AuthGuard,
+    LoginGuard,
+    PermissionGuard,
+    // AdvisoryService,
+    // InvoiceService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ApiInterceptor,

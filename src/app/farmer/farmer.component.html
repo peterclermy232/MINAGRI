@@ -11,7 +11,7 @@
     </div>
     <section class="section">
 
-       <nav class="navbar navbar-ligth ">
+       <nav class="navbar navbar-ligth " *ngIf="canCreate">
          <div class="container">
            <div class="d-flex">
              <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
@@ -52,8 +52,8 @@
              <td>{{row.idNumber}}</td>
 
 
-             <td>
-               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal"
+             <td *ngIf="canUpdate || canDelete">
+               <button  style="color: aliceblue;" type="button" data-bs-toggle="modal" *ngIf="canUpdate"
                  data-bs-target="#exampleModal" (click)="onEdit(row)" class="btn btn-info">Edit</button>
                <!-- <button  class="btn btn-danger">Delete</button> -->
              </td>

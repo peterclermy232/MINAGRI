@@ -11,7 +11,7 @@
   </div>
   <section class="section">
 
-     <nav class="navbar navbar-ligth ">
+     <nav class="navbar navbar-ligth " *ngIf="canCreate">
        <div class="container">
          <div class="flex-centered">
            <button class="btn btn-success" type="button" (click)="clickAddEmployee()" data-bs-toggle="modal"
@@ -89,10 +89,10 @@
                 </span>
               </td>
 
-              <td>
-                <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal"
+              <td *ngIf="canUpdate || canDelete">
+                <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" *ngIf="canUpdate"
                   data-bs-target="#exampleModal" (click)="onEdit(farmer)">Edit</button>
-                <button class="btn btn-danger btn-sm" (click)="deleteFarmer(farmer.farmer_id)">Delete</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteFarmer(farmer.farmer_id)" *ngIf="canDelete">Delete</button>
               </td>
             </tr>
           </tbody>

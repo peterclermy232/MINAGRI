@@ -1,300 +1,55 @@
 <aside id="sidebar" class="sidebar">
   <ul class="sidebar-nav" id="sidebar-nav">
-    <li class="nav-item">
-      <a class="nav-link" routerLink="/dashboard">
-        <i class="bi bi-grid"></i> <span>Dashboard</span>
-      </a>
-    </li>
+    <!-- Loop through filtered menu items -->
+    <ng-container *ngFor="let item of menuItems">
+      <!-- Parent menu item WITHOUT children (direct link) -->
+      <li class="nav-item" *ngIf="!hasChildren(item)">
+        <a
+          class="nav-link"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i [class]="'bi ' + item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
 
-    <!--Policy Mgt-->
-    <li class="nav-item">
-      <a
-        class="nav-link collapsed"
-        data-bs-target="#tables-nav"
-        data-bs-toggle="collapse"
-        href="#"
-      >
-        <i class="bi bi-layout-text-window-reverse"></i
-        ><span>Policy Administration</span
-        ><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul
-        id="tables-nav"
-        class="nav-content collapse"
-        data-bs-parent="#sidebar-nav"
-      >
-        <li>
-          <a routerLink="/manage-farmer">
-            <i class="bi bi-circle"></i><span>Farmer Register</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/manage-farms">
-            <i class="bi bi-circle"></i><span>Manage Farms</span>
-          </a>
-        </li>
-        <!-- <li> <a routerLink="/farmer"> <i class="bi bi-circle"></i><span>Self Farmer Registration</span> </a></li> -->
-        <li>
-          <a routerLink="/quotation">
-            <i class="bi bi-circle"></i><span>Open Quotation</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/paid">
-            <i class="bi bi-circle"></i><span>Paid Quotation</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/insurance">
-            <i class="bi bi-circle"></i><span>Subsidy Approved Quotation</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/written">
-            <i class="bi bi-circle"></i><span>Written Policy</span>
-          </a>
-        </li>
-        <!-- <li> <a routerLink="/tables-data"> <i class="bi bi-circle"></i><span>Data Tables</span> </a></li> -->
-      </ul>
-    </li>
+      <!-- Parent menu item WITH children (collapsible) -->
+      <li class="nav-item" *ngIf="hasChildren(item)">
+        <a
+          class="nav-link collapsed"
+          [attr.data-bs-target]="'#' + getMenuId(item.label)"
+          data-bs-toggle="collapse"
+          href="javascript:void(0)">
+          <i [class]="'bi ' + item.icon"></i>
+          <span>{{ item.label }}</span>
+          <i class="bi bi-chevron-down ms-auto"></i>
+        </a>
 
-    <!--Subsidy Settlement-->
-    <li class="nav-item">
-      <a
-        class="nav-link collapsed"
-        data-bs-target="#subsidy-nav"
-        data-bs-toggle="collapse"
-        href="#"
-      >
-        <i class="bi bi-gem"></i><span>Subsidy Settlement</span
-        ><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul
-        id="subsidy-nav"
-        class="nav-content collapse"
-        data-bs-parent="#sidebar-nav"
-      >
-        <li>
-          <a routerLink="/subsidy-settlement/approved">
-            <i class="bi bi-circle"></i><span>Approved Invoice</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/subsidy-settlement/pending">
-            <i class="bi bi-circle"></i><span>Pending Settlement</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/subsidy-settlement/settled">
-            <i class="bi bi-circle"></i><span>Settled Invoice</span>
-          </a>
-        </li>
-      </ul>
-    </li>
+        <!-- Child menu items -->
+        <ul
+          [id]="getMenuId(item.label)"
+          class="nav-content collapse"
+          data-bs-parent="#sidebar-nav">
+          <li *ngFor="let child of item.children">
+            <a
+              [routerLink]="child.route"
+              routerLinkActive="active">
+              <i class="bi bi-circle"></i>
+              <span>{{ child.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ng-container>
 
-    <!--Claim Mgt-->
-    <li class="nav-item">
-  <a class="nav-link collapsed"
-        data-bs-target="#claim-nav"
-        data-bs-toggle="collapse"
-        href="#">
-    <i class="bi bi-gem"></i><span>Claim Management</span
-        ><i class="bi bi-chevron-down ms-auto"></i>
-  </a>
-  <ul  id="claim-nav"
-        class="nav-content collapse"
-        data-bs-parent="#claim-nav">
-    <li class="nav-item">
-      <a routerLink="/claims/create" class="nav-link"
-            routerLinkActive="active">
-        <i class="bi bi-circle"></i>
-        <span>Create Claim</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a routerLink="/claims/opens" class="nav-link"
-            routerLinkActive="active">
-        <i class="bi bi-circle"></i>
-        <span>Open Claims</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a routerLink="/claims/pendings" routerLinkActive="active" class="nav-link">
-        <i class="bi bi-circle"></i>
-        <span>Pending Assessment</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a routerLink="/claims/approveds" routerLinkActive="active" class="nav-link">
-        <i class="bi bi-circle"></i>
-        <span>Approved Claims</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a routerLink="/claims/payments" routerLinkActive="active" class="nav-link">
-        <i class="bi bi-circle"></i>
-        <span>Payment Processing</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a routerLink="/claims/paids" routerLinkActive="active" class="nav-link">
-        <i class="bi bi-circle"></i>
-        <span>Paid Claims</span>
-      </a>
-    </li>
-  </ul>
-</li>
-
-    <!--Product Mgt-->
-    <li class="nav-item">
-      <a
-        class="nav-link collapsed"
-        data-bs-target="#icons-nav"
-        data-bs-toggle="collapse"
-        href="#"
-      >
-        <i class="bi bi-gem"></i><span>Product Management</span
-        ><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul
-        id="icons-nav"
-        class="nav-content collapse"
-        data-bs-parent="#sidebar-nav"
-      >
-        <li>
-          <a routerLink="/crop">
-            <i class="bi bi-circle"></i><span> Crops</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/crop-varieties">
-            <i class="bi bi-circle"></i><span> Crop Varieties</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/seasons">
-            <i class="bi bi-circle"></i><span>Seasons</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/manage-product">
-            <i class="bi bi-circle"></i><span> Product Categories </span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/manage-insurance">
-            <i class="bi bi-circle"></i><span> Product Insurance</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/manage-subsidy">
-            <i class="bi bi-circle"></i><span>Subsidy</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/assignloss">
-            <i class="bi bi-circle"></i><span>Insurance Loss Assessors</span>
-          </a>
-        </li>
-      </ul>
-    </li>
-
-    <!--weather-->
-    <li class="nav-item">
-      <a
-        class="nav-link collapsed"
-        data-bs-target="#weather-nav"
-        data-bs-toggle="collapse"
-        href="#"
-      >
-        <i class="bi bi-journal-text"></i
-        ><span>Weather and Climate Information</span
-        ><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul
-        id="weather-nav"
-        class="nav-content collapse"
-        data-bs-parent="#sidebar-nav"
-      >
-        <li>
-          <a routerLink="/forecast">
-            <i class="bi bi-circle"></i><span>Forcast Data</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/historical">
-            <i class="bi bi-circle"></i><span>Historical Data</span>
-          </a>
-        </li>
-      </ul>
-    </li>
-
-    <!--aDVISORY-->
-    <li class="nav-item">
-      <a
-        class="nav-link collapsed"
-        data-bs-target="#advise-nav"
-        data-bs-toggle="collapse"
-        href="#"
-      >
-        <i class="bi bi-bar-chart"></i><span>Advisory Services</span
-        ><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul
-        id="advise-nav"
-        class="nav-content collapse"
-        data-bs-parent="#sidebar-nav"
-      >
-        <li>
-          <a routerLink="/advisory">
-            <i class="bi bi-circle"></i><span>Advisory</span>
-          </a>
-        </li>
-      </ul>
-    </li>
-
-    <li class="nav-item">
-      <a
-        class="nav-link collapsed"
-        data-bs-target="#components-nav"
-        data-bs-toggle="collapse"
-        href="#"
-      >
-        <i class="bi bi-menu-button-wide"></i><span>Administration</span
-        ><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul
-        id="components-nav"
-        class="nav-content collapse"
-        data-bs-parent="#sidebar-nav"
-      >
-        <li>
-          <a routerLink="/organization-type">
-            <i class="bi bi-circle"></i><span> Organisation Type</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/organization">
-            <i class="bi bi-circle"></i><span>Organisation</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/roles">
-            <i class="bi bi-circle"></i><span>Roles</span>
-          </a>
-        </li>
-
-        <li>
-          <a routerLink="/add-organization">
-            <i class="bi bi-circle"></i><span>Users</span>
-          </a>
-        </li>
-        <li>
-          <a routerLink="/charts-chartjs">
-            <i class="bi bi-circle"></i><span>Add Loss Assessors</span>
-          </a>
-        </li>
-      </ul>
+    <!-- User Role Badge (Optional - shows current role) -->
+    <li class="nav-item mt-3" *ngIf="userRole">
+      <div class="nav-link disabled text-center">
+        <small class="text-muted">
+          Role: <span class="badge bg-primary">{{ userRole }}</span>
+        </small>
+      </div>
     </li>
   </ul>
 </aside>

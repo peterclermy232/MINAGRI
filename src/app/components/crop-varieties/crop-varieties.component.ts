@@ -7,6 +7,7 @@ import { UserService } from '../../shared/user.service';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { NotifierService } from '../../services/notifier.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 @Component({
   selector: 'app-crop-varieties',
@@ -63,27 +64,47 @@ export class CropVarietiesComponent implements OnInit {
     ],
   };
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
+
   constructor(
     private authService: AuthService,
     private userService: UserService,
     private cropService: CropService,
     private notifierService: NotifierService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private permissionService: PermissionService,
   ) {
     this.cropVarietyForm = this.fb.group({
       crop_variety: ['', [Validators.required, Validators.minLength(2)]],
       crop: ['', [Validators.required]],
       status: [true, Validators.required],
       crop_variety_id: [''],
-      organisation: [''],      
+      organisation: [''],
     });
   }
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.getCropVarieties();
     this.loadCrops();
   }
 
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('crops');
+    this.canUpdate = this.permissionService.canUpdate('crops');
+    this.canDelete = this.permissionService.canDelete('crops');
+    this.canRead = this.permissionService.canRead('crops');
+
+    console.log('Crops permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
+  }
   showModal(crop?: CropVariety) {
     if (crop) {
       this.modalMode.typ = 'edit';

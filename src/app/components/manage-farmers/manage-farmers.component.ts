@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FarmerService } from 'src/app/shared/farmer.service';
 import { FarmerModel } from './manage-farmers';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 @Component({
   selector: 'app-manage-farmers',
@@ -22,9 +23,14 @@ export class ManageFarmersComponent implements OnInit {
   totalPages: number = 1;
   isLoading: boolean = false;
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private formbuilder: FormBuilder,
-    private api: FarmerService
+    private api: FarmerService,
+    private permissionService: PermissionService,
   ) { }
 
   ngOnInit(): void {
@@ -48,9 +54,23 @@ export class ManageFarmersComponent implements OnInit {
     // Initialize arrays to empty to prevent iteration errors
     this.farmerData = [];
     this.filteredFarmers = [];
-
+   this.loadPermissions();
     // Load data from backend
     this.getAllFarmers();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('farmers');
+    this.canUpdate = this.permissionService.canUpdate('farmers');
+    this.canDelete = this.permissionService.canDelete('farmers');
+    this.canRead = this.permissionService.canRead('farmers');
+
+    console.log('Farmer permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   clickAddEmployee() {

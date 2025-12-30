@@ -12,7 +12,7 @@
 
   <section class="section">
     <!-- Action Bar -->
-    <nav class="navbar navbar-light">
+    <nav class="navbar navbar-light" *ngIf="canCreate">
       <div class="container">
         <div class="flex-centered">
           <button class="btn btn-success" type="button" (click)="clickAddEmployee()"
@@ -103,9 +103,9 @@
               </span>
             </td>
             <td>{{ row.quotation_date | date:'short' }}</td>
-            <td>
+            <td *ngIf="canUpdate || canDelete">
               <div class="btn-group" role="group">
-                <button
+                <button *ngIf="canUpdate"
                   class="btn btn-warning btn-sm"
                   data-bs-toggle="modal"
                   data-bs-target="#exampleModal"
@@ -128,6 +128,7 @@
                   Write
                 </button>
                 <button
+                  *ngIf="canDelete"
                   class="btn btn-danger btn-sm"
                   (click)="deleteQuotation(row.quotation_id)"
                   title="Delete">

@@ -11,7 +11,7 @@
   </div>
 
   <section class="section">
-    <nav class="navbar navbar-ligth">
+    <nav class="navbar navbar-ligth" *ngIf="canCreate">
       <div class="container">
         <div class="flex-centered">
           <button class="btn btn-success" (click)="clickAddEmployee()" type="button" data-bs-toggle="modal"
@@ -50,7 +50,7 @@
           <td>{{row.quotation_date}}</td>
           <td>{{row.landSize}}</td>
           <td>{{row.measure}}</td>
-          <td>
+          <td *ngIf="canUpdate">
             <button style="color: aliceblue;" type="button" data-bs-toggle="modal"
               data-bs-target="#exampleModal" (click)="onEdit(row)" class="btn btn-info">Edit</button>
           </td>

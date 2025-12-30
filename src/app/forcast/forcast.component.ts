@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ForecastData, WeatherService } from '../shared/weather.service';
+import { PermissionService } from '../shared/permission.service';
 
 
 @Component({
@@ -29,14 +30,33 @@ export class ForcastComponent implements OnInit {
   pageSize = 10;
   totalPages = 1;
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private formbuilder: FormBuilder,
-    private weatherService: WeatherService
+    private weatherService: WeatherService,
+    private permissionService: PermissionService,
   ) { }
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.initializeForm();
     this.loadForecastData();
+  }
+ private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('forecast');
+    this.canUpdate = this.permissionService.canUpdate('forecast');
+    this.canDelete = this.permissionService.canDelete('forecast');
+    this.canRead = this.permissionService.canRead('forecast');
+
+    console.log('Forecast permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   initializeForm(): void {

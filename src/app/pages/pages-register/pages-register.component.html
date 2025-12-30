@@ -85,16 +85,16 @@
                                  name="email"
                                  class="form-control"
                                  id="yourEmail"
-                                 formControlName="user_email"
-                                 [class.is-invalid]="formSubmitted && f['user_email'].invalid"
+                                 formControlName="email"
+                                 [class.is-invalid]="formSubmitted && f['email'].invalid"
                                  placeholder="user@example.com">
 
                                <div class="invalid-feedback d-block"
-                                    *ngIf="formSubmitted && f['user_email'].invalid">
-                                  <div *ngIf="f['user_email'].errors?.['required']">
+                                    *ngIf="formSubmitted && f['email'].invalid">
+                                  <div *ngIf="f['email'].errors?.['required']">
                                     Email is required
                                   </div>
-                                  <div *ngIf="f['user_email'].errors?.['email']">
+                                  <div *ngIf="f['email'].errors?.['email']">
                                     Please enter a valid email address
                                   </div>
                                </div>
@@ -133,6 +133,28 @@
                                    {{ org.organisation_name }}
                                  </option>
                                </select>
+                            </div>
+
+                            <!-- User Role (Optional) -->
+                            <div class="col-12" *ngIf="availableRoles.length > 0">
+                               <label for="userRole" class="form-label">Account Type (Optional)</label>
+                               <select
+                                 class="form-select"
+                                 id="userRole"
+                                 formControlName="user_role">
+                                 <option value="CUSTOMER">Customer (Default)</option>
+                                 <option *ngFor="let role of availableRoles"
+                                         [value]="role.role_name"
+                                         [disabled]="role.role_name === 'SUPERUSER' || role.role_name === 'ADMIN'">
+                                   {{ role.role_description || role.role_name }}
+                                   <span *ngIf="role.role_name === 'SUPERUSER' || role.role_name === 'ADMIN'">
+                                     (Requires Admin Approval)
+                                   </span>
+                                 </option>
+                               </select>
+                               <small class="form-text text-muted">
+                                 Select your account type. SUPERUSER and ADMIN roles require administrator approval.
+                               </small>
                             </div>
 
                             <!-- Password -->

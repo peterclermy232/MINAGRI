@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { NotifierService } from '../../services/notifier.service';
 import { ClaimCreateRequest, ClaimService } from '../../shared/claim.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 interface Farmer {
   farmer_id: number;
@@ -85,17 +86,36 @@ export class CreateClaimComponent implements OnInit {
   availableDistricts: string[] = [];
 
   private apiUrl = environment.apiUrl;
-
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private notifier: NotifierService,
-    private claimService: ClaimService
+    private claimService: ClaimService,
+    private permissionService: PermissionService,
   ) {}
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.initializeForm();
     this.loadInitialData();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('claims');
+    this.canUpdate = this.permissionService.canUpdate('claims');
+    this.canDelete = this.permissionService.canDelete('claims');
+    this.canRead = this.permissionService.canRead('claims');
+
+    console.log('Claims permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   // =========================================================

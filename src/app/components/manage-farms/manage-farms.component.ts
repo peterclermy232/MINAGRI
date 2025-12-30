@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FarmService } from 'src/app/shared/farm.service';
 import { FarmerService } from 'src/app/shared/farmer.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 interface Farm {
   farm_id?: number;
@@ -52,10 +53,15 @@ export class ManageFarmsComponent implements OnInit {
   unitOptions = ['Acres', 'Hectares', 'Square Meters'];
   statusOptions = ['ACTIVE', 'INACTIVE'];
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private fb: FormBuilder,
     private farmService: FarmService,
-    private farmerService: FarmerService
+    private farmerService: FarmerService,
+    private permissionService: PermissionService,
   ) {
     this.farmForm = this.fb.group({
       farmer: ['', Validators.required],
@@ -70,8 +76,23 @@ export class ManageFarmsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.loadFarms();
     this.loadFarmers();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('farms');
+    this.canUpdate = this.permissionService.canUpdate('farms');
+    this.canDelete = this.permissionService.canDelete('farms');
+    this.canRead = this.permissionService.canRead('farms');
+
+    console.log('Farm permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   loadFarms(): void {

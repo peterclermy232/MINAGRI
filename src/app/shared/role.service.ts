@@ -28,7 +28,7 @@ export interface RoleResponse {
   providedIn: 'root'
 })
 export class RoleService {
-  private apiUrl = `${environment.apiUrl}/roles`;
+  private apiUrl = `${environment.apiUrl}roles`;
 
   constructor(private http: HttpClient) {}
 

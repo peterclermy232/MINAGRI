@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClaimService, Claim } from '../../shared/claim.service';
 import { NotifierService } from '../../services/notifier.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 @Component({
   selector: 'app-open-claim',
@@ -23,15 +24,34 @@ export class OpenClaimComponent implements OnInit {
 
   selectedClaim: Claim | null = null;
   showDetailsModal = false;
-
+   canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private claimService: ClaimService,
     private router: Router,
-    private notifier: NotifierService
+    private notifier: NotifierService,
+    private permissionService: PermissionService,
   ) {}
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.loadOpenClaims();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('claims');
+    this.canUpdate = this.permissionService.canUpdate('claims');
+    this.canDelete = this.permissionService.canDelete('claims');
+    this.canRead = this.permissionService.canRead('claims');
+
+    console.log('Claims permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   loadOpenClaims(): void {

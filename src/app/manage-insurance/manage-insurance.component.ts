@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductInsurance } from './product-insurance.model';
 import { ProductInsuranceService } from '../shared/product-insurance.service';
 import { OrganizationService } from '../shared/organization.service';
+import { PermissionService } from '../shared/permission.service';
 
 
 declare var bootstrap: any;
@@ -33,16 +34,38 @@ countries: any[] = [];
   errorMessage = '';
   successMessage = '';
 
+  // NEW: Permission flags
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
+
   constructor(
     private fb: FormBuilder,
     private productService: ProductInsuranceService,
-    private OrganizationService: OrganizationService
+    private OrganizationService: OrganizationService,
+    private permissionService: PermissionService,
   ) { }
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.initializeForm();
     this.loadDropdownData();
     this.loadProducts();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('products');
+    this.canUpdate = this.permissionService.canUpdate('products');
+    this.canDelete = this.permissionService.canDelete('products');
+    this.canRead = this.permissionService.canRead('products');
+
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   initializeForm(): void {

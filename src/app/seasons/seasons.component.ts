@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SeasonsService } from '../shared/seasons.service';
 import { SeasonModel } from './season';
+import { PermissionService } from '../shared/permission.service';
 
 @Component({
   selector: 'app-seasons',
@@ -15,10 +16,15 @@ export class SeasonsComponent implements OnInit {
   roleData: any[] = [];
   showAdd: boolean = false;
   showUpdate: boolean = false;
-
+   // NEW: Permission flags
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private formbuilder: FormBuilder,
-    private api: SeasonsService
+    private api: SeasonsService,
+    private permissionService: PermissionService,
   ) { }
 
   ngOnInit(): void {
@@ -29,8 +35,22 @@ export class SeasonsComponent implements OnInit {
       status: [true, Validators.required],
       organisation: ['', Validators.required]
     });
-
+    this.loadPermissions();
     this.getAllSeasons();
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('seasons');
+    this.canUpdate = this.permissionService.canUpdate('seasons');
+    this.canDelete = this.permissionService.canDelete('seasons');
+    this.canRead = this.permissionService.canRead('seasons');
+
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   clickAddEmployee() {

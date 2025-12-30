@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RoleService, RoleType } from 'src/app/shared/role.service';
 import { NotifierService } from 'src/app/services/notifier.service';
 import { finalize } from 'rxjs';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 @Component({
   selector: 'app-role',
@@ -27,10 +28,15 @@ export class RoleComponent implements OnInit {
     text: 'Create Role',
   };
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private fb: FormBuilder,
     private roleService: RoleService,
-    private notifierService: NotifierService
+    private notifierService: NotifierService,
+    private permissionService: PermissionService,
   ) {
     this.roleForm = this.fb.group({
       role_name: ['', [Validators.required, Validators.minLength(2)]],
@@ -42,9 +48,23 @@ export class RoleComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('Role Component Initialized');
+    this.loadPermissions();
     this.loadAllRoles();
   }
 
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('roles');
+    this.canUpdate = this.permissionService.canUpdate('roles');
+    this.canDelete = this.permissionService.canDelete('roles');
+    this.canRead = this.permissionService.canRead('roles');
+
+    console.log('Role permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
+  }
   loadAllRoles() {
     console.log('Loading all roles...');
     this.isLoading = true;

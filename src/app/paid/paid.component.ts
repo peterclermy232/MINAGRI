@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder,FormGroup } from '@angular/forms';
 import { PaidService } from '../shared/paid.service';
 import { PaidModel } from './paid';
+import { PermissionService } from '../shared/permission.service';
 
 @Component({
   selector: 'app-paid',
@@ -15,8 +16,13 @@ export class PaidComponent implements OnInit {
   policyData : any[] = [];
   showAdd!: boolean;
   showUpdate!:boolean;
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(private formbuilder:FormBuilder,
-    private api : PaidService
+    private api : PaidService,
+    private permissionService: PermissionService,
     ) { }
 
   ngOnInit(): void {
@@ -28,6 +34,7 @@ export class PaidComponent implements OnInit {
         landSize     :  [''],
         measure     : ['']
     })
+    this.loadPermissions();
     this.getAllEmployee();
   }
     clickAddEmployee(){
@@ -36,30 +43,19 @@ export class PaidComponent implements OnInit {
       this.showUpdate = false;
     }
 
-    // postEmployeeDetails(){
-    // this.paidModelObj.idNumber = this.formValue.value.idNumber;
-    // this.paidModelObj.idNumber = this.formValue.value.idNumber;
-    // this.paidModelObj.farm = this.formValue.value.farm;
-    // this.paidModelObj.insurance= this.formValue.value.insurance;
-    // this.paidModelObj.planting = this.formValue.value.planting;
-    // this.paidModelObj.landSize = this.formValue.value.landSize;
-    // this.paidModelObj.measure = this.formValue.value.measure;
+    private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('quotations');
+    this.canUpdate = this.permissionService.canUpdate('quotations');
+    this.canDelete = this.permissionService.canDelete('quotations');
+    this.canRead = this.permissionService.canRead('quotations');
 
-
-
-    //   this.api.postPaid(this.paidModelObj)
-    //   .subscribe(res=>{
-    //     console.log(res);
-    //     alert("Organization Added Successfully");
-    //     let ref = document.getElementById('cancel')
-    //     ref?.click();
-    //     this.formValue.reset();
-    //     this.getAllEmployee();
-    //   },
-    //   error=>{
-    //     alert("something went wrong");
-    //   })
-    // }
+    console.log('Product permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
+  }
     getAllEmployee(){
       this.api.getPaidQuotations()
       .subscribe(res=>{

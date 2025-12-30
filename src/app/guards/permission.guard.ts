@@ -30,6 +30,14 @@ export class PermissionGuard implements CanActivate {
       return false;
     }
 
+    // Get user role
+    const userRole = this.authService.getUserRole();
+
+    // SUPERUSER bypasses all checks
+    if (userRole === 'SUPERUSER') {
+      return true;
+    }
+
     // Check for required permission in route data
     const requiredPermission = route.data['permission'];
     const requiredRole = route.data['role'];
@@ -42,7 +50,8 @@ export class PermissionGuard implements CanActivate {
     // Check role if specified
     if (requiredRole) {
       const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-      if (!this.permissionService.hasRole(...roles)) {
+      if (!roles.includes(userRole || '')) {
+        console.warn(`Access denied: User role '${userRole}' not in required roles:`, roles);
         this.router.navigate(['/dashboard']);
         return false;
       }
@@ -51,7 +60,16 @@ export class PermissionGuard implements CanActivate {
     // Check permission if specified
     if (requiredPermission) {
       const [resource, action] = requiredPermission.split(':');
+
+      // Special handling for 'roles' resource - allow read access for all authenticated users
+      // This allows viewing roles in dropdowns but backend controls create/update/delete
+      if (resource === 'roles' && action === 'read') {
+        console.log('Allowing read access to roles for authenticated user');
+        return true;
+      }
+
       if (!this.permissionService.hasPermission(resource, action)) {
+        console.warn(`Access denied: Missing permission '${requiredPermission}' for user role '${userRole}'`);
         this.router.navigate(['/dashboard']);
         return false;
       }

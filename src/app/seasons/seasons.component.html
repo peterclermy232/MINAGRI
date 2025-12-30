@@ -11,7 +11,7 @@
   </div>
 
   <section class="section">
-    <nav class="navbar navbar-ligth">
+    <nav class="navbar navbar-ligth" *ngIf="canCreate">
       <div class="container">
         <div class="flex-centered">
           <button (click)="clickAddEmployee()" class="btn btn-success" type="button" data-bs-toggle="modal"
@@ -36,7 +36,7 @@
           <th scope="col">Start Date</th>
           <th scope="col">End Date</th>
           <th scope="col">Status</th>
-          <th scope="col">Actions</th>
+          <th scope="col" *ngIf="canUpdate || canDelete">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -50,10 +50,10 @@
               {{ getStatusDisplay(season.status) }}
             </span>
           </td>
-          <td>
-            <button style="color: aliceblue;" type="button" data-bs-toggle="modal"
+          <td *ngIf="canUpdate || canDelete">
+            <button style="color: aliceblue;" type="button" data-bs-toggle="modal" *ngIf="canUpdate"
               data-bs-target="#exampleModal" (click)="onEdit(season)" class="btn btn-info btn-sm">Edit</button>
-            <button class="btn btn-danger btn-sm mx-2" (click)="deleteSeason(season)">Delete</button>
+            <button class="btn btn-danger btn-sm mx-2" *ngIf="canDelete" (click)="deleteSeason(season)">Delete</button>
           </td>
         </tr>
         <tr *ngIf="!roleData || roleData.length === 0">

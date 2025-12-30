@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdvisoryService, Advisory } from 'src/app/shared/advisory.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 @Component({
   selector: 'app-advisory',
@@ -37,17 +38,36 @@ export class AdvisoryComponent implements OnInit {
   advisoryData: Advisory[] = [];
 
   editAdvisoryId: number | null = null;
-
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
   constructor(
     private fb: FormBuilder,
-    private advisoryService: AdvisoryService
+    private advisoryService: AdvisoryService,
+    private permissionService: PermissionService,
   ) {}
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.initializeForm();
     this.loadLists();
     this.loadAdvisories();
     this.minDateTime = this.formatDateTimeLocal(new Date());
+  }
+
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('advisories');
+    this.canUpdate = this.permissionService.canUpdate('advisories');
+    this.canDelete = this.permissionService.canDelete('advisories');
+    this.canRead = this.permissionService.canRead('advisories');
+
+    console.log('Advisory permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
   }
 
   // ---------------------------------------------------

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { CropService } from '../../shared/crop.service';
 import { NotifierService } from '../../services/notifier.service';
+import { PermissionService } from 'src/app/shared/permission.service';
 
 interface Crop {
   crop_id?: number;
@@ -59,10 +60,16 @@ export class ManageCrops implements OnInit {
     ],
   };
 
+  canCreate = false;
+  canUpdate = false;
+  canDelete = false;
+  canRead = false;
+
   constructor(
     private cropService: CropService,
     private notifierService: NotifierService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private permissionService: PermissionService,
   ) {
     this.cropForm = this.fb.group({
       crop: ['', [Validators.required, Validators.minLength(2)]],
@@ -72,9 +79,23 @@ export class ManageCrops implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadPermissions();
     this.getCrops();
   }
 
+  private loadPermissions(): void {
+    this.canCreate = this.permissionService.canCreate('crops');
+    this.canUpdate = this.permissionService.canUpdate('crops');
+    this.canDelete = this.permissionService.canDelete('crops');
+    this.canRead = this.permissionService.canRead('crops');
+
+    console.log('Crops permissions:', {
+      canCreate: this.canCreate,
+      canUpdate: this.canUpdate,
+      canDelete: this.canDelete,
+      canRead: this.canRead
+    });
+  }
   showModal(crop?: Crop): void {
     if (crop) {
       this.modalMode.typ = 'edit';
